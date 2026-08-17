@@ -1,0 +1,25 @@
+# Project TODO
+
+- [x] Documentar a especificação validada e o plano de implementação no projeto web.
+- [x] Definir os modelos de domínio para categorias, produtos, opções, carrinho, checkout e pedido.
+- [x] Implementar catálogo com as categorias Destaques, Menu Econômico, Mais Vendidos, Especialidades, Promoções para duas pessoas, Porções e Adicionais, Sobremesas e Bebidas.
+- [x] Implementar busca de produtos por nome, descrição e categoria.
+- [x] Construir home com hero, horários, localização de Telêmaco Borba/PR, pagamentos aceitos e CTA para o cardápio.
+- [x] Aplicar identidade visual acolhedora, com paleta em creme, vermelho e verde, em toda a experiência.
+- [x] Exibir cards de produto com preço em BRL, preço anterior riscado e badge de desconto para promoções.
+- [x] Criar painel de configuração para tamanho, embalagem, acompanhamento e observações de produtos configuráveis.
+- [x] Implementar carrinho persistente no localStorage com ajuste de quantidade, remoção, subtotal, taxa estimada e total em BRL.
+- [x] Implementar seleção entre entrega e retirada, endereço de entrega e instruções de retirada.
+- [x] Construir checkout em etapas com dados do cliente, endereço condicional, pagamento, revisão e confirmação.
+- [x] Criar tela de confirmação com número local, resumo, modalidade, estimativa e orientação de WhatsApp.
+- [x] Construir adaptador de pedido local substituível por Cardápio Web, WhatsApp ou API própria.
+- [x] Garantir responsividade mobile-first com barra de ação inferior no celular e resumo lateral no desktop.
+- [x] Criar testes unitários para cálculos de pedido, persistência e serviço local de confirmação.
+- [x] Verificar build, testes, acessibilidade básica e comportamento visual em telas desktop e mobile.
+- [x] Validar acessibilidade básica de teclado, foco, rótulos e ordem de navegação do fluxo principal.
+- [x] Executar e registrar a validação funcional por teclado do fluxo de sacola, configuração, checkout e confirmação.
+- [x] Aplicar foco visível consistente aos botões customizados do cabeçalho, catálogo, sacola e checkout.
+- [x] Documentar o checklist de acessibilidade básica dos componentes críticos.
+- [x] Adicionar testes de teclado para navegar no checkout, selecionar pagamento, avançar e retornar entre etapas e confirmar o pedido.
+- [x] Adicionar validação de teclado da confirmação, cobrindo foco inicial, cópia do número, abertura de WhatsApp e retorno ao cardápio.
+- [x] Garantir e testar o foco inicial na tela de confirmação de pedido.

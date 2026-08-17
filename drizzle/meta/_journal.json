@@ -8,6 +8,20 @@
       "when": 1786995726970,
       "tag": "0000_steep_triathlon",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1787006330816,
+      "tag": "0001_shocking_saracen",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1787009857504,
+      "tag": "0002_slim_amazoness",
+      "breakpoints": true
     }
   ]
 }

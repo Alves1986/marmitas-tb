@@ -11,6 +11,16 @@ import { ProductConfigurator } from "./ProductConfigurator";
 import { CheckoutFlow } from "./CheckoutFlow";
 import { CheckoutSuccess } from "./CheckoutSuccess";
 
+vi.mock("@/lib/trpc", () => ({
+  trpc: {
+    orders: {
+      create: { useMutation: () => ({ mutateAsync: vi.fn().mockResolvedValue({ code: "TB-001234", paymentReference: "test_payment_001" }) }) },
+      confirmTestPayment: { useMutation: () => ({ mutateAsync: vi.fn().mockResolvedValue({ status: "confirmed" }) }) },
+    },
+    store: { publicSettings: { useQuery: () => ({ data: { paymentMode: "test" } }) } },
+  },
+}));
+
 afterEach(() => {
   cleanup();
   window.localStorage.clear();

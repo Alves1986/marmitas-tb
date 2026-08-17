@@ -28,3 +28,48 @@
 - [x] Substituir ilustrações do catálogo e atualizar elementos de marca com a logo oficial.
 - [x] Verificar desempenho, responsividade e apresentação das imagens reais em desktop e celular.
 - [x] Executar e registrar uma verificação objetiva de desempenho dos ativos e do carregamento do catálogo após a troca das imagens reais.
+- [x] Definir a arquitetura de pagamentos, pedidos, permissões, alertas e impressão da operação.
+- [x] Criar modelo de dados persistente para pedidos, itens, clientes, status, pagamentos, cardápio e configurações operacionais.
+- [x] Implementar painel administrativo autenticado para catálogo, equipe e configurações, com visão de pedidos e atualização de status concentradas na fila operacional protegida.
+- [x] Implementar gestão de categorias, produtos, preços, fotos, opções e disponibilidade do cardápio.
+- [x] Implementar acompanhamento público do pedido por código e linha do tempo de status.
+- [x] Implementar alertas de novos pedidos e tela operacional de comandas.
+- [x] Implementar impressão de comanda formatada para pedido novo.
+- [ ] Preparar checkout para PIX, cartão e voucher com um adaptador de gateway seguro.
+- [x] Validar fluxos administrativos, acompanhamento público, impressão e pagamentos simulados.
+- [x] Pesquisar e documentar o contrato público atual do Asaas para cobranças, status e eventos.
+- [x] Criar adaptador de pagamento em modo de teste compatível com a futura integração oficial do Asaas.
+- [x] Separar visualmente os estados de pagamento simulado e pagamento oficial para evitar cobranças indevidas durante a implantação.
+- [x] Implementar permissões separadas para administrador e equipe operacional, protegendo cardápio, configurações e dados de pagamento.
+- [x] Implementar alertas sonoros e visuais no painel para pedidos novos.
+- [x] Implementar impressão automática de comanda para novos pedidos confirmados.
+- [x] Documentar a configuração do computador dedicado, modo quiosque e impressora térmica necessária para impressão sem diálogo.
+- [x] Registrar e revisar a especificação aprovada da operação, incluindo permissões, pagamento híbrido, alertas e impressão.
+- [x] Revisar integralmente a especificação operacional quanto à consistência, ambiguidades, escopo e ausência de lacunas.
+- [x] Obter a revisão e aprovação formal da especificação operacional antes de iniciar a implementação.
+- [x] Criar o plano técnico detalhado da operação aprovada, com migrações, contratos, telas, testes e verificações.
+- [x] Executar a evolução operacional aprovada em blocos sequenciais com testes e revisões entre etapas.
+- [x] Entregar a fila operacional protegida, com alertas acessíveis, transição de status e impressão de comandas térmicas.
+- [x] Persistir o reconhecimento de alertas operacionais e documentar o limite de autoplay do navegador no posto em modo quiosque.
+- [x] Cobrir ponta a ponta o enfileiramento automático, a baixa e a reimpressão de comandas em print_jobs.
+- [x] Unificar a comanda térmica exibida e a comanda enviada ao fluxo de impressão.
+- [x] Integrar a visualização da comanda térmica em cada pedido da fila operacional.
+- [x] Criar teste integrado do ciclo de print_jobs: enfileiramento, baixa de resultado e reimpressão.
+- [x] Entregar o painel administrativo para catálogo, equipe e configurações da loja.
+- [x] Expor procedimentos administrativos protegidos para catálogo, disponibilidade, equipe e configurações.
+- [x] Criar o gerenciador de cardápio com categorias, produtos, preços em BRL e disponibilidade.
+- [x] Criar os módulos administrativos de equipe e configurações operacionais da loja.
+- [x] Adicionar no gerenciador edição e ativação/desativação de categorias existentes, com testes de interface e persistência.
+- [x] Exibir no checkout, na confirmação e no acompanhamento o modo de pagamento de teste ou oficial com texto preventivo.
+- [x] Adicionar no gerenciador de cardápio suporte real à gestão de fotos dos produtos, com persistência e testes.
+- [x] Conectar o aviso de modo de pagamento do checkout à configuração real da loja ou do adaptador, sem valor fixo na interface.
+- [x] Cobrir a exibição do aviso correto de pagamento em checkout, confirmação e acompanhamento conforme o modo configurado ou persistido.
+- [x] Adicionar testes de renderização do aviso de pagamento em CheckoutFlow, CheckoutSuccess e TrackOrder conforme o modo configurado ou persistido.
+- [x] Preparar o adaptador oficial do Asaas e o endpoint seguro de webhook sem ativar cobranças reais.
+- [x] Registrar a orientação do posto dedicado de impressão e a evidência de validação integrada.
+- [x] Criar o adaptador oficial do Asaas em modo inativo, com erro explícito até a inclusão segura das credenciais.
+- [x] Implementar endpoint de webhook com validação do token, idempotência por evento e atualização segura de pagamento.
+- [x] Documentar a configuração do Chrome em modo quiosque, a impressora térmica e as limitações de áudio do navegador.
+- [x] Criar `docs/operations-validation.md` com comandos, resultados, rotas validadas, roteiro de impressão e limitações do modo híbrido.
+- [x] Executar e registrar a validação integrada dos fluxos administrativos, acompanhamento público, impressão e pagamentos simulados.
+- [x] Substituir os rótulos genéricos da barra lateral administrativa por navegação explícita da Marmitas TB.

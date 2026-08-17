@@ -78,4 +78,8 @@ export type OrderConfirmation = {
   orderNumber: string;
   estimatedTime: string;
   submittedAt: string;
+  trackingCode?: string;
+  paymentReference?: string;
+  paymentStatus?: "pending" | "confirmed";
+  isTestPayment?: boolean;
 };

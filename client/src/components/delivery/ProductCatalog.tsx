@@ -69,10 +69,15 @@ function ProductCard({ product, onAdd }: { product: Product; onAdd: () => void }
   const discount = discountPercentage(product);
   return (
     <article className="group relative flex min-h-67 flex-col overflow-hidden rounded-[1.55rem] border border-[#eadbc5] bg-white p-4 shadow-[0_8px_25px_rgba(72,30,31,0.045)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_17px_34px_rgba(72,30,31,0.11)]">
-      <div className={`relative flex h-27 items-start justify-between overflow-hidden rounded-[1.1rem] bg-gradient-to-br ${accentStyles[product.accent ?? "red"]} p-4 text-white`}><div className="absolute -bottom-7 -right-5 size-27 rounded-full border-[10px] border-white/15" /><span className="relative rounded-full bg-black/15 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.12em]">{product.badge ?? product.categoryLabel}</span><span className="relative text-4xl drop-shadow-sm" role="img" aria-label="Prato">{product.categoryId === "beverages" ? "🥤" : product.categoryId === "desserts" ? "🍫" : product.categoryId === "sides" ? "🍟" : "🍱"}</span></div>
+      <div className={`relative flex h-31 items-start justify-between overflow-hidden rounded-[1.1rem] bg-gradient-to-br ${accentStyles[product.accent ?? "red"]} p-3.5 text-white`}>
+        {product.imageUrl ? <img src={product.imageUrl} alt={`Foto de ${product.name}`} loading="lazy" decoding="async" className="absolute inset-0 size-full object-cover" /> : null}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#481e1f]/55 via-transparent to-black/10" />
+        <div className="absolute -bottom-7 -right-5 size-27 rounded-full border-[10px] border-white/15" />
+        <span className="relative rounded-full bg-[#481e1f]/75 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.12em] backdrop-blur-sm">{product.badge ?? product.categoryLabel}</span>
+      </div>
       <div className="flex flex-1 flex-col px-1 pt-4"><div className="flex items-start justify-between gap-3"><h4 className="text-[15px] font-extrabold leading-snug text-[#481e1f]">{product.name}</h4>{discount ? <span className="shrink-0 rounded-full bg-[#f9e0ce] px-2 py-1 text-[10px] font-black text-[#a82926]">-{discount}%</span> : null}</div><p className="mt-2 line-clamp-3 text-xs leading-relaxed text-[#806859]">{product.description}</p><div className="mt-auto flex items-end justify-between gap-3 pt-4"><div><div className="text-base font-black text-[#a82926]">{formatCurrency(product.price)}</div>{product.originalPrice ? <div className="mt-0.5 text-[11px] font-semibold text-[#a58f7a] line-through">{formatCurrency(product.originalPrice)}</div> : <div className="mt-0.5 text-[11px] font-semibold text-[#a58f7a]">{product.options?.length ? "Personalizável" : "Pronto para pedir"}</div>}</div><button type="button" onClick={onAdd} className="inline-flex size-10 items-center justify-center rounded-xl bg-[#481e1f] text-white shadow-sm transition hover:bg-[#a82926] active:scale-95" aria-label={`Adicionar ${product.name}`}><Plus className="size-5" /></button></div></div>
       <button type="button" onClick={onAdd} className="absolute inset-0 z-0 cursor-pointer opacity-0" tabIndex={-1} aria-hidden="true" />
-      <ArrowUpRight className="pointer-events-none absolute right-5 top-17 size-4 text-white/75 opacity-0 transition group-hover:opacity-100" />
+      <ArrowUpRight className="pointer-events-none absolute right-5 top-5 size-4 text-white/75 opacity-0 transition group-hover:opacity-100" />
     </article>
   );
 }

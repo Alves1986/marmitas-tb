@@ -16,7 +16,7 @@ export function Hero() {
             <span className="relative flex size-2"><span className="absolute inline-flex size-2 animate-ping rounded-full bg-[#9dad54] opacity-70" /><span className="relative inline-flex size-2 rounded-full bg-[#c6d270]" /></span>
             Pedidos por agendamento
           </div>
-          <p className="mb-3 flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.19em] text-[#d9e19b]"><Sparkles className="size-3.5" /> Comida de verdade, perto de você</p>
+          <div className="mb-3 flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.19em] text-[#d9e19b]"><img src="/manus-storage/logo-marmitastb_9d67f9be.jpg" alt="Marmitas TB" className="size-8 rounded-lg object-cover" /><span className="flex items-center gap-2"><Sparkles className="size-3.5" /> Comida de verdade, perto de você</span></div>
           <h1 className="font-display max-w-xl text-5xl leading-[0.96] tracking-[-0.045em] text-[#fff8e9] sm:text-6xl lg:text-7xl">
             Seu almoço com <span className="text-[#ffc94f]">gosto de casa.</span>
           </h1>
@@ -43,9 +43,10 @@ export function Hero() {
             <div className="rounded-[1.55rem] border border-[#6c2d1f]/15 bg-[#ffecc2] p-4 text-[#481e1f]">
               <div className="flex items-center justify-between text-xs font-black uppercase tracking-[0.14em] text-[#9c4d28]"><span>Prato de hoje</span><span>feito com carinho</span></div>
               <div className="mt-4 grid grid-cols-[1.2fr_0.8fr] gap-3">
-                <div className="rounded-3xl bg-[#ad4d27] p-5 text-[#fff8e9] shadow-inner">
-                  <span className="text-4xl" role="img" aria-label="Marmita">🍱</span>
-                  <p className="mt-6 font-display text-2xl leading-none">Seu prato,<br />seu ritmo.</p>
+                <div className="relative min-h-43 overflow-hidden rounded-3xl bg-[#ad4d27] shadow-inner">
+                  <img src="/manus-storage/carne-panela_e0eb82b4.jpg" alt="Carne de panela com purê de batata" className="absolute inset-0 size-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#481e1f]/80 via-[#481e1f]/10 to-transparent" />
+                  <p className="absolute inset-x-5 bottom-5 font-display text-2xl leading-none text-[#fff8e9]">Seu prato,<br />seu ritmo.</p>
                 </div>
                 <div className="grid gap-3">
                   <div className="rounded-3xl bg-[#7d8a42] p-4 text-[#fffce8]"><span className="text-3xl" role="img" aria-label="Salada">🥗</span><p className="mt-3 text-xs font-bold">Opções com legumes</p></div>

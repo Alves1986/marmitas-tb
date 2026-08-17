@@ -23,3 +23,8 @@
 - [x] Adicionar testes de teclado para navegar no checkout, selecionar pagamento, avançar e retornar entre etapas e confirmar o pedido.
 - [x] Adicionar validação de teclado da confirmação, cobrindo foco inicial, cópia do número, abertura de WhatsApp e retorno ao cardápio.
 - [x] Garantir e testar o foco inicial na tela de confirmação de pedido.
+- [x] Organizar a logo oficial fornecida em armazenamento estático apropriado para a aplicação.
+- [x] Extrair e selecionar fotos reais de produtos do Cardápio Web compartilhado.
+- [x] Substituir ilustrações do catálogo e atualizar elementos de marca com a logo oficial.
+- [x] Verificar desempenho, responsividade e apresentação das imagens reais em desktop e celular.
+- [x] Executar e registrar uma verificação objetiva de desempenho dos ativos e do carregamento do catálogo após a troca das imagens reais.

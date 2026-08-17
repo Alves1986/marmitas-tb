@@ -21,6 +21,7 @@ export type Product = {
   categoryLabel: string;
   name: string;
   description: string;
+  imageUrl?: string;
   price: number;
   originalPrice?: number;
   badge?: string;

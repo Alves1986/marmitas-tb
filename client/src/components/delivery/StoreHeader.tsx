@@ -1,4 +1,4 @@
-import { Menu, ShoppingBag, UtensilsCrossed } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 import { useOrder } from "@/contexts/OrderContext";
 
 function scrollToSection(id: string) {
@@ -17,8 +17,8 @@ export function StoreHeader() {
           className="group flex items-center gap-2 text-left"
           aria-label="Voltar ao início"
         >
-          <span className="grid size-10 place-items-center rounded-2xl bg-[#8e1718] text-[#ffefce] shadow-[0_8px_20px_rgba(142,23,24,0.2)] transition-transform duration-200 group-active:scale-95">
-            <UtensilsCrossed className="size-5" aria-hidden="true" />
+          <span className="grid size-10 place-items-center overflow-hidden rounded-2xl bg-[#8e1718] shadow-[0_8px_20px_rgba(142,23,24,0.2)] transition-transform duration-200 group-active:scale-95">
+            <img src="/manus-storage/logo-marmitastb_9d67f9be.jpg" alt="" className="size-full object-cover" />
           </span>
           <span className="leading-none">
             <strong className="font-display block text-[15px] tracking-tight text-[#481e1f]">Marmitas TB</strong>

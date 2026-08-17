@@ -1,6 +1,6 @@
 export type DeliveryMode = "delivery" | "pickup";
 
-export type PaymentMethod = "cash" | "card" | "food_voucher";
+export type PaymentMethod = "cash" | "pix" | "card" | "food_voucher";
 
 export type ProductOption = {
   id: string;

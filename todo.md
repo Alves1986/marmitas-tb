@@ -35,7 +35,9 @@
 - [x] Implementar acompanhamento público do pedido por código e linha do tempo de status.
 - [x] Implementar alertas de novos pedidos e tela operacional de comandas.
 - [x] Implementar impressão de comanda formatada para pedido novo.
-- [ ] Preparar checkout para PIX, cartão e voucher com um adaptador de gateway seguro.
+- [x] Preparar checkout para PIX, cartão e voucher com um adaptador de gateway seguro.
+- [x] Incluir PIX no contrato do checkout, na interface e no fluxo simulado de confirmação, sem gerar cobrança real.
+- [x] Cobrir em teste a conversão e a submissão de PIX, cartão e voucher ao adaptador de pagamento configurado.
 - [x] Validar fluxos administrativos, acompanhamento público, impressão e pagamentos simulados.
 - [x] Pesquisar e documentar o contrato público atual do Asaas para cobranças, status e eventos.
 - [x] Criar adaptador de pagamento em modo de teste compatível com a futura integração oficial do Asaas.

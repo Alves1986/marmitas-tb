@@ -23,4 +23,10 @@ describe("test payment adapter", () => {
     expect(confirmedPayment.reference).toBe(pendingPayment.reference);
     expect(confirmedPayment.confirmedAt).toBeTypeOf("number");
   });
+
+  it.each(["pix", "credit_card", "voucher"] as const)("preserva o método %s no contrato simulado", (method) => {
+    const payment = createTestPayment({ orderCode: "TB-20260817-0044", amountInCents: 1890, method });
+
+    expect(payment).toMatchObject({ provider: "asaas_test", method, status: "pending" });
+  });
 });

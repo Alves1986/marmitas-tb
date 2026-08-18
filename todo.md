@@ -103,7 +103,7 @@
 - [ ] Configurar URLs de retorno do Supabase Auth para o domínio vercel.app e os deploys de prévia da homologação.
 - [ ] Adaptar a aplicação Vite para a Vercel com funções TypeScript server-side para pedidos, Asaas, webhook e impressão.
 - [x] Provisionar e validar um projeto Supabase exclusivo para a Marmitas TB antes de aplicar migrações de banco ou Storage.
-- [ ] Manter a criação do projeto Marmitas TB na Vercel para após a validação final, o checkpoint e o envio da branch de migração ao GitHub, sem deploy automático.
+- [x] Manter a criação do projeto Marmitas TB na Vercel para após a validação final, o checkpoint e o envio da branch de migração ao GitHub, sem deploy automático.
 - [ ] Migrar os contratos de autoria de auditoria para UUIDs do Supabase sem alterar os identificadores de domínio ainda numéricos no legado.
 - [x] Manter isoladas as rotas tRPC/MySQL legadas até que suas substitutas Vercel/Supabase estejam implementadas, impedindo a gravação de UUID em auditoria inteira.
 - [ ] Retomar a inspeção de dados e Storage pelo conector Supabase quando o serviço MCP externo voltar a responder, antes da migração de produção.
@@ -114,3 +114,4 @@
 - [x] Tratar falhas de baixa de impressão e reconhecimento de alertas no runtime Vercel, com feedback ao operador, estado consistente e nova tentativa possível.
 - [x] Cobrir falhas de baixa de impressão e reconhecimento de alertas no runtime Vercel em testes automatizados.
 - [x] Adicionar teste de interface para falha de reconhecimento de alerta no runtime Vercel, garantindo que o pedido permaneça pendente e o erro seja exibido ao operador.
+- [x] Confirmar a branch de migração no GitHub antes de habilitar ou configurar o projeto de homologação na Vercel.

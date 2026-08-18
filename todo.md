@@ -81,3 +81,5 @@
 - [x] Empacotar o processo de evolução segura de delivery em uma habilidade reutilizável.
 - [x] Exibir a foto do produto ao abrir sua configuração no cardápio.
 - [x] Corrigir a comparação visual usada para aprovar o posicionamento da foto do produto.
+- [x] Exportar o projeto Marmitas TB para o repositório GitHub selecionado na pasta marmitastb.
+- [x] Criar README.md detalhado com instalação, configuração, testes e uso do projeto marmitastb.

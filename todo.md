@@ -86,3 +86,5 @@
 - [x] Adicionar capturas de tela representativas da aplicação ao README de marmitastb.
 - [x] Criar .env.example seguro com todas as variáveis de ambiente necessárias em marmitastb.
 - [x] Incluir um guia detalhado de deploy em produção no README de marmitastb.
+- [ ] Adicionar um diagrama de arquitetura detalhado ao README de marmitastb.
+- [ ] Criar workflow de GitHub Actions para testes, checagem de tipos e build a cada commit.

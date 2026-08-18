@@ -121,3 +121,7 @@
 - [x] Projetar, testar e migrar a autoria de auditoria para UUIDs Supabase, mantendo IDs numéricos legados somente como referência histórica compatível.
 - [x] Impedir por contrato que mutações administrativas e operacionais no runtime Vercel alcancem o tRPC/MySQL, usando apenas autoria UUID Supabase.
 - [ ] Conectar a branch de migração e validar uma única implantação Vercel de Preview, sem publicar em produção ou alterar o domínio.
+- [ ] Cancelar a implantação Vercel classificada indevidamente como produção e corrigir a branch de produção antes de qualquer nova prévia.
+- [x] Bloquear novos commits, pushes e implantações da Marmitas TB no repositório `Alves1986/ministral`, sem modificar o histórico desse sistema.
+- [x] Interromper novos envios ao repositório `Alves1986/ministral` e desvincular esse repositório do projeto Vercel Marmitas TB.
+- [ ] Criar um repositório GitHub privado e dedicado para Marmitas TB somente após aprovação explícita do nome e da separação do sistema existente.

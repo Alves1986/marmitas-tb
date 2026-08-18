@@ -16,4 +16,14 @@ Após a autorização explícita para uma única prévia, o repositório `Alves1
 
 O preset de framework foi então definido como **Vite**, com saída padrão `dist`. Os comandos permanecem sem sobrescritas manuais, permitindo que a Vercel use o `pnpm build` definido no repositório. Essa configuração foi salva antes do commit que criará a prévia autorizada.
 
+## Incidente de classificação de ambiente — 18 de agosto de 2026
+
+O commit `4f76d4b` da branch `feat/supabase-vercel-migration`, enviado exclusivamente para uma prévia autorizada, foi inesperadamente exibido pela Vercel como ambiente **Production** durante a construção. Após confirmação explícita do responsável, foi solicitada a interrupção imediata. O painel passou a exibir o estado **Error** e informou que o cancelamento já não podia ser aplicado a uma implantação em erro. Não há evidência de conclusão bem-sucedida ou de URL de produção disponível nesta sessão. A integração Git deve ser reconfigurada antes de qualquer nova tentativa.
+
+A inspeção do deployment `HLoocpCVG` identificou a causa objetiva da falha: o plano Vercel **Hobby** limita cada implantação a 12 funções serverless, enquanto a estrutura atual contém mais endpoints em `api/`. A compilação terminou em erro antes de servir a aplicação. Os domínios temporários exibidos pelo painel pertencem à implantação falha e não confirmam disponibilidade funcional; o domínio personalizado não foi associado a uma implantação concluída.
+
+## Contenção da integração Git — 18 de agosto de 2026
+
+Após identificação de que `Alves1986/ministral` hospeda outro sistema, o remoto local nomeado `github`, que apontava para esse repositório, foi removido. O remoto interno do projeto foi preservado. O painel Vercel confirmou que `Alves1986/ministral` permanecia conectado e que qualquer novo commit nesse repositório criaria deployments; a conexão foi removida com sucesso. O painel passou a informar que o projeto não está conectado a repositório Git, portanto não há novo deployment automático por commits. Nenhuma tentativa de apagar, reescrever ou alterar o histórico remoto foi realizada.
+
 Fonte consultada: <https://vercel.com/docs/git>.

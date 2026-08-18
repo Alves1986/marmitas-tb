@@ -58,6 +58,9 @@ export function ProductConfigurator({ product, onOpenChange }: ProductConfigurat
     <Dialog open={Boolean(product)} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[92vh] overflow-y-auto rounded-[1.7rem] border-[#ead8c0] bg-[#fffaf1] p-0 sm:max-w-xl">
         <DialogHeader className="border-b border-[#ead8c0] px-6 pb-5 pt-6">
+          {product.imageUrl ? (
+            <img src={product.imageUrl} alt={`Foto de ${product.name}`} className="h-48 w-full rounded-2xl object-cover sm:h-56" />
+          ) : null}
           <div className="flex items-start justify-between gap-4 pr-7"><div><p className="text-xs font-bold uppercase tracking-[0.14em] text-[#a82926]">Personalize seu pedido</p><DialogTitle className="font-display mt-1 text-3xl tracking-[-0.035em] text-[#481e1f]">{product.name}</DialogTitle></div><span className="rounded-full bg-[#f2e6d0] px-3 py-1.5 text-sm font-black text-[#a82926]">{formatCurrency(configuredPrice)}</span></div>
           <DialogDescription className="mt-2 text-sm leading-relaxed text-[#765f50]">{product.description}</DialogDescription>
         </DialogHeader>

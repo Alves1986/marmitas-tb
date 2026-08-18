@@ -78,3 +78,6 @@
 - [x] Criar uma interface administrativa simples para cadastrar membros da equipe e atribuir os papéis de administrador ou operação.
 - [x] Permitir o rastreamento público de pedidos usando apenas o número de telefone informado no checkout.
 - [x] Transformar a Marmitas TB em PWA instalável com manifesto, ícones e experiência offline apropriada.
+- [x] Empacotar o processo de evolução segura de delivery em uma habilidade reutilizável.
+- [x] Exibir a foto do produto ao abrir sua configuração no cardápio.
+- [x] Corrigir a comparação visual usada para aprovar o posicionamento da foto do produto.

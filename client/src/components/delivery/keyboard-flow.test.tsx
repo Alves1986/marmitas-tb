@@ -32,6 +32,7 @@ const configurableProduct: Product = {
   categoryLabel: "Destaques",
   name: "Marmita para teste",
   description: "Produto usado para validar o fluxo por teclado.",
+  imageUrl: "/manus-storage/marmita-teste.jpg",
   price: 20,
   options: [
     {
@@ -59,6 +60,28 @@ const confirmedItems: CartItem[] = [{ id: "item-1", productId: configurableProdu
 const confirmedSummary: CartSummary = { subtotal: 20, savings: 0, deliveryFee: 6, total: 26 };
 
 describe("fluxo acessível de pedido", () => {
+  it("mostra a foto do produto no topo da configuração", () => {
+    render(
+      <OrderProvider>
+        <ProductConfigurator product={configurableProduct} onOpenChange={vi.fn()} />
+      </OrderProvider>,
+    );
+
+    const productImage = screen.getByRole("img", { name: /foto de marmita para teste/i });
+    expect(productImage.getAttribute("src")).toBe("/manus-storage/marmita-teste.jpg");
+  });
+
+  it("não reserva uma área de imagem quando o produto não possui foto", () => {
+    const productWithoutImage = { ...configurableProduct, imageUrl: undefined };
+    render(
+      <OrderProvider>
+        <ProductConfigurator product={productWithoutImage} onOpenChange={vi.fn()} />
+      </OrderProvider>,
+    );
+
+    expect(screen.queryByRole("img", { name: /foto de marmita para teste/i })).toBeNull();
+  });
+
   it("abre e fecha a sacola com teclado", async () => {
     const user = userEvent.setup();
     render(

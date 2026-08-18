@@ -88,3 +88,4 @@
 - [x] Incluir um guia detalhado de deploy em produção no README de marmitastb.
 - [x] Adicionar um diagrama de arquitetura detalhado ao README de marmitastb.
 - [x] Criar workflow de GitHub Actions para testes, checagem de tipos e build a cada commit.
+- [ ] Configurar a homologação segura do Asaas com variáveis de ambiente privadas, validação sem cobrança real e documentação operacional.

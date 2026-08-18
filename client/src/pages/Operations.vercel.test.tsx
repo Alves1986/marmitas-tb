@@ -3,7 +3,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { useEffect } from "react";
 import { describe, expect, it, vi } from "vitest";
 
-const mocks = vi.hoisted(() => ({ acknowledgeAlert: vi.fn() }));
+const mocks = vi.hoisted(() => ({ acknowledgeAlert: vi.fn(), legacyAcknowledge: vi.fn() }));
 
 vi.mock("@/_core/hooks/useAuth", () => ({ useAuth: () => ({ loading: false, user: { id: "operator-1", role: "staff" } }) }));
 vi.mock("wouter", () => ({ useLocation: () => ["/operacao", vi.fn()] }));
@@ -11,13 +11,13 @@ vi.mock("@/lib/runtimeConfig", () => ({ isVercelRuntime: () => true }));
 vi.mock("@/lib/trpc", () => ({
   trpc: {
     useUtils: () => ({ operations: { list: { invalidate: vi.fn() } } }),
-    operations: { acknowledge: { useMutation: () => ({ mutate: vi.fn() }) } },
+    operations: { acknowledge: { useMutation: () => ({ mutate: mocks.legacyAcknowledge }) } },
   },
 }));
 vi.mock("@/services/operationsService", () => ({ vercelOperationsService: { acknowledgeAlert: mocks.acknowledgeAlert } }));
 vi.mock("@/components/operations/OrderQueue", () => ({
   OrderQueue: ({ onOrdersChange }: { onOrdersChange(orders: Array<{ id: string; code: string; status: "confirmado"; acknowledgedAt: Date | null }>): void }) => {
-    useEffect(() => onOrdersChange([{ id: "order-1", code: "TB-0001", status: "confirmado", acknowledgedAt: null }]), [onOrdersChange]);
+    useEffect(() => onOrdersChange([{ id: "18e59e53-81f3-494d-90b9-420dbe4a0892", code: "TB-0001", status: "confirmado", acknowledgedAt: null }]), [onOrdersChange]);
     return <div>Fila simulada</div>;
   },
 }));
@@ -25,7 +25,7 @@ vi.mock("@/components/operations/OrderAlert", () => ({
   OrderAlert: ({ orders, onAcknowledge }: { orders: Array<{ id: string; acknowledgedAt: Date | null }>; onAcknowledge(id: string): void }) => (
     <section>
       <p>{orders[0]?.acknowledgedAt ? "Reconhecido" : "Pendente"}</p>
-      <button type="button" onClick={() => onAcknowledge("order-1")}>Reconhecer pedido</button>
+      <button type="button" onClick={() => onAcknowledge("18e59e53-81f3-494d-90b9-420dbe4a0892")}>Reconhecer pedido</button>
     </section>
   ),
 }));
@@ -42,5 +42,7 @@ describe("Operations no runtime Vercel", () => {
 
     expect((await screen.findByRole("alert")).textContent).toContain("Serviço indisponível");
     expect(screen.getByText("Pendente")).toBeTruthy();
+    expect(mocks.acknowledgeAlert).toHaveBeenCalledWith("18e59e53-81f3-494d-90b9-420dbe4a0892");
+    expect(mocks.legacyAcknowledge).not.toHaveBeenCalled();
   });
 });

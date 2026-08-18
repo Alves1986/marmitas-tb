@@ -21,7 +21,7 @@ describe("/api/admin/settings", () => {
     const response = await handler(new Request("https://marmitas-tb.vercel.app/api/admin/settings", {
       method: "PATCH",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ storeName: "Marmitas TB", deliveryFeeInCents: 700, openingHours: "10h às 15h", paymentMode: "test", autoPrint: false }),
+      body: JSON.stringify({ storeName: "Marmitas TB", deliveryFeeInCents: 700, openingHours: "10h às 15h", paymentMode: "test", autoPrint: false, actorUserId: "browser-id" }),
     }));
 
     expect(response.status).toBe(200);

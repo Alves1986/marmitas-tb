@@ -37,7 +37,7 @@ describe("/api/operations/orders", () => {
       new Request("https://marmitas-tb.vercel.app/api/operations/orders", {
         method: "PATCH",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ orderId: "f10c41ea-a610-46f3-a340-9cae1e8b09f6", nextStatus: "em_preparo" }),
+        body: JSON.stringify({ orderId: "f10c41ea-a610-46f3-a340-9cae1e8b09f6", nextStatus: "em_preparo", actorUserId: "browser-id" }),
       }),
     );
 

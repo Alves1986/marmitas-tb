@@ -1,7 +1,9 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { InstallAppPrompt } from "@/components/pwa/InstallAppPrompt";
+import { OfflineNotice } from "@/components/pwa/OfflineNotice";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
+import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Admin from "./pages/Admin";
@@ -30,6 +32,9 @@ function Router() {
 // - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
 
 function App() {
+  const [location] = useLocation();
+  const isPublicRoute = location === "/" || location === "/acompanhar";
+
   return (
     <ErrorBoundary>
       <ThemeProvider
@@ -37,8 +42,10 @@ function App() {
         // switchable
       >
         <TooltipProvider>
+          {isPublicRoute && <OfflineNotice />}
           <Toaster />
           <Router />
+          {isPublicRoute && <InstallAppPrompt />}
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

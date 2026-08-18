@@ -67,6 +67,7 @@ export const orders = mysqlTable("orders", {
   code: varchar("code", { length: 32 }).notNull(),
   customerName: varchar("customerName", { length: 160 }).notNull(),
   customerPhone: varchar("customerPhone", { length: 32 }).notNull(),
+  customerPhoneLookup: varchar("customerPhoneLookup", { length: 32 }).notNull(),
   fulfillmentMethod: mysqlEnum("fulfillmentMethod", ["delivery", "pickup"]).notNull(),
   deliveryAddress: text("deliveryAddress"),
   customerNotes: text("customerNotes"),
@@ -93,6 +94,7 @@ export const orders = mysqlTable("orders", {
   uniqueIndex("orders_code_unique").on(table.code),
   index("orders_status_created_idx").on(table.status, table.createdAt),
   index("orders_phone_idx").on(table.customerPhone),
+  index("orders_phone_lookup_created_idx").on(table.customerPhoneLookup, table.createdAt),
 ]);
 
 export const orderItems = mysqlTable("orderItems", {

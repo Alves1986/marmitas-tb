@@ -76,5 +76,5 @@
 - [x] Executar e registrar a validação integrada dos fluxos administrativos, acompanhamento público, impressão e pagamentos simulados.
 - [x] Substituir os rótulos genéricos da barra lateral administrativa por navegação explícita da Marmitas TB.
 - [x] Criar uma interface administrativa simples para cadastrar membros da equipe e atribuir os papéis de administrador ou operação.
-- [ ] Permitir o rastreamento público de pedidos usando apenas o número de telefone informado no checkout.
-- [ ] Transformar a Marmitas TB em PWA instalável com manifesto, ícones e experiência offline apropriada.
+- [x] Permitir o rastreamento público de pedidos usando apenas o número de telefone informado no checkout.
+- [x] Transformar a Marmitas TB em PWA instalável com manifesto, ícones e experiência offline apropriada.

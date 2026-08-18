@@ -111,6 +111,15 @@ export const appRouter = router({
     })).query(async ({ input }) => {
       return db.getOrderByTracking(input.code.toUpperCase(), input.phone);
     }),
+    trackByPhone: publicProcedure.input(z.object({
+      phone: z.string().trim().min(1).max(32),
+    })).query(async ({ input }) => {
+      const phone = db.normalizePhoneForLookup(input.phone);
+      if (phone.length < 8) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Informe um telefone válido." });
+      }
+      return db.getLatestActiveOrderByPhone(phone);
+    }),
   }),
   catalog: router({
     listAdmin: adminProcedure.query(() => db.listAdminCatalog()),

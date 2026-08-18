@@ -5,6 +5,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { defineConfig, type Plugin, type ViteDevServer } from "vite";
 import { vitePluginManusRuntime } from "vite-plugin-manus-runtime";
+import { VitePWA } from "vite-plugin-pwa";
 
 // =============================================================================
 // Manus Debug Collector - Vite Plugin
@@ -150,7 +151,43 @@ function vitePluginManusDebugCollector(): Plugin {
   };
 }
 
-const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector()];
+const plugins = [
+  react(),
+  tailwindcss(),
+  jsxLocPlugin(),
+  VitePWA({
+    registerType: "autoUpdate",
+    injectRegister: null,
+    manifest: {
+      name: "Marmitas TB Delivery",
+      short_name: "Marmitas TB",
+      description: "Cardápio e pedidos online da Marmitas TB em Telêmaco Borba.",
+      start_url: "/",
+      display: "standalone",
+      theme_color: "#481e1f",
+      background_color: "#fffaf1",
+      icons: [
+        { src: "/manus-storage/logo-marmitastb_9d67f9be.jpg", sizes: "192x192", type: "image/jpeg", purpose: "any" },
+        { src: "/manus-storage/logo-marmitastb_9d67f9be.jpg", sizes: "512x512", type: "image/jpeg", purpose: "any maskable" },
+      ],
+    },
+    workbox: {
+      navigateFallback: "/index.html",
+      runtimeCaching: [
+        {
+          urlPattern: ({ request, url }) => request.destination === "image" || url.pathname.startsWith("/manus-storage/"),
+          handler: "CacheFirst",
+          options: {
+            cacheName: "marmitas-tb-imagens",
+            expiration: { maxEntries: 64, maxAgeSeconds: 60 * 60 * 24 * 30 },
+          },
+        },
+      ],
+    },
+  }),
+  vitePluginManusRuntime(),
+  vitePluginManusDebugCollector(),
+];
 
 export default defineConfig({
   plugins,

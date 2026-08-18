@@ -34,6 +34,7 @@ vi.mock("@/lib/trpc", () => ({
       create: { useMutation: () => ({ mutateAsync: mocks.createOrder }) },
       confirmTestPayment: { useMutation: () => ({ mutateAsync: mocks.confirmTestPayment }) },
       track: { useQuery: () => ({ data: { order: mocks.trackedOrder, events: [] }, isFetching: false }) },
+      trackByPhone: { useQuery: () => ({ data: undefined, isFetching: false, error: null }) },
     },
     store: { publicSettings: { useQuery: () => ({ data: mocks.storeSettings }) } },
   },

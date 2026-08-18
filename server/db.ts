@@ -1,4 +1,4 @@
-import { and, asc, eq, inArray } from "drizzle-orm";
+import { and, asc, desc, eq, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   categories,
@@ -172,6 +172,18 @@ function createTemporaryOrderCode(): string {
   return `TMP-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
+const activePublicTrackingStatuses = [
+  "aguardando_pagamento",
+  "confirmado",
+  "em_preparo",
+  "saiu_para_entrega",
+  "pronto_para_retirada",
+] as const;
+
+export function normalizePhoneForLookup(value: string) {
+  return value.replace(/\D/g, "");
+}
+
 export async function createStoredOrder(input: CreateStoredOrderInput) {
   const database = ensureDatabase(await getDb());
   const paymentAdapter = selectPaymentAdapter((await getStoreSettings()).paymentMode);
@@ -182,6 +194,7 @@ export async function createStoredOrder(input: CreateStoredOrderInput) {
       code: createTemporaryOrderCode(),
       customerName: input.customerName,
       customerPhone: input.customerPhone,
+      customerPhoneLookup: normalizePhoneForLookup(input.customerPhone),
       fulfillmentMethod: input.fulfillmentMethod,
       deliveryAddress: input.deliveryAddress ?? null,
       customerNotes: input.customerNotes ?? null,
@@ -333,7 +346,7 @@ export async function processAsaasWebhookEvent(event: AsaasPaymentWebhookEvent):
 export async function getOrderByTracking(code: string, phone: string) {
   const database = ensureDatabase(await getDb());
   const [order] = await database.select().from(orders)
-    .where(and(eq(orders.code, code), eq(orders.customerPhone, phone))).limit(1);
+    .where(and(eq(orders.code, code), eq(orders.customerPhoneLookup, normalizePhoneForLookup(phone)))).limit(1);
   if (!order) return undefined;
 
   const [items, events] = await Promise.all([
@@ -342,6 +355,40 @@ export async function getOrderByTracking(code: string, phone: string) {
   ]);
 
   return { order, items, events };
+}
+
+export async function getLatestActiveOrderByPhone(phone: string) {
+  const database = ensureDatabase(await getDb());
+  const [selectedOrder] = await database.select({
+    id: orders.id,
+    code: orders.code,
+    status: orders.status,
+    totalInCents: orders.totalInCents,
+    paymentStatus: orders.paymentStatus,
+    paymentMethod: orders.paymentMethod,
+    paymentProvider: orders.paymentProvider,
+    fulfillmentMethod: orders.fulfillmentMethod,
+    createdAt: orders.createdAt,
+  }).from(orders)
+    .where(and(
+      eq(orders.customerPhoneLookup, normalizePhoneForLookup(phone)),
+      inArray(orders.status, activePublicTrackingStatuses),
+    ))
+    .orderBy(desc(orders.createdAt))
+    .limit(1);
+  if (!selectedOrder) return undefined;
+
+  const events = await database.select({
+    id: orderEvents.id,
+    toStatus: orderEvents.toStatus,
+    message: orderEvents.message,
+    createdAt: orderEvents.createdAt,
+  }).from(orderEvents)
+    .where(eq(orderEvents.orderId, selectedOrder.id))
+    .orderBy(asc(orderEvents.createdAt));
+
+  const { id: _internalOrderId, ...order } = selectedOrder;
+  return { order, events };
 }
 
 export async function listAdminCatalog() {

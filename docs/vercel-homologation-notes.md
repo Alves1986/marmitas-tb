@@ -12,4 +12,8 @@ Uma captura fornecida pelo responsável confirma que o domínio de produção do
 
 Observação técnica: quando uma implantação for autorizada, a URL pública deve ser utilizada com HTTPS (`https://marmitastb.vercel.app`). Antes do primeiro teste de OTP em homologação, convém validar no painel Supabase se os Redirect URLs também abrangem o domínio de prévia correspondente.
 
+Após a autorização explícita para uma única prévia, o repositório `Alves1986/ministral` foi conectado ao projeto Vercel. A tela de **Build and Deployment** confirmou que o diretório raiz está vazio, conforme a estrutura da branch de migração. Nenhuma implantação de produção foi criada nesta etapa.
+
+O preset de framework foi então definido como **Vite**, com saída padrão `dist`. Os comandos permanecem sem sobrescritas manuais, permitindo que a Vercel use o `pnpm build` definido no repositório. Essa configuração foi salva antes do commit que criará a prévia autorizada.
+
 Fonte consultada: <https://vercel.com/docs/git>.

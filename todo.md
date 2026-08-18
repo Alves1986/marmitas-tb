@@ -120,3 +120,4 @@
 - [x] Criar e testar o exportador somente leitura do histórico operacional legado, com proteção contra versionamento e documentação de reconciliação por UUID.
 - [x] Projetar, testar e migrar a autoria de auditoria para UUIDs Supabase, mantendo IDs numéricos legados somente como referência histórica compatível.
 - [x] Impedir por contrato que mutações administrativas e operacionais no runtime Vercel alcancem o tRPC/MySQL, usando apenas autoria UUID Supabase.
+- [ ] Conectar a branch de migração e validar uma única implantação Vercel de Preview, sem publicar em produção ou alterar o domínio.

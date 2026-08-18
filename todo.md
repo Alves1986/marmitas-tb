@@ -83,3 +83,6 @@
 - [x] Corrigir a comparação visual usada para aprovar o posicionamento da foto do produto.
 - [x] Exportar o projeto Marmitas TB para o repositório GitHub selecionado na pasta marmitastb.
 - [x] Criar README.md detalhado com instalação, configuração, testes e uso do projeto marmitastb.
+- [x] Adicionar capturas de tela representativas da aplicação ao README de marmitastb.
+- [x] Criar .env.example seguro com todas as variáveis de ambiente necessárias em marmitastb.
+- [x] Incluir um guia detalhado de deploy em produção no README de marmitastb.

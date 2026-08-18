@@ -92,3 +92,13 @@
 - [ ] Cadastrar futuramente a chave e o token de webhook do Asaas Sandbox no cofre protegido, antes de habilitar a verificação externa.
 - [ ] Executar e registrar a sonda de leitura do Asaas Sandbox sem cobrança após o cadastro das credenciais válidas.
 - [ ] Executar a guarda de configuração com segredos injetados e revalidar a homologação completa sem expor valores.
+- [ ] Avaliar e definir a arquitetura de migração da Marmitas TB para Supabase e Vercel.
+- [ ] Migrar persistência, autenticação, API e variáveis de ambiente para serviços compatíveis com Supabase e Vercel.
+- [ ] Preparar configuração, documentação e validação de deploy externo na Vercel sem publicar automaticamente.
+- [ ] Substituir Manus OAuth por Supabase Auth, preservando os papéis de cliente, operação e administrador.
+- [ ] Converter o esquema e os dados operacionais de MySQL/TiDB para Supabase Postgres com integridade e reversibilidade.
+- [ ] Transferir os ativos persistentes da aplicação para Supabase Storage e remover dependências exclusivas da infraestrutura atual.
+- [ ] Conectar e validar os projetos existentes de Supabase e Vercel para a Marmitas TB antes da migração de produção.
+- [ ] Implementar login interno por código OTP de e-mail no Supabase, sem cadastro público automático da equipe.
+- [ ] Configurar URLs de retorno do Supabase Auth para o domínio vercel.app e os deploys de prévia da homologação.
+- [ ] Adaptar a aplicação Vite para a Vercel com funções TypeScript server-side para pedidos, Asaas, webhook e impressão.

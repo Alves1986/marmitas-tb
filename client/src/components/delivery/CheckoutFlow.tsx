@@ -5,6 +5,8 @@ import type { CheckoutDraft, OrderConfirmation, PaymentMethod } from "@shared/or
 import { useOrder } from "@/contexts/OrderContext";
 import { formatCurrency } from "@/lib/order";
 import { trpc } from "@/lib/trpc";
+import { apiRequest } from "@/lib/api";
+import { createVercelOrderService } from "@/services/orderService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -46,10 +48,28 @@ export function CheckoutFlow({ onSuccess, onBack }: CheckoutFlowProps) {
     const isValid = await form.trigger();
     if (!isValid || !selectedPayment) return;
     setIsSubmitting(true);
-    const customer = form.getValues();
-    setCheckoutDraft(customer);
-    try {
-      const paymentMethod = selectedPayment === "card" ? "credit_card" : selectedPayment === "food_voucher" ? "voucher" : selectedPayment;
+      const customer = form.getValues();
+      setCheckoutDraft(customer);
+      try {
+        if (import.meta.env.VITE_API_RUNTIME === "vercel" && import.meta.env.PROD) {
+          const confirmation = await createVercelOrderService({
+            request: (path, options) => apiRequest<OrderConfirmation>(path, {
+              method: options.method,
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify(options.body),
+            }),
+          }).submit({
+            id: crypto.randomUUID(),
+            createdAt: new Date().toISOString(),
+            customer,
+            deliveryMode,
+            items,
+            summary,
+          });
+          onSuccess({ ...confirmation, trackingCode: confirmation.trackingCode ?? confirmation.orderNumber }, { items, summary, deliveryMode });
+          return;
+        }
+        const paymentMethod = selectedPayment === "card" ? "credit_card" : selectedPayment === "food_voucher" ? "voucher" : selectedPayment;
       const deliveryAddress = deliveryMode === "delivery"
         ? [customer.address, customer.neighborhood, customer.reference].filter(Boolean).join(" · ")
         : undefined;

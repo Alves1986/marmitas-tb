@@ -89,3 +89,6 @@
 - [x] Adicionar um diagrama de arquitetura detalhado ao README de marmitastb.
 - [x] Criar workflow de GitHub Actions para testes, checagem de tipos e build a cada commit.
 - [ ] Configurar a homologação segura do Asaas com variáveis de ambiente privadas, validação sem cobrança real e documentação operacional.
+- [ ] Cadastrar futuramente a chave e o token de webhook do Asaas Sandbox no cofre protegido, antes de habilitar a verificação externa.
+- [ ] Executar e registrar a sonda de leitura do Asaas Sandbox sem cobrança após o cadastro das credenciais válidas.
+- [ ] Executar a guarda de configuração com segredos injetados e revalidar a homologação completa sem expor valores.

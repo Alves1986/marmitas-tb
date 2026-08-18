@@ -21,7 +21,6 @@
 | `server/_core/env.ts` | Centralizar a configuração validada do Asaas para o servidor. |
 | `server/routers/asaasWebhook.ts` | Obter o token esperado por meio da configuração central. |
 | `server/services/asaasSandboxConfig.secret.test.ts` | Verificar, após o cadastro protegido, que o segredo injetado forma uma configuração pronta sem imprimir valores. |
-| `.env.example` | Documentar os nomes das variáveis sem valores confidenciais. |
 | `docs/operacao/asaas-homologacao.md` | Orientar a operação de Sandbox, a verificação e o cadastro manual do webhook. |
 
 ### Task 1: Configuração segura e centralizada do Sandbox
@@ -336,33 +335,26 @@ git commit -m "feat: protege webhook de homologação Asaas"
 ### Task 4: Documentação e contrato de ambiente
 
 **Files:**
-- Create: `.env.example`
 - Create: `docs/operacao/asaas-homologacao.md`
 
-- [ ] **Step 1: Criar o contrato de ambiente sem valores**
+- [ ] **Step 1: Registrar o contrato de ambiente sem valores em documentação versionada**
 
-```dotenv
-# Asaas: homologação exclusiva. Nunca use prefixo VITE_ para estes valores.
-ASAAS_ENVIRONMENT=sandbox
-ASAAS_API_URL=https://api-sandbox.asaas.com/v3
-ASAAS_API_KEY=
-ASAAS_WEBHOOK_TOKEN=
-```
+Documente em `docs/operacao/asaas-homologacao.md` os nomes `ASAAS_ENVIRONMENT`, `ASAAS_API_URL`, `ASAAS_API_KEY` e `ASAAS_WEBHOOK_TOKEN`, os valores permitidos para as duas primeiras e a classificação privada das duas últimas. O ambiente gerenciado pelo projeto é o único meio permitido para registrar variáveis; arquivos `.env` e `.env.example` não serão criados ou versionados.
 
 - [ ] **Step 2: Documentar a operação sem comandos que exponham segredos**
 
 Inclua em `docs/operacao/asaas-homologacao.md` a sequência: criar conta Sandbox independente; gerar chave nomeada para Marmitas TB Homologação; cadastrar chave e token por cofre de segredos; executar a guarda de segredo; configurar manualmente o webhook HTTPS `/api/asaas/webhook` com os eventos indispensáveis `PAYMENT_CREATED`, `PAYMENT_CONFIRMED`, `PAYMENT_RECEIVED`, `PAYMENT_OVERDUE` e `PAYMENT_REFUNDED`; testar com dados autorizados; e consultar os logs de webhook do Asaas em caso de erro. A documentação deve declarar explicitamente que não se deve enviar chaves em mensagens, repositórios ou frontend.
 
-- [ ] **Step 3: Verificar que os arquivos não contêm valores reais nem prefixos de frontend**
+- [ ] **Step 3: Verificar que a documentação não contém valores reais nem prefixos de frontend**
 
-Run: `grep -nE 'ASAAS_(API_KEY|WEBHOOK_TOKEN)=.+|VITE_ASAAS' .env.example docs/operacao/asaas-homologacao.md`
+Run: `grep -nE 'ASAAS_(API_KEY|WEBHOOK_TOKEN)=[^[:space:]]+|VITE_ASAAS' docs/operacao/asaas-homologacao.md`
 
-Expected: somente os nomes vazios no `.env.example`; nenhuma variável `VITE_ASAAS`.
+Expected: nenhuma credencial literal e nenhuma variável `VITE_ASAAS`.
 
 - [ ] **Step 4: Salvar o marco local**
 
 ```bash
-git add .env.example docs/operacao/asaas-homologacao.md
+git add docs/operacao/asaas-homologacao.md
 git commit -m "docs: orienta homologação segura do Asaas"
 ```
 

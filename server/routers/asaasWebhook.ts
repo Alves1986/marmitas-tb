@@ -1,4 +1,5 @@
 import type { Express, Request, Response } from "express";
+import { ENV } from "../_core/env";
 import { processAsaasWebhookEvent } from "../db";
 import { isValidAsaasWebhook } from "../services/asaasPaymentAdapter";
 
@@ -44,9 +45,10 @@ export function createAsaasWebhookHandler({
 }
 
 export function registerAsaasWebhook(app: Pick<Express, "post">, dependencies?: WebhookDependencies) {
+  const expectedToken = ENV.asaas.ready ? ENV.asaas.config.webhookToken : undefined;
   app.post("/api/asaas/webhook", createAsaasWebhookHandler(
     dependencies ?? {
-      expectedToken: process.env.ASAAS_WEBHOOK_TOKEN,
+      expectedToken,
       processEvent: processAsaasWebhookEvent,
     },
   ));

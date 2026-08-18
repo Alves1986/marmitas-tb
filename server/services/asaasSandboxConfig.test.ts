@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { ENV } from "../_core/env";
 import { ASAAS_SANDBOX_API_URL, getAsaasSandboxConfig } from "./asaasSandboxConfig";
 
 describe("getAsaasSandboxConfig", () => {
@@ -29,5 +30,9 @@ describe("getAsaasSandboxConfig", () => {
     [{ ...validEnv, ASAAS_WEBHOOK_TOKEN: "curto" }, "invalid_webhook_token"],
   ] as const)("bloqueia configuração insegura", (env, reason) => {
     expect(getAsaasSandboxConfig(env)).toEqual({ ready: false, reason });
+  });
+
+  it("reconhece o Sandbox injetado e permanece bloqueado sem chave privada", () => {
+    expect(ENV.asaas).toEqual({ ready: false, reason: "missing_api_key" });
   });
 });

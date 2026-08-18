@@ -124,5 +124,5 @@
 - [ ] Cancelar a implantação Vercel classificada indevidamente como produção e corrigir a branch de produção antes de qualquer nova prévia.
 - [x] Bloquear novos commits, pushes e implantações da Marmitas TB no repositório `Alves1986/ministral`, sem modificar o histórico desse sistema.
 - [x] Interromper novos envios ao repositório `Alves1986/ministral` e desvincular esse repositório do projeto Vercel Marmitas TB.
-- [ ] Criar um repositório GitHub privado e dedicado para Marmitas TB somente após aprovação explícita do nome e da separação do sistema existente.
-- [ ] Publicar a cópia local exclusivamente no repositório privado `Alves1986/marmitas-tb` e confirmar que nenhum remoto aponta ao sistema existente.
+- [x] Criar um repositório GitHub privado e dedicado para Marmitas TB somente após aprovação explícita do nome e da separação do sistema existente.
+- [x] Publicar a cópia local exclusivamente no repositório privado `Alves1986/marmitas-tb` e confirmar que nenhum remoto aponta ao sistema existente.

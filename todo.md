@@ -118,3 +118,5 @@
 - [x] Criar e testar o webhook Asaas em função Vercel, com token Sandbox obrigatório, idempotência transacional prevista e bloqueio seguro sem credenciais.
 - [x] Aplicar e validar no Supabase a migração transacional do webhook Asaas antes de cadastrar token ou testar uma prévia externa.
 - [x] Criar e testar o exportador somente leitura do histórico operacional legado, com proteção contra versionamento e documentação de reconciliação por UUID.
+- [ ] Projetar, testar e migrar a autoria de auditoria para UUIDs Supabase, mantendo IDs numéricos legados somente como referência histórica compatível.
+- [ ] Impedir por contrato que mutações administrativas e operacionais no runtime Vercel alcancem o tRPC/MySQL, usando apenas autoria UUID Supabase.

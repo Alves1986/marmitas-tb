@@ -123,8 +123,9 @@ export function OrderQueue({ onOrdersChange }: OrderQueueProps) {
   const useVercelApi = isVercelRuntime();
   const utils = trpc.useUtils();
   const printedJobIds = useRef(new Set<string | number>());
-  const { data: legacyData, isLoading: legacyLoading, error: legacyError } = trpc.operations.list.useQuery(undefined, { refetchInterval: useVercelApi ? false : 10_000 });
-  const { data: legacyPrintJobs = [] } = trpc.operations.printJobs.useQuery(undefined, { refetchInterval: useVercelApi ? false : 10_000 });
+  const legacyQueryOptions = { enabled: !useVercelApi, refetchInterval: (useVercelApi ? false : 10_000) as number | false };
+  const { data: legacyData, isLoading: legacyLoading, error: legacyError } = trpc.operations.list.useQuery(undefined, legacyQueryOptions);
+  const { data: legacyPrintJobs = [] } = trpc.operations.printJobs.useQuery(undefined, legacyQueryOptions);
   const transition = trpc.operations.transition.useMutation({
     onSuccess: () => void utils.operations.list.invalidate(),
   });

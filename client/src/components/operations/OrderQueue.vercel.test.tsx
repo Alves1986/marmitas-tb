@@ -2,15 +2,19 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-const mocks = vi.hoisted(() => ({ markPrintJob: vi.fn() }));
+const mocks = vi.hoisted(() => ({
+  legacyListQuery: vi.fn(() => ({ data: [], isLoading: false, error: null })),
+  legacyPrintJobsQuery: vi.fn(() => ({ data: [] })),
+  markPrintJob: vi.fn(),
+}));
 
 vi.mock("@/lib/runtimeConfig", () => ({ isVercelRuntime: () => true }));
 vi.mock("@/lib/trpc", () => ({
   trpc: {
     useUtils: () => ({ operations: { list: { invalidate: vi.fn() }, printJobs: { invalidate: vi.fn() } } }),
     operations: {
-      list: { useQuery: () => ({ data: [], isLoading: false, error: null }) },
-      printJobs: { useQuery: () => ({ data: [] }) },
+      list: { useQuery: mocks.legacyListQuery },
+      printJobs: { useQuery: mocks.legacyPrintJobsQuery },
       transition: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) },
       markPrintJob: { useMutation: () => ({ mutate: vi.fn() }) },
       queuePrint: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) },
@@ -34,6 +38,14 @@ vi.mock("@/services/operationsService", () => ({
 import { OrderQueue } from "./OrderQueue";
 
 describe("OrderQueue no runtime Vercel", () => {
+  it("desativa as consultas tRPC legadas", async () => {
+    render(<OrderQueue />);
+
+    await waitFor(() => expect(mocks.legacyListQuery).toHaveBeenCalled());
+    expect(mocks.legacyListQuery).toHaveBeenCalledWith(undefined, expect.objectContaining({ enabled: false, refetchInterval: false }));
+    expect(mocks.legacyPrintJobsQuery).toHaveBeenCalledWith(undefined, expect.objectContaining({ enabled: false, refetchInterval: false }));
+  });
+
   it("exibe a falha de baixa da impressão ao operador", async () => {
     mocks.markPrintJob.mockRejectedValueOnce(new Error("Impressora indisponível"));
     render(<OrderQueue />);

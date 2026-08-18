@@ -92,14 +92,14 @@
 - [ ] Cadastrar futuramente a chave e o token de webhook do Asaas Sandbox no cofre protegido, antes de habilitar a verificação externa.
 - [ ] Executar e registrar a sonda de leitura do Asaas Sandbox sem cobrança após o cadastro das credenciais válidas.
 - [ ] Executar a guarda de configuração com segredos injetados e revalidar a homologação completa sem expor valores.
-- [ ] Avaliar e definir a arquitetura de migração da Marmitas TB para Supabase e Vercel.
+- [x] Avaliar e definir a arquitetura de migração da Marmitas TB para Supabase e Vercel.
 - [ ] Migrar persistência, autenticação, API e variáveis de ambiente para serviços compatíveis com Supabase e Vercel.
 - [ ] Preparar configuração, documentação e validação de deploy externo na Vercel sem publicar automaticamente.
 - [ ] Substituir Manus OAuth por Supabase Auth, preservando os papéis de cliente, operação e administrador.
 - [ ] Converter o esquema e os dados operacionais de MySQL/TiDB para Supabase Postgres com integridade e reversibilidade.
 - [ ] Transferir os ativos persistentes da aplicação para Supabase Storage e remover dependências exclusivas da infraestrutura atual.
 - [ ] Conectar e validar os projetos existentes de Supabase e Vercel para a Marmitas TB antes da migração de produção.
-- [ ] Implementar login interno por código OTP de e-mail no Supabase, sem cadastro público automático da equipe.
+- [x] Implementar login interno por código OTP de e-mail no Supabase, sem cadastro público automático da equipe.
 - [ ] Configurar URLs de retorno do Supabase Auth para o domínio vercel.app e os deploys de prévia da homologação.
 - [ ] Adaptar a aplicação Vite para a Vercel com funções TypeScript server-side para pedidos, Asaas, webhook e impressão.
 - [x] Provisionar e validar um projeto Supabase exclusivo para a Marmitas TB antes de aplicar migrações de banco ou Storage.
@@ -115,3 +115,5 @@
 - [x] Cobrir falhas de baixa de impressão e reconhecimento de alertas no runtime Vercel em testes automatizados.
 - [x] Adicionar teste de interface para falha de reconhecimento de alerta no runtime Vercel, garantindo que o pedido permaneça pendente e o erro seja exibido ao operador.
 - [x] Confirmar a branch de migração no GitHub antes de habilitar ou configurar o projeto de homologação na Vercel.
+- [x] Criar e testar o webhook Asaas em função Vercel, com token Sandbox obrigatório, idempotência transacional prevista e bloqueio seguro sem credenciais.
+- [ ] Aplicar e validar no Supabase a migração transacional do webhook Asaas antes de cadastrar token ou testar uma prévia externa.

@@ -6,7 +6,7 @@ Este procedimento prepara a Marmitas TB para integração no ambiente **Sandbox*
 
 ## Estado atual da preparação
 
-O projeto está restrito ao ambiente Sandbox e valida localmente a URL, o formato de chave e o token de webhook. Por decisão operacional, **`ASAAS_API_KEY` e `ASAAS_WEBHOOK_TOKEN` ainda não foram cadastrados**. Assim, a sonda externa, o recebimento autenticado de webhook e qualquer cobrança oficial permanecem bloqueados de forma segura. O próximo responsável deve cadastrar ambos exclusivamente no cofre de segredos e executar as verificações descritas nesta página.
+O projeto está restrito ao ambiente Sandbox e valida localmente a URL, o formato de chave e o token de webhook. A função Vercel `POST /api/webhooks/asaas` já rejeita chamadas sem token e permanece indisponível enquanto as duas credenciais privadas não estiverem presentes. Por decisão operacional, **`ASAAS_API_KEY` e `ASAAS_WEBHOOK_TOKEN` ainda não foram cadastrados**. Assim, a sonda externa, o recebimento autenticado de webhook e qualquer cobrança oficial permanecem bloqueados de forma segura. O próximo responsável deve cadastrar ambos exclusivamente no cofre de segredos, aplicar a migração `20260818190000_process_asaas_webhook_event.sql` no Supabase e executar as verificações descritas nesta página.
 
 ## Cadastro protegido das variáveis
 
@@ -31,9 +31,9 @@ Após cadastrar os segredos, execute a guarda automatizada `pnpm vitest run serv
 
 ## Configuração manual do webhook
 
-Depois de publicar uma URL HTTPS acessível, registre manualmente no painel Sandbox do Asaas o endpoint `https://SEU-DOMINIO/api/asaas/webhook`. Configure o mesmo `ASAAS_WEBHOOK_TOKEN` no campo de token de acesso. O Asaas envia esse valor pelo cabeçalho `asaas-access-token`, que a aplicação compara antes de processar qualquer evento. [4]
+Depois de autorizar uma prévia HTTPS acessível, registre manualmente no painel Sandbox do Asaas o endpoint `https://SEU-DOMINIO/api/webhooks/asaas`. Configure o mesmo `ASAAS_WEBHOOK_TOKEN` no campo de token de acesso. O Asaas envia esse valor pelo cabeçalho `asaas-access-token`, que a aplicação compara em tempo constante antes de processar qualquer evento. [4]
 
-Cadastre somente os eventos necessários à operação: `PAYMENT_CREATED`, `PAYMENT_CONFIRMED`, `PAYMENT_RECEIVED`, `PAYMENT_OVERDUE` e `PAYMENT_REFUNDED`. A rota responde rapidamente e processa eventos de forma idempotente, pois a entrega de webhook pode ocorrer mais de uma vez. [4]
+Cadastre somente os eventos necessários à operação: `PAYMENT_CREATED`, `PAYMENT_CONFIRMED`, `PAYMENT_RECEIVED`, `PAYMENT_OVERDUE` e `PAYMENT_REFUNDED`. A função registra cada evento com chave única `(provider, external_event_id)` e, para confirmações de pagamento, atualiza o pedido, a auditoria e a fila de impressão em uma única transação no Postgres. Reenvios do mesmo evento recebem sucesso sem duplicar efeitos operacionais. [4]
 
 Em caso de falha, consulte os registros de entrega no painel Sandbox do Asaas e confirme a URL, o código HTTP e a equivalência do token sem revelar o valor do token. Não altere o ambiente para Produção para contornar uma falha de homologação.
 

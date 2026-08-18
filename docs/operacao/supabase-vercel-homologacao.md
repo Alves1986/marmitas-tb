@@ -20,7 +20,7 @@ O projeto Vercel `marmitas-tb` foi criado sem repositório conectado e sem deplo
 
 ## Prévia autorizada
 
-Quando uma prévia for autorizada, conecte a branch `feat/supabase-vercel-migration` ao projeto Vercel, configure `marmitastb/` como diretório raiz e dispare **somente uma implantação de Preview**. Não acione Production nem altere o domínio durante esse procedimento.
+Quando uma prévia for autorizada, conecte a branch `feat/supabase-vercel-migration` ao projeto Vercel, mantenha o diretório raiz na **raiz do repositório** e dispare **somente uma implantação de Preview**. A estrutura da branch já contém `package.json`, `vercel.json`, `api/` e `client/` nesse nível; não configure o diretório inexistente `marmitastb/`. Não acione Production nem altere o domínio durante esse procedimento.
 
 > A prévia é necessária para verificar a presença das variáveis em build e funções, validar o domínio HTTPS e testar o retorno do OTP. Nenhuma chave sensível deve aparecer em logs, capturas de tela ou artefatos de build.
 

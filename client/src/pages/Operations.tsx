@@ -28,9 +28,9 @@ export function OperationsAccessGate({ role, children }: OperationsAccessGatePro
   );
 }
 
-export function toAlertableOrders(orders: Array<{ id: number; code: string; status: string; acknowledgedAt: Date | null }>) {
+export function toAlertableOrders(orders: Array<{ id: string | number; code: string; status: string; acknowledgedAt: Date | null }>) {
   return orders.map((order) => ({
-    id: order.id,
+    id: String(order.id),
     code: order.code,
     status: order.status,
     acknowledgedAt: order.acknowledgedAt,
@@ -57,8 +57,8 @@ export default function Operations() {
   const onOrdersChange = useCallback((nextOrders: OperationalOrder[]) => {
     setOrders(nextOrders);
   }, []);
-  const onAcknowledge = useCallback((orderId: number) => {
-    acknowledge.mutate({ orderId });
+  const onAcknowledge = useCallback((orderId: string) => {
+    acknowledge.mutate({ orderId: Number(orderId) });
   }, [acknowledge]);
   const alertOrders = toAlertableOrders(orders);
 

@@ -14,11 +14,16 @@ type OperationalOrder = {
   id: string;
   code: string;
   customerName: string;
+  customerPhone: string;
   fulfillmentMethod: "delivery" | "pickup";
+  deliveryAddress: string | null;
+  customerNotes: string | null;
+  totalInCents: number;
   status: OrderStatus;
+  paymentMethod: string;
   paymentStatus: string;
   createdAt: string;
-  items: Array<{ name: string; quantity: number; configuration: unknown; note: string | null }>;
+  items: Array<{ productName: string; quantity: number; unitPriceInCents: number; configuration: unknown; notes: string | null }>;
 };
 
 export type OperationsOrdersDependencies = {
@@ -57,13 +62,18 @@ export function createOperationsOrdersHandler(dependencies: OperationsOrdersDepe
   };
 }
 
-type RawOperationalItem = { product_name: string; quantity: number; configuration: unknown; notes: string | null };
+type RawOperationalItem = { product_name: string; quantity: number; unit_price_in_cents: number; configuration: unknown; notes: string | null };
 type RawOperationalOrder = {
   id: string;
   code: string;
   customer_name: string;
+  customer_phone: string;
   fulfillment_method: "delivery" | "pickup";
+  delivery_address: string | null;
+  customer_notes: string | null;
+  total_in_cents: number;
   status: OrderStatus;
+  payment_method: string;
   payment_status: string;
   created_at: string;
   order_items: RawOperationalItem[] | null;
@@ -73,7 +83,7 @@ async function listSupabaseOperationsOrders(): Promise<OperationalOrder[]> {
   const client = createSupabaseAdmin();
   const { data, error } = await client
     .from("orders")
-    .select("id, code, customer_name, fulfillment_method, status, payment_status, created_at, order_items(product_name, quantity, configuration, notes)")
+    .select("id, code, customer_name, customer_phone, fulfillment_method, delivery_address, customer_notes, total_in_cents, status, payment_method, payment_status, created_at, order_items(product_name, quantity, unit_price_in_cents, configuration, notes)")
     .in("status", ["aguardando_pagamento", "confirmado", "em_preparo", "saiu_para_entrega", "pronto_para_retirada"])
     .order("created_at", { ascending: false });
   if (error) throw new Error("Não foi possível carregar a fila operacional.");
@@ -82,15 +92,21 @@ async function listSupabaseOperationsOrders(): Promise<OperationalOrder[]> {
     id: order.id,
     code: order.code,
     customerName: order.customer_name,
+    customerPhone: order.customer_phone,
     fulfillmentMethod: order.fulfillment_method,
+    deliveryAddress: order.delivery_address,
+    customerNotes: order.customer_notes,
+    totalInCents: order.total_in_cents,
     status: order.status,
+    paymentMethod: order.payment_method,
     paymentStatus: order.payment_status,
     createdAt: order.created_at,
     items: (order.order_items ?? []).map((item) => ({
-      name: item.product_name,
+      productName: item.product_name,
       quantity: item.quantity,
+      unitPriceInCents: item.unit_price_in_cents,
       configuration: item.configuration,
-      note: item.notes,
+      notes: item.notes,
     })),
   }));
 }

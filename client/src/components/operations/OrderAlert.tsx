@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { shouldAlert } from "@/services/browserPrint";
 
 export type AlertableOrder = {
-  id: number;
+  id: string;
   code: string;
   status: string;
   acknowledgedAt: Date | null;
@@ -12,7 +12,7 @@ export type AlertableOrder = {
 
 type OrderAlertProps = {
   orders: AlertableOrder[];
-  onAcknowledge: (orderId: number) => void;
+  onAcknowledge: (orderId: string) => void;
 };
 
 function playNotificationTone() {

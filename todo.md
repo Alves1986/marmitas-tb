@@ -102,3 +102,7 @@
 - [ ] Implementar login interno por código OTP de e-mail no Supabase, sem cadastro público automático da equipe.
 - [ ] Configurar URLs de retorno do Supabase Auth para o domínio vercel.app e os deploys de prévia da homologação.
 - [ ] Adaptar a aplicação Vite para a Vercel com funções TypeScript server-side para pedidos, Asaas, webhook e impressão.
+- [x] Provisionar e validar um projeto Supabase exclusivo para a Marmitas TB antes de aplicar migrações de banco ou Storage.
+- [ ] Manter a criação do projeto Marmitas TB na Vercel para após a validação final, o checkpoint e o envio da branch de migração ao GitHub, sem deploy automático.
+- [ ] Migrar os contratos de autoria de auditoria para UUIDs do Supabase sem alterar os identificadores de domínio ainda numéricos no legado.
+- [x] Manter isoladas as rotas tRPC/MySQL legadas até que suas substitutas Vercel/Supabase estejam implementadas, impedindo a gravação de UUID em auditoria inteira.

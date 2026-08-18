@@ -9,6 +9,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Admin from "./pages/Admin";
 import Home from "./pages/Home";
 import Operations from "./pages/Operations";
+import StaffAccess from "./pages/StaffAccess";
 import TrackOrder from "./pages/TrackOrder";
 
 function Router() {
@@ -17,6 +18,7 @@ function Router() {
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/acompanhar"} component={TrackOrder} />
+      <Route path={"/acesso"} component={StaffAccess} />
       <Route path={"/operacao"} component={Operations} />
       <Route path={"/admin"} component={Admin} />
       <Route path={"/404"} component={NotFound} />

@@ -6,7 +6,6 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { OrderAlert } from "@/components/operations/OrderAlert";
 import { OrderQueue, type OperationalOrder } from "@/components/operations/OrderQueue";
-import { startLogin } from "@/const";
 import { trpc } from "@/lib/trpc";
 
 type OperationsAccessGateProps = {
@@ -74,7 +73,7 @@ export default function Operations() {
           <LogIn aria-hidden="true" className="mx-auto size-9 text-[#68703d]" />
           <h1 className="mt-4 font-display text-3xl font-bold text-[#481e1f]">Acesso da equipe</h1>
           <p className="mt-3 text-sm leading-6 text-[#765f50]">Entre com a conta autorizada para acompanhar os pedidos em tempo real.</p>
-          <Button type="button" onClick={() => startLogin()} className="mt-6 bg-[#a82926] text-white hover:bg-[#7e1f1d]">Entrar para operar</Button>
+          <Button asChild className="mt-6 bg-[#a82926] text-white hover:bg-[#7e1f1d]"><a href="/acesso">Entrar para operar</a></Button>
         </section>
       </main>
     );

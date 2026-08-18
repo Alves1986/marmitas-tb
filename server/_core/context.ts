@@ -14,6 +14,9 @@ export async function createContext(
   let user: User | null = null;
 
   try {
+    // As rotas tRPC ainda gravam auditoria no MySQL legado, cujas chaves
+    // numéricas não aceitam UUIDs. A adoção do Supabase no servidor ocorrerá
+    // nas funções Vercel, que persistirão diretamente no Postgres.
     user = await sdk.authenticateRequest(opts.req);
   } catch (error) {
     // Authentication is optional for public procedures.

@@ -106,7 +106,7 @@
 - [x] Manter a criação do projeto Marmitas TB na Vercel para após a validação final, o checkpoint e o envio da branch de migração ao GitHub, sem deploy automático.
 - [ ] Migrar os contratos de autoria de auditoria para UUIDs do Supabase sem alterar os identificadores de domínio ainda numéricos no legado.
 - [x] Manter isoladas as rotas tRPC/MySQL legadas até que suas substitutas Vercel/Supabase estejam implementadas, impedindo a gravação de UUID em auditoria inteira.
-- [ ] Retomar a inspeção de dados e Storage pelo conector Supabase quando o serviço MCP externo voltar a responder, antes da migração de produção.
+- [x] Retomar a inspeção de dados e Storage pelo conector Supabase quando o serviço MCP externo voltar a responder, antes da migração de produção.
 - [x] Transferir ao Supabase Storage a logo e as 18 imagens do catálogo, e importar 8 categorias, 18 produtos e 90 opções ao Postgres com referências públicas estáveis.
 - [x] Migrar a fila operacional, seus alertas e a impressão do navegador para os endpoints Vercel com UUIDs Supabase no runtime de homologação.
 - [x] Migrar o painel administrativo de catálogo, equipe e configurações para os endpoints Vercel protegidos no runtime de homologação.
@@ -116,5 +116,5 @@
 - [x] Adicionar teste de interface para falha de reconhecimento de alerta no runtime Vercel, garantindo que o pedido permaneça pendente e o erro seja exibido ao operador.
 - [x] Confirmar a branch de migração no GitHub antes de habilitar ou configurar o projeto de homologação na Vercel.
 - [x] Criar e testar o webhook Asaas em função Vercel, com token Sandbox obrigatório, idempotência transacional prevista e bloqueio seguro sem credenciais.
-- [ ] Aplicar e validar no Supabase a migração transacional do webhook Asaas antes de cadastrar token ou testar uma prévia externa.
+- [x] Aplicar e validar no Supabase a migração transacional do webhook Asaas antes de cadastrar token ou testar uma prévia externa.
 - [x] Criar e testar o exportador somente leitura do histórico operacional legado, com proteção contra versionamento e documentação de reconciliação por UUID.

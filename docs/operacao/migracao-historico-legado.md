@@ -29,3 +29,7 @@ O comando emite apenas o caminho do arquivo e as contagens por coleção. Não i
 Antes de desenvolver o importador, compare as contagens do JSON com o banco legado e defina uma tabela de mapeamento auditável de IDs numéricos para UUIDs. Registros com `configurationJson` ou `payloadJson` inválidos são preservados como texto pelo exportador; devem ser corrigidos ou explicitamente aprovados, nunca descartados silenciosamente.
 
 > Não execute importação no Supabase enquanto o ambiente de prévia não estiver autorizado, o snapshot não estiver revisado e a estratégia de autoria de `order_events` e `store_settings` não estiver aprovada.
+
+## Evidência de exportação em 18 de agosto de 2026
+
+Após autorização operacional, o exportador foi executado com `DATABASE_URL` e gerou um snapshot local protegido. As contagens registradas foram **zero** para pedidos, itens, eventos de pedido, eventos de pagamento e trabalhos de impressão; consequentemente, nenhum dado histórico operacional precisa ser importado nesta etapa. O artefato continua local, ignorado pelo Git e não foi anexado a esta documentação.

@@ -1,15 +1,17 @@
 import { CircleAlert, ClipboardList, LoaderCircle, Printer, RefreshCw } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { OrderStatus } from "@shared/operations";
 import { Button } from "@/components/ui/button";
 import { Receipt } from "@/components/operations/Receipt";
 import { buildPrintTicketHtml, formatBRL } from "@/lib/printTicket";
 import type { PrintTicketInput } from "@/lib/printTicket";
 import { trpc } from "@/lib/trpc";
+import { isVercelRuntime } from "@/lib/runtimeConfig";
 import { printReceipt } from "@/services/browserPrint";
+import { vercelOperationsService, type VercelOperationalOrder, type VercelPrintJob } from "@/services/operationsService";
 
 export type OperationalOrder = {
-  id: number;
+  id: string | number;
   code: string;
   customerName: string;
   customerPhone: string;
@@ -83,6 +85,18 @@ export function getManualPrintRequest(orderId: number) {
   return { orderId };
 }
 
+export function toPrintFailureMessage(error: unknown) {
+  return error instanceof Error ? error.message : "Não foi possível registrar a impressão. Tente novamente.";
+}
+
+export function toOperationalOrders(orders: VercelOperationalOrder[]): OperationalOrder[] {
+  return orders.map((order) => ({
+    ...order,
+    acknowledgedAt: order.acknowledgedAt ? new Date(order.acknowledgedAt) : null,
+    createdAt: new Date(order.createdAt),
+  }));
+}
+
 function buildReceiptDocument(order: OperationalOrder): string {
   return buildPrintTicketHtml({
     ...order,
@@ -106,10 +120,11 @@ type OrderQueueProps = {
 };
 
 export function OrderQueue({ onOrdersChange }: OrderQueueProps) {
+  const useVercelApi = isVercelRuntime();
   const utils = trpc.useUtils();
-  const printedJobIds = useRef(new Set<number>());
-  const { data, isLoading, error } = trpc.operations.list.useQuery(undefined, { refetchInterval: 10_000 });
-  const { data: printJobs = [] } = trpc.operations.printJobs.useQuery(undefined, { refetchInterval: 10_000 });
+  const printedJobIds = useRef(new Set<string | number>());
+  const { data: legacyData, isLoading: legacyLoading, error: legacyError } = trpc.operations.list.useQuery(undefined, { refetchInterval: useVercelApi ? false : 10_000 });
+  const { data: legacyPrintJobs = [] } = trpc.operations.printJobs.useQuery(undefined, { refetchInterval: useVercelApi ? false : 10_000 });
   const transition = trpc.operations.transition.useMutation({
     onSuccess: () => void utils.operations.list.invalidate(),
   });
@@ -119,33 +134,119 @@ export function OrderQueue({ onOrdersChange }: OrderQueueProps) {
   const queuePrint = trpc.operations.queuePrint.useMutation({
     onSuccess: () => void utils.operations.printJobs.invalidate(),
   });
-  const orders = (data ?? []) as OperationalOrder[];
+  const [vercelOrders, setVercelOrders] = useState<OperationalOrder[]>([]);
+  const [vercelPrintJobs, setVercelPrintJobs] = useState<VercelPrintJob[]>([]);
+  const [vercelLoading, setVercelLoading] = useState(false);
+  const [vercelError, setVercelError] = useState<string | null>(null);
+  const [pendingOrderId, setPendingOrderId] = useState<string | number | null>(null);
+  const [pendingPrintOrderId, setPendingPrintOrderId] = useState<string | number | null>(null);
+
+  const refreshVercelQueue = useCallback(async () => {
+    const [orders, jobs] = await Promise.all([vercelOperationsService.listOrders(), vercelOperationsService.listPrintJobs()]);
+    setVercelOrders(toOperationalOrders(orders));
+    setVercelPrintJobs(jobs);
+  }, []);
+
+  useEffect(() => {
+    if (!useVercelApi) return;
+    let active = true;
+    setVercelLoading(true);
+    const load = async () => {
+      try {
+        await refreshVercelQueue();
+        if (active) setVercelError(null);
+      } catch (error) {
+        if (active) setVercelError(error instanceof Error ? error.message : "Não foi possível carregar a fila.");
+      } finally {
+        if (active) setVercelLoading(false);
+      }
+    };
+    void load();
+    const interval = window.setInterval(() => void load(), 10_000);
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+    };
+  }, [refreshVercelQueue, useVercelApi]);
+
+  const orders = useVercelApi ? vercelOrders : (legacyData ?? []) as OperationalOrder[];
+  const printJobs = useVercelApi
+    ? vercelPrintJobs.map((job) => ({ id: job.id, orderId: job.order_id }))
+    : legacyPrintJobs.map((printJob) => ({ id: printJob.job.id, orderId: printJob.order.id }));
+  const isLoading = useVercelApi ? vercelLoading : legacyLoading;
+  const errorMessage = useVercelApi ? vercelError : legacyError?.message;
+
+  const handleTransition = async (orderId: string | number, nextStatus: OrderStatus) => {
+    if (!useVercelApi) {
+      transition.mutate({ orderId: Number(orderId), nextStatus });
+      return;
+    }
+    setPendingOrderId(orderId);
+    try {
+      await vercelOperationsService.transitionOrder(String(orderId), nextStatus);
+      await refreshVercelQueue();
+    } catch (error) {
+      setVercelError(error instanceof Error ? error.message : "Não foi possível atualizar o pedido.");
+    } finally {
+      setPendingOrderId(null);
+    }
+  };
+
+  const handleReprint = async (orderId: string | number) => {
+    if (!useVercelApi) {
+      queuePrint.mutate(getManualPrintRequest(Number(orderId)));
+      return;
+    }
+    setPendingPrintOrderId(orderId);
+    try {
+      await vercelOperationsService.requeuePrint(String(orderId));
+      await refreshVercelQueue();
+    } catch (error) {
+      setVercelError(error instanceof Error ? error.message : "Não foi possível reenviar a comanda.");
+    } finally {
+      setPendingPrintOrderId(null);
+    }
+  };
 
   useEffect(() => {
     onOrdersChange?.(orders);
   }, [onOrdersChange, orders]);
 
   useEffect(() => {
+    const finalizePrint = async (printJobId: string | number, status: "printed" | "failed") => {
+      try {
+        if (useVercelApi) {
+          await vercelOperationsService.markPrintJob(String(printJobId), status, "Navegador do posto");
+          await refreshVercelQueue();
+        } else {
+          markPrintJob.mutate({ printJobId: Number(printJobId), status, printerName: "Navegador do posto" });
+        }
+      } catch (error) {
+        printedJobIds.current.delete(printJobId);
+        setVercelError(toPrintFailureMessage(error));
+      }
+    };
+
     for (const printJob of printJobs) {
-      if (printedJobIds.current.has(printJob.job.id)) continue;
-      const order = orders.find((candidate) => candidate.id === printJob.order.id);
+      if (printedJobIds.current.has(printJob.id)) continue;
+      const order = orders.find((candidate) => String(candidate.id) === String(printJob.orderId));
       if (!order) continue;
-      printedJobIds.current.add(printJob.job.id);
+      printedJobIds.current.add(printJob.id);
       try {
         printReceipt(buildReceiptDocument(order));
-        markPrintJob.mutate({ printJobId: printJob.job.id, status: "printed", printerName: "Navegador do posto" });
+        void finalizePrint(printJob.id, "printed");
       } catch {
-        markPrintJob.mutate({ printJobId: printJob.job.id, status: "failed", printerName: "Navegador do posto" });
+        void finalizePrint(printJob.id, "failed");
       }
     }
-  }, [markPrintJob, orders, printJobs]);
+  }, [markPrintJob, orders, printJobs, refreshVercelQueue, useVercelApi]);
 
   if (isLoading) {
     return <div className="flex min-h-52 items-center justify-center rounded-2xl border border-[#e4d7c4] bg-white"><LoaderCircle aria-label="Carregando pedidos" className="size-6 animate-spin text-[#a82926]" /></div>;
   }
 
-  if (error) {
-    return <div className="rounded-2xl border border-[#f2b4a2] bg-[#fff1eb] p-5 text-[#7e1f1d]"><CircleAlert className="mb-2 size-5" /><p className="font-bold">Não foi possível carregar a fila.</p><p className="mt-1 text-sm">{error.message}</p></div>;
+  if (errorMessage) {
+    return <div className="rounded-2xl border border-[#f2b4a2] bg-[#fff1eb] p-5 text-[#7e1f1d]"><CircleAlert className="mb-2 size-5" /><p className="font-bold">Não foi possível carregar a fila.</p><p className="mt-1 text-sm">{errorMessage}</p></div>;
   }
 
   if (orders.length === 0) {
@@ -156,7 +257,7 @@ export function OrderQueue({ onOrdersChange }: OrderQueueProps) {
     <div className="grid gap-4 xl:grid-cols-2">
       {orders.map((order) => {
         const actions = getNextStatusActions(order.status);
-        const isMutating = transition.isPending && transition.variables?.orderId === order.id;
+        const isMutating = useVercelApi ? pendingOrderId === order.id : transition.isPending && transition.variables?.orderId === Number(order.id);
         return (
           <article key={order.id} className="rounded-2xl border border-[#dfd0ba] bg-white p-5 shadow-[0_8px_30px_rgba(72,30,31,0.07)]">
             <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[#eee3d3] pb-4">
@@ -179,10 +280,10 @@ export function OrderQueue({ onOrdersChange }: OrderQueueProps) {
             </div>
 
             <div className="mt-5 flex flex-wrap gap-2 border-t border-[#eee3d3] pt-4">
-              <Button type="button" size="sm" variant="outline" disabled={queuePrint.isPending && queuePrint.variables?.orderId === order.id} className="border-[#c2ad91] text-[#481e1f] hover:bg-[#fff7e8]" onClick={() => queuePrint.mutate(getManualPrintRequest(order.id))}>
+              <Button type="button" size="sm" variant="outline" disabled={useVercelApi ? pendingPrintOrderId === order.id : queuePrint.isPending && queuePrint.variables?.orderId === Number(order.id)} className="border-[#c2ad91] text-[#481e1f] hover:bg-[#fff7e8]" onClick={() => void handleReprint(order.id)}>
                 <Printer aria-hidden="true" className="mr-1.5 size-4" />Reimprimir
               </Button>
-              {actions.map((action) => <Button key={action.nextStatus} type="button" size="sm" disabled={isMutating} variant={action.nextStatus === "cancelado" ? "outline" : "default"} className={action.nextStatus === "cancelado" ? "border-[#e0ada9] text-[#a82926] hover:bg-[#fff1eb]" : "bg-[#68703d] text-white hover:bg-[#4e5729]"} onClick={() => transition.mutate({ orderId: order.id, nextStatus: action.nextStatus })}>{isMutating ? <RefreshCw aria-hidden="true" className="mr-1.5 size-4 animate-spin" /> : null}{action.label}</Button>)}
+              {actions.map((action) => <Button key={action.nextStatus} type="button" size="sm" disabled={isMutating} variant={action.nextStatus === "cancelado" ? "outline" : "default"} className={action.nextStatus === "cancelado" ? "border-[#e0ada9] text-[#a82926] hover:bg-[#fff1eb]" : "bg-[#68703d] text-white hover:bg-[#4e5729]"} onClick={() => void handleTransition(order.id, action.nextStatus)}>{isMutating ? <RefreshCw aria-hidden="true" className="mr-1.5 size-4 animate-spin" /> : null}{action.label}</Button>)}
             </div>
           </article>
         );

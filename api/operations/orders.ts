@@ -22,6 +22,7 @@ type OperationalOrder = {
   status: OrderStatus;
   paymentMethod: string;
   paymentStatus: string;
+  acknowledgedAt: string | null;
   createdAt: string;
   items: Array<{ productName: string; quantity: number; unitPriceInCents: number; configuration: unknown; notes: string | null }>;
 };
@@ -88,6 +89,21 @@ async function listSupabaseOperationsOrders(): Promise<OperationalOrder[]> {
     .order("created_at", { ascending: false });
   if (error) throw new Error("Não foi possível carregar a fila operacional.");
 
+  const orderIds = (data ?? []).map((order) => order.id);
+  const acknowledgedAtByOrderId = new Map<string, string>();
+  if (orderIds.length > 0) {
+    const { data: acknowledgements, error: acknowledgementError } = await client
+      .from("order_events")
+      .select("order_id, created_at")
+      .in("order_id", orderIds)
+      .eq("event_type", "alert_acknowledged")
+      .order("created_at", { ascending: false });
+    if (acknowledgementError) throw new Error("Não foi possível carregar os alertas operacionais.");
+    for (const event of acknowledgements ?? []) {
+      if (!acknowledgedAtByOrderId.has(event.order_id)) acknowledgedAtByOrderId.set(event.order_id, event.created_at);
+    }
+  }
+
   return ((data ?? []) as RawOperationalOrder[]).map((order) => ({
     id: order.id,
     code: order.code,
@@ -100,6 +116,7 @@ async function listSupabaseOperationsOrders(): Promise<OperationalOrder[]> {
     status: order.status,
     paymentMethod: order.payment_method,
     paymentStatus: order.payment_status,
+    acknowledgedAt: acknowledgedAtByOrderId.get(order.id) ?? null,
     createdAt: order.created_at,
     items: (order.order_items ?? []).map((item) => ({
       productName: item.product_name,

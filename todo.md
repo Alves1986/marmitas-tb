@@ -108,5 +108,8 @@
 - [x] Manter isoladas as rotas tRPC/MySQL legadas até que suas substitutas Vercel/Supabase estejam implementadas, impedindo a gravação de UUID em auditoria inteira.
 - [ ] Retomar a inspeção de dados e Storage pelo conector Supabase quando o serviço MCP externo voltar a responder, antes da migração de produção.
 - [x] Transferir ao Supabase Storage a logo e as 18 imagens do catálogo, e importar 8 categorias, 18 produtos e 90 opções ao Postgres com referências públicas estáveis.
-- [ ] Migrar a fila operacional, seus alertas e a impressão do navegador para os endpoints Vercel com UUIDs Supabase no runtime de homologação.
+- [x] Migrar a fila operacional, seus alertas e a impressão do navegador para os endpoints Vercel com UUIDs Supabase no runtime de homologação.
 - [ ] Migrar o painel administrativo de catálogo, equipe e configurações para os endpoints Vercel protegidos no runtime de homologação.
+- [x] Tratar falhas de baixa de impressão e reconhecimento de alertas no runtime Vercel, com feedback ao operador, estado consistente e nova tentativa possível.
+- [x] Cobrir falhas de baixa de impressão e reconhecimento de alertas no runtime Vercel em testes automatizados.
+- [x] Adicionar teste de interface para falha de reconhecimento de alerta no runtime Vercel, garantindo que o pedido permaneça pendente e o erro seja exibido ao operador.

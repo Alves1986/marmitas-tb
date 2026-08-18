@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { OrderAlert } from "@/components/operations/OrderAlert";
 import { OrderQueue, type OperationalOrder } from "@/components/operations/OrderQueue";
 import { trpc } from "@/lib/trpc";
+import { isVercelRuntime } from "@/lib/runtimeConfig";
+import { vercelOperationsService } from "@/services/operationsService";
 
 type OperationsAccessGateProps = {
   role?: "user" | "admin" | "staff" | null;
@@ -37,11 +39,17 @@ export function toAlertableOrders(orders: Array<{ id: string | number; code: str
   }));
 }
 
+export function toOperationFailureMessage(error: unknown) {
+  return error instanceof Error ? error.message : "Não foi possível reconhecer o alerta. Tente novamente.";
+}
+
 export default function Operations() {
   const { user, loading } = useAuth();
+  const useVercelApi = isVercelRuntime();
   const [, setLocation] = useLocation();
   const utils = trpc.useUtils();
   const [orders, setOrders] = useState<OperationalOrder[]>([]);
+  const [operationError, setOperationError] = useState<string | null>(null);
   const role = user?.role ?? null;
   const canOperate = Boolean(role && canAccessOperation(role));
   const acknowledge = trpc.operations.acknowledge.useMutation({
@@ -58,8 +66,17 @@ export default function Operations() {
     setOrders(nextOrders);
   }, []);
   const onAcknowledge = useCallback((orderId: string) => {
-    acknowledge.mutate({ orderId: Number(orderId) });
-  }, [acknowledge]);
+    if (!useVercelApi) {
+      acknowledge.mutate({ orderId: Number(orderId) });
+      return;
+    }
+    setOperationError(null);
+    void vercelOperationsService.acknowledgeAlert(orderId)
+      .then(() => {
+        setOrders((current) => current.map((order) => order.id === orderId ? { ...order, acknowledgedAt: new Date() } : order));
+      })
+      .catch((error) => setOperationError(toOperationFailureMessage(error)));
+  }, [acknowledge, useVercelApi]);
   const alertOrders = toAlertableOrders(orders);
 
   if (loading) {
@@ -93,6 +110,7 @@ export default function Operations() {
         </header>
 
         <div className="container space-y-5 py-7">
+          {operationError ? <div role="alert" className="rounded-xl border border-[#f2b4a2] bg-[#fff1eb] p-4 text-sm font-medium text-[#7e1f1d]">{operationError}</div> : null}
           <OrderAlert orders={alertOrders} onAcknowledge={onAcknowledge} />
           <OrderQueue onOrdersChange={onOrdersChange} />
         </div>

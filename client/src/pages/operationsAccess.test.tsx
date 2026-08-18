@@ -22,7 +22,7 @@ describe("toAlertableOrders", () => {
   it("mantém o reconhecimento persistido do pedido ao preparar os alertas", () => {
     const acknowledgedAt = new Date("2026-08-17T15:30:00.000Z");
     expect(toAlertableOrders([{ id: 7, code: "TB-20260817-0007", status: "confirmado", acknowledgedAt }])).toEqual([
-      { id: 7, code: "TB-20260817-0007", status: "confirmado", acknowledgedAt },
+      { id: "7", code: "TB-20260817-0007", status: "confirmado", acknowledgedAt },
     ]);
   });
 });

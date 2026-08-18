@@ -2,7 +2,8 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { getAlertRepeatInterval, OrderAlert, shouldPlayNotification } from "./OrderAlert";
-import { OrderReceiptPreview } from "./OrderQueue";
+import { OrderReceiptPreview, toPrintFailureMessage } from "./OrderQueue";
+import { toOperationFailureMessage } from "@/pages/Operations";
 import { Receipt } from "./Receipt";
 
 describe("Receipt", () => {
@@ -79,5 +80,17 @@ describe("OrderReceiptPreview", () => {
     expect(screen.getByText(/Pré-visualizar comanda térmica/i)).toBeTruthy();
     expect(screen.getByText(/TB-20260817-0012/)).toBeTruthy();
     expect(screen.getByText(/Marmita família/)).toBeTruthy();
+  });
+});
+
+describe("falhas operacionais Vercel", () => {
+  it("mantém uma mensagem recuperável quando a baixa de impressão falha", () => {
+    expect(toPrintFailureMessage(new Error("offline"))).toBe("offline");
+    expect(toPrintFailureMessage(null)).toContain("Tente novamente");
+  });
+
+  it("mantém uma mensagem recuperável quando o reconhecimento do alerta falha", () => {
+    expect(toOperationFailureMessage(new Error("indisponível"))).toBe("indisponível");
+    expect(toOperationFailureMessage(null)).toContain("Tente novamente");
   });
 });

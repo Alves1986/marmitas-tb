@@ -28,6 +28,8 @@ export default defineConfig({
       "client/**/*.spec.tsx",
       "shared/**/*.test.ts",
       "shared/**/*.spec.ts",
+      "scripts/**/*.test.ts",
+      "scripts/**/*.spec.ts",
     ],
   },
 });

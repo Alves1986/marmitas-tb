@@ -117,3 +117,4 @@
 - [x] Confirmar a branch de migração no GitHub antes de habilitar ou configurar o projeto de homologação na Vercel.
 - [x] Criar e testar o webhook Asaas em função Vercel, com token Sandbox obrigatório, idempotência transacional prevista e bloqueio seguro sem credenciais.
 - [ ] Aplicar e validar no Supabase a migração transacional do webhook Asaas antes de cadastrar token ou testar uma prévia externa.
+- [x] Criar e testar o exportador somente leitura do histórico operacional legado, com proteção contra versionamento e documentação de reconciliação por UUID.

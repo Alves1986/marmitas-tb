@@ -43,3 +43,10 @@ export const trackingInput = z.object({
     .transform(normalizePhoneForLookup)
     .refine((value) => value.length >= 8, "Informe um telefone válido."),
 });
+
+export const phoneTrackingInput = z.object({
+  phone: z
+    .string()
+    .transform(normalizePhoneForLookup)
+    .refine((value) => value.length >= 8, "Informe um telefone válido."),
+});

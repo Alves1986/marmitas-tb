@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, CircleCheck, Clock3, CreditCard, PackageCheck, Search, ShieldCheck } from "lucide-react";
 import { trpc } from "@/lib/trpc";
+import { apiRequest } from "@/lib/api";
+import { createVercelTrackingService, type PublicTracking } from "@/services/trackingService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,29 +24,59 @@ function formatDate(value: Date | string) {
 }
 
 export default function TrackOrder() {
+  const useVercelApi = import.meta.env.VITE_API_RUNTIME === "vercel" && import.meta.env.PROD;
   const params = new URLSearchParams(window.location.search);
   const [phone, setPhone] = useState("");
   const [submittedPhone, setSubmittedPhone] = useState<string | null>(null);
   const [specificCode, setSpecificCode] = useState(params.get("pedido") ?? "");
   const [specificPhone, setSpecificPhone] = useState("");
   const [submittedSpecificTracking, setSubmittedSpecificTracking] = useState<{ code: string; phone: string } | null>(null);
+  const [vercelTracking, setVercelTracking] = useState<{ data: PublicTracking | null; isFetching: boolean; error: Error | null }>({ data: null, isFetching: false, error: null });
 
   const trackingByPhone = trpc.orders.trackByPhone.useQuery(
     { phone: submittedPhone ?? "_" },
-    { enabled: Boolean(submittedPhone), retry: false },
+    { enabled: !useVercelApi && Boolean(submittedPhone), retry: false },
   );
   const trackingByCode = trpc.orders.track.useQuery(
     { code: submittedSpecificTracking?.code ?? "_", phone: submittedSpecificTracking?.phone ?? "_" },
-    { enabled: Boolean(submittedSpecificTracking), retry: false },
+    { enabled: !useVercelApi && Boolean(submittedSpecificTracking), retry: false },
   );
+
+  useEffect(() => {
+    if (!useVercelApi || (!submittedPhone && !submittedSpecificTracking)) return;
+    let cancelled = false;
+    const service = createVercelTrackingService({ request: (path) => apiRequest<PublicTracking>(path) });
+    setVercelTracking({ data: null, isFetching: true, error: null });
+    const request = submittedPhone ? service.byPhone(submittedPhone) : service.byCode(submittedSpecificTracking!.code, submittedSpecificTracking!.phone);
+    void request
+      .then((data) => { if (!cancelled) setVercelTracking({ data, isFetching: false, error: null }); })
+      .catch((error: unknown) => { if (!cancelled) setVercelTracking({ data: null, isFetching: false, error: error instanceof Error ? error : new Error("Falha ao consultar pedido.") }); });
+    return () => { cancelled = true; };
+  }, [submittedPhone, submittedSpecificTracking, useVercelApi]);
 
   const publicTracking = trackingByPhone.data;
   const specificTracking = trackingByCode.data;
-  const activeTracking = publicTracking ?? specificTracking;
+  const activeTracking = useVercelApi
+    ? vercelTracking.data && {
+      order: {
+        code: vercelTracking.data.code,
+        status: vercelTracking.data.status,
+        totalInCents: vercelTracking.data.totalInCents,
+        paymentStatus: vercelTracking.data.paymentStatus,
+        paymentMethod: vercelTracking.data.paymentMethod,
+        paymentProvider: vercelTracking.data.paymentProvider,
+        fulfillmentMethod: vercelTracking.data.fulfillmentMethod,
+        createdAt: vercelTracking.data.createdAt,
+      },
+      events: vercelTracking.data.events,
+    }
+    : publicTracking ?? specificTracking;
   const order = activeTracking?.order;
   const timeline = activeTracking?.events ?? [];
-  const isFetching = trackingByPhone.isFetching || trackingByCode.isFetching;
-  const hasNetworkError = (Boolean(trackingByPhone.error) || Boolean(trackingByCode.error)) && !activeTracking;
+  const isFetching = useVercelApi ? vercelTracking.isFetching : trackingByPhone.isFetching || trackingByCode.isFetching;
+  const hasNetworkError = useVercelApi
+    ? Boolean(vercelTracking.error) && !activeTracking
+    : (Boolean(trackingByPhone.error) || Boolean(trackingByCode.error)) && !activeTracking;
   const searchedByPhone = Boolean(submittedPhone);
   const searchedByCode = Boolean(submittedSpecificTracking);
 
@@ -78,7 +110,7 @@ export default function TrackOrder() {
 
           {order && <div className="mt-8"><div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.15em] text-[#a58f7a]">Pedido {order.code}</p><h2 className="font-display mt-1 text-3xl tracking-[-0.04em]">{statusLabels[order.status]}</h2></div><span className={`rounded-full px-3 py-1.5 text-xs font-extrabold ${order.paymentStatus === "confirmed" ? "bg-[#e6efd0] text-[#53652b]" : "bg-[#f7e7d5] text-[#8d3c2f]"}`}>{order.paymentStatus === "confirmed" ? "Pagamento confirmado" : order.paymentMethod === "cash" ? "Pagamento no recebimento" : "Pagamento pendente"}</span></div><div className="mt-4"><PaymentModeNotice mode={toPaymentNoticeModeFromProvider(order.paymentProvider)} /></div>
 
-            <div className="mt-6 grid gap-3 sm:grid-cols-2"><div className="rounded-2xl bg-[#f8f0e3] p-4"><p className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.14em] text-[#8b735f]"><PackageCheck className="size-4 text-[#a82926]" /> Recebimento</p><p className="mt-2 text-sm font-bold text-[#481e1f]">{order.fulfillmentMethod === "delivery" ? "Entrega em andamento" : "Retirada na Marmitas TB"}</p>{specificTracking?.order?.fulfillmentMethod === "delivery" && specificTracking.order.deliveryAddress && <p className="mt-1 text-xs leading-relaxed text-[#765f50]">{specificTracking.order.deliveryAddress}</p>}</div><div className="rounded-2xl bg-[#f8f0e3] p-4"><p className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.14em] text-[#8b735f]"><CreditCard className="size-4 text-[#a82926]" /> Total</p><p className="mt-2 text-xl font-black text-[#a82926]">{formatCurrency(order.totalInCents / 100)}</p><p className="mt-1 text-xs text-[#765f50]">{order.paymentProvider === "asaas_test" ? "Pagamento em modo de teste" : "Pagamento processado pelo Asaas"}</p></div></div>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2"><div className="rounded-2xl bg-[#f8f0e3] p-4"><p className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.14em] text-[#8b735f]"><PackageCheck className="size-4 text-[#a82926]" /> Recebimento</p><p className="mt-2 text-sm font-bold text-[#481e1f]">{order.fulfillmentMethod === "delivery" ? "Entrega em andamento" : "Retirada na Marmitas TB"}</p>{!useVercelApi && specificTracking?.order?.fulfillmentMethod === "delivery" && specificTracking.order.deliveryAddress && <p className="mt-1 text-xs leading-relaxed text-[#765f50]">{specificTracking.order.deliveryAddress}</p>}</div><div className="rounded-2xl bg-[#f8f0e3] p-4"><p className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.14em] text-[#8b735f]"><CreditCard className="size-4 text-[#a82926]" /> Total</p><p className="mt-2 text-xl font-black text-[#a82926]">{formatCurrency(order.totalInCents / 100)}</p><p className="mt-1 text-xs text-[#765f50]">{order.paymentProvider === "asaas_test" ? "Pagamento em modo de teste" : "Pagamento processado pelo Asaas"}</p></div></div>
 
             <ol className="mt-7 space-y-0" aria-label="Linha do tempo do pedido">{timeline.map((event, index) => <li key={event.id} className="relative flex gap-4 pb-6 last:pb-0"><span className="relative z-10 mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-[#e6efd0] text-[#53652b]"><CircleCheck className="size-3.5" /></span>{index < timeline.length - 1 && <span className="absolute left-3 top-6 h-[calc(100%-18px)] w-px bg-[#d7c5ac]" />}<div><p className="text-sm font-extrabold text-[#481e1f]">{event.toStatus ? statusLabels[event.toStatus] ?? event.toStatus : "Atualização do pedido"}</p><p className="mt-0.5 text-xs leading-relaxed text-[#765f50]">{event.message ?? "Sua solicitação foi atualizada."}</p><p className="mt-1 text-[11px] font-semibold text-[#a58f7a]">{formatDate(event.createdAt)}</p></div></li>)}</ol>
           </div>}

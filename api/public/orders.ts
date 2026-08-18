@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { json, jsonError, methodNotAllowed } from "../_lib/http";
-import { normalizePhoneForLookup, trackingInput } from "../_lib/orders";
-import { createSupabaseOrder, findSupabaseTracking } from "../_lib/ordersRepository";
+import { normalizePhoneForLookup, phoneTrackingInput, trackingInput } from "../_lib/orders";
+import { createSupabaseOrder, findSupabaseTracking, findSupabaseTrackingByPhone } from "../_lib/ordersRepository";
 
 const itemInput = z.object({
   productId: z.string().uuid(),
@@ -46,23 +46,37 @@ export type PublicTrackingOrder = {
   status: string;
   customerName: string;
   items: Array<{ name: string; quantity: number }>;
+  totalInCents: number;
+  paymentStatus: "pending" | "confirmed";
+  paymentMethod: "pix" | "credit_card" | "voucher" | "cash";
+  paymentProvider: "asaas_test" | "asaas";
+  fulfillmentMethod: "delivery" | "pickup";
+  createdAt: string;
+  events: Array<{ id: string; toStatus: string | null; message: string | null; createdAt: string }>;
 };
 
 export type PublicOrderRepository = {
   createOrder(input: CreatePublicOrderInput): Promise<PublicOrderConfirmation>;
   findTracking(input: z.infer<typeof trackingInput>): Promise<PublicTrackingOrder | null>;
+  findLatestTrackingByPhone(phone: string): Promise<PublicTrackingOrder | null>;
 };
 
 export function createPublicOrdersHandler(repository: PublicOrderRepository) {
   return async function publicOrdersHandler(request: Request): Promise<Response> {
     if (request.method === "GET") {
-      const input = trackingInput.safeParse({
-        code: new URL(request.url).searchParams.get("code") ?? "",
-        phone: new URL(request.url).searchParams.get("phone") ?? "",
-      });
-      if (!input.success) return jsonError(400, "Informe código e telefone válidos.");
+      const url = new URL(request.url);
+      const code = url.searchParams.get("code") ?? "";
+      const phone = url.searchParams.get("phone") ?? "";
 
       try {
+        if (!code) {
+          const input = phoneTrackingInput.safeParse({ phone });
+          if (!input.success) return jsonError(400, "Informe um telefone válido.");
+          const tracking = await repository.findLatestTrackingByPhone(input.data.phone);
+          return tracking ? json(200, tracking) : jsonError(404, "Pedido não encontrado.");
+        }
+        const input = trackingInput.safeParse({ code, phone });
+        if (!input.success) return jsonError(400, "Informe código e telefone válidos.");
         const tracking = await repository.findTracking(input.data);
         return tracking ? json(200, tracking) : jsonError(404, "Pedido não encontrado.");
       } catch (error) {
@@ -91,4 +105,5 @@ export function createPublicOrdersHandler(repository: PublicOrderRepository) {
 export default createPublicOrdersHandler({
   createOrder: createSupabaseOrder,
   findTracking: findSupabaseTracking,
+  findLatestTrackingByPhone: findSupabaseTrackingByPhone,
 });

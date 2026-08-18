@@ -132,7 +132,7 @@ export async function findSupabaseTracking(input: { code: string; phone: string 
   const client = createSupabaseAdmin();
   const { data: order, error } = await client
     .from("orders")
-    .select("id, code, status, customer_name")
+    .select("id, code, status, customer_name, total_in_cents, payment_status, payment_method, payment_provider, fulfillment_method, created_at")
     .eq("code", input.code)
     .eq("customer_phone_lookup", input.phone)
     .maybeSingle();
@@ -141,11 +141,59 @@ export async function findSupabaseTracking(input: { code: string; phone: string 
 
   const { data: items, error: itemsError } = await client.from("order_items").select("product_name, quantity").eq("order_id", order.id);
   if (itemsError) throw new Error("Não foi possível consultar os itens do pedido.");
+  const { data: events, error: eventsError } = await client
+    .from("order_events")
+    .select("id, to_status, message, created_at")
+    .eq("order_id", order.id)
+    .order("created_at", { ascending: true });
+  if (eventsError) throw new Error("Não foi possível consultar o histórico do pedido.");
 
   return {
     code: order.code,
     status: order.status,
     customerName: order.customer_name,
     items: (items ?? []).map((item) => ({ name: item.product_name, quantity: item.quantity })),
+    totalInCents: order.total_in_cents,
+    paymentStatus: order.payment_status,
+    paymentMethod: order.payment_method,
+    paymentProvider: order.payment_provider,
+    fulfillmentMethod: order.fulfillment_method,
+    createdAt: order.created_at,
+    events: (events ?? []).map((event) => ({ id: event.id, toStatus: event.to_status, message: event.message, createdAt: event.created_at })),
+  };
+}
+
+export async function findSupabaseTrackingByPhone(phone: string): Promise<PublicTrackingOrder | null> {
+  const client = createSupabaseAdmin();
+  const { data: order, error } = await client
+    .from("orders")
+    .select("id, code, status, customer_name, total_in_cents, payment_status, payment_method, payment_provider, fulfillment_method, created_at")
+    .eq("customer_phone_lookup", phone)
+    .not("status", "in", "(concluido,cancelado)")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw new Error("Não foi possível consultar o pedido.");
+  if (!order) return null;
+
+  const { data: events, error: eventsError } = await client
+    .from("order_events")
+    .select("id, to_status, message, created_at")
+    .eq("order_id", order.id)
+    .order("created_at", { ascending: true });
+  if (eventsError) throw new Error("Não foi possível consultar o histórico do pedido.");
+
+  return {
+    code: order.code,
+    status: order.status,
+    customerName: order.customer_name,
+    items: [],
+    totalInCents: order.total_in_cents,
+    paymentStatus: order.payment_status,
+    paymentMethod: order.payment_method,
+    paymentProvider: order.payment_provider,
+    fulfillmentMethod: order.fulfillment_method,
+    createdAt: order.created_at,
+    events: (events ?? []).map((event) => ({ id: event.id, toStatus: event.to_status, message: event.message, createdAt: event.created_at })),
   };
 }

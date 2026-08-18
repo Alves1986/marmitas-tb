@@ -60,6 +60,22 @@ describe("/api/public/orders", () => {
     expect(findTracking).toHaveBeenCalledWith({ code: "TB-20260818-A1B2C3", phone: "42999991234" });
   });
 
+  it("consulta somente o pedido ativo mais recente por telefone", async () => {
+    const findLatestTrackingByPhone = vi.fn().mockResolvedValue({
+      code: "TB-20260818-A1B2C3",
+      status: "em_preparo",
+      customerName: "Ana da Silva",
+      items: [],
+    });
+    const handler = createPublicOrdersHandler({ createOrder: vi.fn(), findTracking: vi.fn(), findLatestTrackingByPhone });
+
+    const response = await handler(new Request("https://marmitas-tb.vercel.app/api/public/orders?phone=(42)%2099999-1234"));
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({ code: "TB-20260818-A1B2C3", status: "em_preparo" });
+    expect(findLatestTrackingByPhone).toHaveBeenCalledWith("42999991234");
+  });
+
   it("valida requisições e métodos antes de acessar a persistência", async () => {
     const createOrder = vi.fn();
     const handler = createPublicOrdersHandler({ createOrder, findTracking: vi.fn() });

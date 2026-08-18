@@ -75,3 +75,4 @@
 - [x] Criar `docs/operations-validation.md` com comandos, resultados, rotas validadas, roteiro de impressão e limitações do modo híbrido.
 - [x] Executar e registrar a validação integrada dos fluxos administrativos, acompanhamento público, impressão e pagamentos simulados.
 - [x] Substituir os rótulos genéricos da barra lateral administrativa por navegação explícita da Marmitas TB.
+- [x] Criar uma interface administrativa simples para cadastrar membros da equipe e atribuir os papéis de administrador ou operação.

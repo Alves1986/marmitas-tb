@@ -51,12 +51,30 @@ describe("AdminView", () => {
     expect(image.getAttribute("src")).toBe("/manus-storage/marmita-especial.jpg");
   });
 
-  it("libera o acesso operacional para um usuário autenticado", () => {
+  it.each([
+    ["Sem acesso", "user"],
+    ["Operação", "staff"],
+    ["Administrador", "admin"],
+  ] as const)("atribui %s ao usuário", (_label, role) => {
     const onUpdateRole = vi.fn();
     render(<StaffManagerView members={[{ id: 7, name: "Joana", email: "joana@tb.local", role: "user", lastSignedIn: new Date() }]} onUpdateRole={onUpdateRole} />);
 
-    fireEvent.click(screen.getByRole("button", { name: /liberar operação/i }));
-    expect(onUpdateRole).toHaveBeenCalledWith({ userId: 7, role: "staff" });
+    fireEvent.change(screen.getByLabelText(/papel de joana/i), { target: { value: role } });
+    expect(onUpdateRole).toHaveBeenCalledWith({ userId: 7, role });
+  });
+
+  it("informa que a atualização de papel está em andamento", () => {
+    render(<StaffManagerView members={[{ id: 7, name: "Joana", email: "joana@tb.local", role: "staff", lastSignedIn: new Date() }]} onUpdateRole={vi.fn()} pending />);
+
+    expect(screen.getByText(/salvando acesso/i)).toBeTruthy();
+    expect(screen.getByLabelText(/papel de joana/i)).toHaveProperty("disabled", true);
+  });
+
+  it("apresenta uma falha de atualização sem ocultar a equipe", () => {
+    render(<StaffManagerView members={[{ id: 7, name: "Joana", email: "joana@tb.local", role: "staff", lastSignedIn: new Date() }]} onUpdateRole={vi.fn()} errorMessage="Não foi possível atualizar o acesso." />);
+
+    expect(screen.getByRole("alert").textContent).toMatch(/não foi possível atualizar o acesso/i);
+    expect(screen.getByText("Joana")).toBeTruthy();
   });
 
   it("converte a taxa de entrega em reais antes de salvar configurações", () => {

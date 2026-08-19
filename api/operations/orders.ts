@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ApiAuthError, createSupabaseAuthGuards, type AuthenticatedProfile } from "../../server/vercel/_lib/auth.js";
-import { json, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http.js";
+import { asVercelNodeHandler, json, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http.js";
 import { assertTransition, OrderTransitionError } from "../../server/vercel/_lib/orders.js";
 import { orderStatuses, type OrderStatus } from "../../shared/operations.js";
 import { createSupabaseAdmin } from "../../server/vercel/_lib/supabaseAdmin.js";
@@ -160,7 +160,7 @@ async function transitionSupabaseOrder(input: { orderId: string; nextStatus: Ord
   return { id: updatedOrder.id, status: updatedOrder.status as OrderStatus };
 }
 
-export default function defaultOperationsOrdersHandler(request: Request): Promise<Response> {
+function defaultOperationsOrdersHandler(request: Request): Promise<Response> {
   const client = createSupabaseAdmin();
   const guards = createSupabaseAuthGuards(client);
   return createOperationsOrdersHandler({
@@ -169,3 +169,5 @@ export default function defaultOperationsOrdersHandler(request: Request): Promis
     transitionOrder: transitionSupabaseOrder,
   })(request);
 }
+
+export default asVercelNodeHandler(defaultOperationsOrdersHandler);

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ApiAuthError, createSupabaseAuthGuards, type AuthenticatedProfile } from "../../server/vercel/_lib/auth.js";
-import { json, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http.js";
+import { asVercelNodeHandler, json, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http.js";
 import { createSupabaseAdmin } from "../../server/vercel/_lib/supabaseAdmin.js";
 
 const availabilityInput = z.object({ productId: z.string().uuid(), isActive: z.boolean() });
@@ -128,7 +128,7 @@ async function upsertSupabaseProduct(input: ProductInput) {
   return { id: data.id, name: input.name };
 }
 
-export default function defaultAdminCatalogHandler(request: Request): Promise<Response> {
+function defaultAdminCatalogHandler(request: Request): Promise<Response> {
   const client = createSupabaseAdmin();
   return createAdminCatalogHandler({
     requireAdmin: createSupabaseAuthGuards(client).requireAdmin,
@@ -138,3 +138,5 @@ export default function defaultAdminCatalogHandler(request: Request): Promise<Re
     upsertProduct: upsertSupabaseProduct,
   })(request);
 }
+
+export default asVercelNodeHandler(defaultAdminCatalogHandler);

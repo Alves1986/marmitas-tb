@@ -160,3 +160,4 @@
 - [ ] Corrigir a leitura server-side das variáveis Supabase e da URL pública para aceitar a configuração já presente na Vercel e eliminar o `FUNCTION_INVOCATION_FAILED` do catálogo público.
 - [ ] Fazer o endpoint público de cardápio usar somente a chave publicável e a política RLS anônima, sem depender de credencial administrativa no runtime de produção.
 - [ ] Corrigir o empacotamento Vercel das bibliotecas em `server/vercel/_lib`, pois o runtime não encontra `http` ao carregar as funções em `api/`.
+- [ ] Adaptar os nove handlers Vercel ao contrato Node `(req, res)`, pois o runtime confirmou que ignora o `Response` retornado pelo export padrão atual.

@@ -1,4 +1,4 @@
-import { json, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http.js";
+import { asVercelNodeHandler, json, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http.js";
 import { createSupabasePublic } from "../../server/vercel/_lib/supabasePublic.js";
 
 type MenuCategory = {
@@ -126,4 +126,4 @@ export function createMenuHandler(repository: MenuRepository) {
   };
 }
 
-export default createMenuHandler({ listMenu: listSupabaseMenu });
+export default asVercelNodeHandler(createMenuHandler({ listMenu: listSupabaseMenu }));

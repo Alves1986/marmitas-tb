@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ApiAuthError, createSupabaseAuthGuards, type AuthenticatedProfile } from "../../server/vercel/_lib/auth.js";
-import { json, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http.js";
+import { asVercelNodeHandler, json, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http.js";
 import { createSupabaseAdmin } from "../../server/vercel/_lib/supabaseAdmin.js";
 
 const acknowledgeInput = z.object({
@@ -53,7 +53,7 @@ async function acknowledgeSupabaseAlert(input: { orderId: string; actorUserId: s
   return { orderId: order.id };
 }
 
-export default function defaultOperationsAlertsHandler(request: Request): Promise<Response> {
+function defaultOperationsAlertsHandler(request: Request): Promise<Response> {
   const client = createSupabaseAdmin();
   const guards = createSupabaseAuthGuards(client);
   return createOperationsAlertsHandler({
@@ -61,3 +61,5 @@ export default function defaultOperationsAlertsHandler(request: Request): Promis
     acknowledgeAlert: acknowledgeSupabaseAlert,
   })(request);
 }
+
+export default asVercelNodeHandler(defaultOperationsAlertsHandler);

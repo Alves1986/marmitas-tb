@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ApiAuthError, createSupabaseAuthGuards, type AuthenticatedProfile } from "../../server/vercel/_lib/auth.js";
-import { json, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http.js";
+import { asVercelNodeHandler, json, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http.js";
 import { createSupabaseAdmin } from "../../server/vercel/_lib/supabaseAdmin.js";
 
 const roleInput = z.object({ userId: z.string().uuid(), role: z.enum(["customer", "staff", "admin"]) });
@@ -39,7 +39,9 @@ async function setSupabaseRole(input: { userId: string; role: "customer" | "staf
   return data;
 }
 
-export default function defaultAdminStaffHandler(request: Request): Promise<Response> {
+function defaultAdminStaffHandler(request: Request): Promise<Response> {
   const client = createSupabaseAdmin();
   return createAdminStaffHandler({ requireAdmin: createSupabaseAuthGuards(client).requireAdmin, listStaff: listSupabaseStaff, setRole: setSupabaseRole })(request);
 }
+
+export default asVercelNodeHandler(defaultAdminStaffHandler);

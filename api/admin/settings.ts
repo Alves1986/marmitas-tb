@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ApiAuthError, createSupabaseAuthGuards, type AuthenticatedProfile } from "../../server/vercel/_lib/auth.js";
-import { json, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http.js";
+import { asVercelNodeHandler, json, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http.js";
 import { createSupabaseAdmin } from "../../server/vercel/_lib/supabaseAdmin.js";
 
 const settingsInput = z.object({
@@ -73,7 +73,7 @@ async function updateSupabaseSettings(input: StoreSettings & { actorUserId: stri
   return getSupabaseSettings();
 }
 
-export default function defaultAdminSettingsHandler(request: Request): Promise<Response> {
+function defaultAdminSettingsHandler(request: Request): Promise<Response> {
   const client = createSupabaseAdmin();
   return createAdminSettingsHandler({
     requireAdmin: createSupabaseAuthGuards(client).requireAdmin,
@@ -81,3 +81,5 @@ export default function defaultAdminSettingsHandler(request: Request): Promise<R
     updateSettings: updateSupabaseSettings,
   })(request);
 }
+
+export default asVercelNodeHandler(defaultAdminSettingsHandler);

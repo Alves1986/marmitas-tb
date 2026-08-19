@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ApiAuthError, createSupabaseAuthGuards, type AuthenticatedProfile } from "../../server/vercel/_lib/auth.js";
-import { json, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http.js";
+import { asVercelNodeHandler, json, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http.js";
 import { createSupabaseAdmin } from "../../server/vercel/_lib/supabaseAdmin.js";
 
 const requeueInput = z.object({ orderId: z.string().uuid() });
@@ -87,8 +87,10 @@ async function markPrintJob(input: z.infer<typeof markInput>) {
   return data;
 }
 
-export default function defaultPrintJobsHandler(request: Request): Promise<Response> {
+function defaultPrintJobsHandler(request: Request): Promise<Response> {
   const client = createSupabaseAdmin();
   const guards = createSupabaseAuthGuards(client);
   return createPrintJobsHandler({ requireOperator: guards.requireStaff, list: listPrintJobs, requeue: requeuePrintJob, mark: markPrintJob })(request);
 }
+
+export default asVercelNodeHandler(defaultPrintJobsHandler);

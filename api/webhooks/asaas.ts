@@ -1,7 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import { processAsaasWebhookEvent, type AsaasWebhookRpcClient } from "../../server/vercel/_lib/asaasWebhookProcessor.js";
-import { jsonError, methodNotAllowed } from "../../server/vercel/_lib/http.js";
+import { asVercelNodeHandler, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http.js";
 import { createSupabaseAdmin } from "../../server/vercel/_lib/supabaseAdmin.js";
 
 const asaasEventSchema = z.object({
@@ -65,10 +65,12 @@ export function createConfiguredAsaasWebhookHandler(dependencies: ConfiguredAsaa
   });
 }
 
-export default function defaultAsaasWebhookHandler(request: Request): Promise<Response> {
+function defaultAsaasWebhookHandler(request: Request): Promise<Response> {
   const client = createSupabaseAdmin() as unknown as AsaasWebhookRpcClient;
   return createConfiguredAsaasWebhookHandler({
     environment: process.env,
     processEvent: event => processAsaasWebhookEvent(client, event),
   })(request);
 }
+
+export default asVercelNodeHandler(defaultAsaasWebhookHandler);

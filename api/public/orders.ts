@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { json, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http.js";
+import { asVercelNodeHandler, json, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http.js";
 import { normalizePhoneForLookup, phoneTrackingInput, trackingInput } from "../../server/vercel/_lib/orders.js";
 import { createSupabaseOrder, findSupabaseTracking, findSupabaseTrackingByPhone } from "../../server/vercel/_lib/ordersRepository.js";
 
@@ -102,8 +102,8 @@ export function createPublicOrdersHandler(repository: PublicOrderRepository) {
   };
 }
 
-export default createPublicOrdersHandler({
+export default asVercelNodeHandler(createPublicOrdersHandler({
   createOrder: createSupabaseOrder,
   findTracking: findSupabaseTracking,
   findLatestTrackingByPhone: findSupabaseTrackingByPhone,
-});
+}));

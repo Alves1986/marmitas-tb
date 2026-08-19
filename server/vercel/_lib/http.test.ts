@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { json, jsonError, methodNotAllowed } from "./http";
+import { asVercelNodeHandler, json, jsonError, methodNotAllowed } from "./http";
 
 describe("respostas HTTP das funções Vercel", () => {
   it("remove segredos e detalhes internos de um erro 500", async () => {
@@ -28,5 +28,31 @@ describe("respostas HTTP das funções Vercel", () => {
 
     expect(response.headers.get("content-type")).toContain("application/json");
     await expect(response.json()).resolves.toEqual({ code: "TB-000001" });
+  });
+
+  it("adapta o retorno Response ao contrato Node req/res da Vercel", async () => {
+    const calls: Array<[string, unknown]> = [];
+    const response = {
+      status: (status: number) => {
+        calls.push(["status", status]);
+        return response;
+      },
+      setHeader: (name: string, value: string) => calls.push([`header:${name}`, value]),
+      send: (body: string) => calls.push(["send", body]),
+    };
+    const handler = asVercelNodeHandler(async (request) => {
+      expect(request.method).toBe("GET");
+      expect(request.url).toBe("https://marmitastb.vercel.app/api/public/menu");
+      return json(200, { ready: true });
+    });
+
+    await handler(
+      { method: "GET", url: "/api/public/menu", headers: { host: "marmitastb.vercel.app" } },
+      response,
+    );
+
+    expect(calls).toContainEqual(["status", 200]);
+    expect(calls).toContainEqual(["header:content-type", "application/json; charset=utf-8"]);
+    expect(calls).toContainEqual(["send", '{"ready":true}']);
   });
 });

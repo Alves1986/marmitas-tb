@@ -108,3 +108,17 @@ Uma tentativa complementar de arquivar uma captura automatizada em navegador iso
 #### Decisão de homologação
 
 Em 18 de agosto de 2026, foi escolhida a preservação da proteção de acesso da Preview. Assim, esta etapa é encerrada com a inspeção autenticada da vitrine, os atributos publicados no DOM, os retornos HTTP dos ativos e a revisão visual no navegador conectado. A coleta de uma captura independente ou de métricas de carregamento sem sessão permanece deliberadamente fora do escopo enquanto a proteção estiver ativa; ela poderá ser executada em futuro ambiente público controlado, sem alterar a atual prévia protegida.
+
+### Preparação de redirecionamentos Supabase Auth
+
+Antes da configuração, o **Site URL** era `http://localhost:3000` e não havia URLs adicionais permitidas. A alteração autorizada define o Site URL como `https://marmitastb.vercel.app` e restringe a allow list a `http://localhost:3000/**`, `https://marmitastb.vercel.app/**` e `https://marmitas-*-andersonalves.vercel.app/**`. O último padrão cobre apenas as URLs de Preview do projeto Marmitas TB na conta Vercel `andersonalves`, sem permitir redirecionamentos genéricos de outros projetos.
+
+Na interface do Supabase, o Site URL foi preenchido com `https://marmitastb.vercel.app`. Foram incluídas, ainda não salvas, as entradas `http://localhost:3000/**` e `https://marmitastb.vercel.app/**`. A próxima inclusão é o padrão restrito de prévias, após o qual o painel aplicará a lista completa em uma única gravação.
+
+A lista foi completada com `https://marmitas-*-andersonalves.vercel.app/**`. Antes da gravação, os três padrões foram revisados no modal: local, domínio de homologação e previews exclusivos da Marmitas TB. Nenhuma URL genérica de outra aplicação Vercel foi incluída.
+
+O Supabase confirmou a gravação da lista com **3 URLs**: `http://localhost:3000/**`, `https://marmitastb.vercel.app/**` e `https://marmitas-*-andersonalves.vercel.app/**`. O Site URL ainda constava como `http://localhost:3000` nesta confirmação intermediária e será salvo em seguida com o domínio de homologação já autorizado.
+
+O Site URL foi preenchido com `https://marmitastb.vercel.app` e a ação **Save changes** foi acionada. A lista de três redirecionamentos autorizados permaneceu inalterada durante essa gravação. A próxima verificação recarregará a tela para confirmar a persistência antes de qualquer tentativa de autenticação.
+
+A recarga do painel confirmou a persistência completa: o Site URL passou a ser `https://marmitastb.vercel.app`; a lista contém exatamente as três URLs planejadas e totaliza `3`. A configuração não alterou provedores, usuários, papéis, políticas de RLS nem a criação de contas. O próximo teste funcional requer um e-mail já cadastrado com papel `staff` ou `admin`, pois o fluxo OTP permanece com `shouldCreateUser: false`.

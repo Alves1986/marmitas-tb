@@ -100,7 +100,8 @@
 - [ ] Transferir os ativos persistentes da aplicação para Supabase Storage e remover dependências exclusivas da infraestrutura atual.
 - [ ] Conectar e validar os projetos existentes de Supabase e Vercel para a Marmitas TB antes da migração de produção.
 - [x] Implementar login interno por código OTP de e-mail no Supabase, sem cadastro público automático da equipe.
-- [ ] Configurar URLs de retorno do Supabase Auth para o domínio vercel.app e os deploys de prévia da homologação.
+- [x] Configurar URLs de retorno do Supabase Auth para o domínio vercel.app e os deploys de prévia da homologação.
+- [x] Definir o Site URL do Supabase Auth como `https://marmitastb.vercel.app` e permitir somente localhost, esse domínio e previews `marmitas-*-andersonalves.vercel.app`.
 - [ ] Adaptar a aplicação Vite para a Vercel com funções TypeScript server-side para pedidos, Asaas, webhook e impressão.
 - [x] Provisionar e validar um projeto Supabase exclusivo para a Marmitas TB antes de aplicar migrações de banco ou Storage.
 - [x] Manter a criação do projeto Marmitas TB na Vercel para após a validação final, o checkpoint e o envio da branch de migração ao GitHub, sem deploy automático.

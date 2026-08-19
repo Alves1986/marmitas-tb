@@ -4,6 +4,11 @@ export type ServerConfig = {
   appUrl: string;
 };
 
+export type PublicSupabaseConfig = {
+  supabaseUrl: string;
+  supabasePublishableKey: string;
+};
+
 type Environment = Readonly<Record<string, string | undefined>>;
 
 export function readServerConfig(environment: Environment = process.env): ServerConfig {
@@ -24,4 +29,17 @@ export function readServerConfig(environment: Environment = process.env): Server
     supabaseServiceRoleKey,
     appUrl,
   };
+}
+
+export function readPublicSupabaseConfig(environment: Environment = process.env): PublicSupabaseConfig {
+  const supabaseUrl = (environment.SUPABASE_URL ?? environment.VITE_SUPABASE_URL)?.trim();
+  const supabasePublishableKey = environment.VITE_SUPABASE_PUBLISHABLE_KEY?.trim();
+
+  if (!supabaseUrl) throw new Error("Variável obrigatória ausente: SUPABASE_URL");
+  if (!supabasePublishableKey) throw new Error("Variável obrigatória ausente: VITE_SUPABASE_PUBLISHABLE_KEY");
+  if (!supabaseUrl.startsWith("https://") || !supabaseUrl.endsWith(".supabase.co")) {
+    throw new Error("SUPABASE_URL inválida.");
+  }
+
+  return { supabaseUrl, supabasePublishableKey };
 }

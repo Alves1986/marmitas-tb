@@ -1,5 +1,5 @@
 import { json, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http";
-import { createSupabaseAdmin } from "../../server/vercel/_lib/supabaseAdmin";
+import { createSupabasePublic } from "../../server/vercel/_lib/supabasePublic";
 
 type MenuCategory = {
   id: string;
@@ -60,7 +60,7 @@ type RawOption = {
 };
 
 async function listSupabaseMenu(): Promise<MenuPayload> {
-  const client = createSupabaseAdmin();
+  const client = createSupabasePublic();
   const [categoryResult, productResult, optionResult] = await Promise.all([
     client.from("categories").select("id, name, slug, sort_order").eq("is_active", true).order("sort_order"),
     client

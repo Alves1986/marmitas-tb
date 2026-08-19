@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readServerConfig } from "./config";
+import { readPublicSupabaseConfig, readServerConfig } from "./config";
 
 describe("readServerConfig", () => {
   it("aceita uma configuração server-side completa", () => {
@@ -21,6 +21,16 @@ describe("readServerConfig", () => {
     })).toMatchObject({
       appUrl: "https://marmitastb.vercel.app",
       supabaseUrl: "https://marmitas-tb.supabase.co",
+    });
+  });
+
+  it("aceita a configuração publicável do Supabase sem exigir uma chave administrativa", () => {
+    expect(readPublicSupabaseConfig({
+      VITE_SUPABASE_URL: "https://marmitas-tb.supabase.co",
+      VITE_SUPABASE_PUBLISHABLE_KEY: "publishable-test-key",
+    })).toEqual({
+      supabaseUrl: "https://marmitas-tb.supabase.co",
+      supabasePublishableKey: "publishable-test-key",
     });
   });
 

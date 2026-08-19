@@ -13,6 +13,17 @@ describe("readServerConfig", () => {
     });
   });
 
+  it("aceita a URL pública do Supabase e o hostname injetado pela Vercel", () => {
+    expect(readServerConfig({
+      VITE_SUPABASE_URL: "https://marmitas-tb.supabase.co",
+      SUPABASE_SERVICE_ROLE_KEY: "service-role-test-key",
+      VERCEL_URL: "marmitastb.vercel.app",
+    })).toMatchObject({
+      appUrl: "https://marmitastb.vercel.app",
+      supabaseUrl: "https://marmitas-tb.supabase.co",
+    });
+  });
+
   it("recusa a ausência da chave de serviço", () => {
     expect(() => readServerConfig({
       SUPABASE_URL: "https://marmitas-tb.supabase.co",

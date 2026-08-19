@@ -1,5 +1,13 @@
 # Notas de homologação Vercel
 
+## Incidente de produção e correção de configuração — 19 de agosto de 2026
+
+Após a promoção autorizada da versão validada para a branch `main` do repositório dedicado `Alves1986/marmitas-tb`, o domínio `https://marmitastb.vercel.app` respondeu inicialmente com `404 DEPLOYMENT_NOT_FOUND`. Cerca de quinze minutos depois, o alias passou a responder `HTTP 200` e a inspeção pública confirmou a vitrine React, o título **Marmitas TB | Peça seu almoço**, a navegação, as 18 opções do catálogo e os ativos públicos do Supabase Storage.
+
+O endpoint público `GET /api/public/menu`, porém, respondeu `500 FUNCTION_INVOCATION_FAILED`, mesmo com a vitrine estática disponível. A análise do handler apontou uma incompatibilidade entre a configuração server-side e as variáveis já cadastradas na Vercel: a função exigia `SUPABASE_URL` e `APP_URL`, enquanto a configuração previamente registrada fornece `VITE_SUPABASE_URL` e o ambiente Vercel expõe o hostname em `VERCEL_URL`.
+
+Foi preparada uma correção testada que aceita `SUPABASE_URL` ou `VITE_SUPABASE_URL` como URL do projeto Supabase e deriva `APP_URL` de `VERCEL_URL` quando necessário, sem remover validações para `SUPABASE_SERVICE_ROLE_KEY`. A correção ainda precisa ser enviada para `main` e ter o endpoint público revalidado em produção. Nenhuma alteração foi feita no Supabase durante o diagnóstico.
+
 Em 18 de agosto de 2026, a branch `feat/supabase-vercel-migration` foi confirmada no repositório `Alves1986/ministral` no commit `e1d2d49c1b3ceed86ee8eb42ec8a204121f72b2a`.
 
 A sessão autenticada na Vercel reconhece o repositório `Alves1986/ministral`. A tela de importação apresenta explicitamente o botão **Deploy** e informa que a implantação começa após essa ação. A documentação oficial também registra que integrações Git fazem implantações automáticas em pushes de branches suportadas. Portanto, nenhuma importação foi concluída, preservando a exigência do projeto de não realizar deploy automático.

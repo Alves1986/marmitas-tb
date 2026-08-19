@@ -156,3 +156,5 @@
 - [x] Encerrar a homologação protegida por decisão explícita do usuário, com inspeção autenticada, atributos no DOM e respostas HTTP registradas, sem reduzir a proteção de acesso da Vercel.
 - [x] Criar um guia completo em português brasileiro para clientes, equipe operacional e administradores utilizarem o sistema Marmitas TB.
 - [ ] Publicar a versão validada da Marmitas TB em produção na Vercel, exclusivamente a partir do repositório dedicado, e registrar a verificação pós-publicação.
+- [ ] Diagnosticar e corrigir o incidente de produção no domínio `marmitastb.vercel.app`, que retorna `DEPLOYMENT_NOT_FOUND` após a promoção autorizada da branch `main`.
+- [ ] Corrigir a leitura server-side das variáveis Supabase e da URL pública para aceitar a configuração já presente na Vercel e eliminar o `FUNCTION_INVOCATION_FAILED` do catálogo público.

@@ -1,7 +1,6 @@
 export type SupabaseProfile = {
   id: string;
-  email: string;
-  fullName: string | null;
+  displayName: string | null;
   role: string;
 };
 
@@ -25,8 +24,7 @@ export type SessionLookupClient = {
         maybeSingle: () => Promise<{
           data: {
             id: string;
-            email: string;
-            full_name: string | null;
+            display_name: string | null;
             role: string;
           } | null;
           error: unknown;
@@ -40,22 +38,22 @@ type OtpClient = {
   auth: {
     signInWithOtp: (request: {
       email: string;
-      options: { shouldCreateUser: false };
+      options: { shouldCreateUser: false; emailRedirectTo?: string };
     }) => Promise<{ error: { message: string } | null }>;
   };
 };
 
 const validRoles = new Set<SessionUser["role"]>(["user", "staff", "admin"]);
 
-export function toSessionUser(profile: SupabaseProfile): SessionUser {
+export function toSessionUser(profile: SupabaseProfile, email: string): SessionUser {
   if (!validRoles.has(profile.role as SessionUser["role"])) {
     throw new Error("Papel de acesso inválido");
   }
 
   return {
     id: profile.id,
-    email: profile.email,
-    name: profile.fullName?.trim() || profile.email,
+    email,
+    name: profile.displayName?.trim() || email,
     role: profile.role as SessionUser["role"],
   };
 }
@@ -70,7 +68,7 @@ export async function loadSessionUser(
 
   const profileResult = await client
     .from("profiles")
-    .select("id, email, full_name, role")
+    .select("id, display_name, role")
     .eq("id", data.user.id)
     .maybeSingle();
 
@@ -78,10 +76,9 @@ export async function loadSessionUser(
 
   return toSessionUser({
     id: profileResult.data.id,
-    email: profileResult.data.email || data.user.email || "",
-    fullName: profileResult.data.full_name,
+    displayName: profileResult.data.display_name,
     role: profileResult.data.role,
-  });
+  }, data.user.email || "");
 }
 
 export async function requestTeamOtp(client: OtpClient, email: string): Promise<void> {
@@ -89,9 +86,14 @@ export async function requestTeamOtp(client: OtpClient, email: string): Promise<
 
   if (!normalizedEmail) throw new Error("Informe o e-mail da equipe");
 
+  const origin = typeof window === "undefined" ? undefined : window.location?.origin;
+  const emailRedirectTo = origin ? `${origin}/operacao` : undefined;
   const { error } = await client.auth.signInWithOtp({
     email: normalizedEmail,
-    options: { shouldCreateUser: false },
+    options: {
+      shouldCreateUser: false,
+      ...(emailRedirectTo ? { emailRedirectTo } : {}),
+    },
   });
 
   if (error) throw new Error(error.message);

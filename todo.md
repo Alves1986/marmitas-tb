@@ -161,3 +161,5 @@
 - [x] Fazer o endpoint público de cardápio usar somente a chave publicável e a política RLS anônima, sem depender de credencial administrativa no runtime de produção.
 - [x] Corrigir o empacotamento Vercel das bibliotecas em `server/vercel/_lib`, pois o runtime não encontra `http` ao carregar as funções em `api/`.
 - [x] Adaptar os nove handlers Vercel ao contrato Node `(req, res)`, pois o runtime confirmou que ignora o `Response` retornado pelo export padrão atual.
+- [ ] Corrigir o acesso a `/admin` em produção, que retorna ao cardápio por sessão ou autorização administrativa não reconhecida.
+- [ ] Corrigir o fluxo de acesso da equipe em `/acesso`, que exibe `Load failed` e não envia ou valida o código OTP do e-mail autorizado.

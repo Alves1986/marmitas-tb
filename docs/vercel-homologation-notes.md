@@ -16,6 +16,10 @@ O deployment `EhTgmjwRHTC1VDvJAsuXJCaybBCV` foi aceito e tornou a vitrine acess�
 
 **Recuperação confirmada em produção (19/08/2026):** o commit `22b9d75` foi publicado em `main`. Após a implantação, `https://marmitastb.vercel.app/`, `/manifest.webmanifest` e `/api/public/menu` responderam com HTTP 200. A inspeção visual pública confirmou a vitrine carregada, as imagens do Supabase Storage e o cardápio com 18 opções, sem o erro de servidor anterior.
 
+## Incidentes de acesso interno em investigação — 19 de agosto de 2026
+
+As requisições diretas para `/admin` e `/acesso` devolvem `index.html` com HTTP 200, confirmando que o rewrite SPA está ativo. A rota administrativa, entretanto, contém um redirecionamento explícito para `/` quando a sessão não produz um perfil com papel `admin`; por isso o retorno ao cardápio é consequência do estado de autenticação, não de uma rota ausente. A tela `/acesso` abre corretamente, mas a tentativa de solicitar acesso a partir do dispositivo da equipe exibiu `Load failed`. A investigação separará a resolução de perfil, a configuração do cliente Supabase, a entrega de e-mail e o formato de autenticação antes de aplicar qualquer alteração.
+
 Em 18 de agosto de 2026, a branch `feat/supabase-vercel-migration` foi confirmada no repositório `Alves1986/ministral` no commit `e1d2d49c1b3ceed86ee8eb42ec8a204121f72b2a`.
 
 A sessão autenticada na Vercel reconhece o repositório `Alves1986/ministral`. A tela de importação apresenta explicitamente o botão **Deploy** e informa que a implantação começa após essa ação. A documentação oficial também registra que integrações Git fazem implantações automáticas em pushes de branches suportadas. Portanto, nenhuma importação foi concluída, preservando a exigência do projeto de não realizar deploy automático.

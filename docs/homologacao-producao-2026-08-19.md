@@ -105,6 +105,22 @@ O adaptador HTTP agora consulta o cardápio público somente quando identifica I
 
 A regressão foi escrita antes da implementação e falhou com os slugs do pedido de teste; após a correção, confirmou a transformação dos IDs de produto e opções. A suíte integral registrou **220 testes aprovados e 2 pulados**, em 74 arquivos, a checagem TypeScript foi concluída sem erros e os builds PWA/Vercel foram gerados com êxito. A alteração ainda precisa de publicação autorizada e, somente então, o pedido único de homologação poderá ser retomado.
 
+A publicação foi autorizada e o commit `4bb2014` foi enviado à branch `main` do repositório dedicado. Na primeira verificação do bundle de produção, a rota `/api/public/orders` já estava presente, mas a referência `/api/public/menu` ainda não aparecia no arquivo JavaScript servido. A vitrine continuou funcionando e a sacola de homologação permaneceu preservada, porém a confirmação foi deliberadamente mantida suspensa: é necessário aguardar a propagação completa do novo artefato ou confirmar o deployment antes de reenviar o único pedido de teste.
+
+Após a propagação, o bundle `index-CcN2lBa0.js` passou a conter `/api/public/orders`, `/api/public/menu` e a mensagem exclusiva da resolução segura de itens removidos, confirmando a publicação da correção de IDs. A revisão final do pedido de teste mostrou uma unidade de “Panqueca de carne + Coca 200 ml”, total de R$ 23,00, retirada no local, PIX de demonstração e a observação “HOMOLOGAÇÃO — pedido de teste autorizado; não preparar e não imprimir.” O checkout exibiu explicitamente que nenhuma cobrança real será realizada. A confirmação única foi então mantida disponível sob a autorização já registrada.
+
+### Resultado do pedido controlado
+
+O único pedido foi registrado com sucesso em produção sob o código **TB-20260819-C82294251937**. A tela de confirmação exibiu retirada estimada de 35 a 45 minutos, total de R$ 23,00, modalidade PIX de demonstração e o aviso explícito de que nenhuma cobrança real será realizada. A sacola foi esvaziada após a confirmação, não houve envio adicional, impressão nem acionamento de WhatsApp. O próximo passo é apenas validar o acompanhamento público usando o código gerado e, se possível sem alterar status indevidamente, observar a visibilidade na fila operacional autenticada.
+
+### Correção local de acompanhamento pendente de publicação
+
+A consulta do pedido confirmado `TB-20260819-C82294251937` foi preparada com o código e telefone sintéticos usados no checkout. O formulário aceitou os valores e habilitou a consulta, mas a produção não mostrou o resultado. A análise identificou que `TrackOrder.tsx` ainda verificava `VITE_API_RUNTIME` diretamente; no bundle publicado essa variável não é incorporada, fazendo a tela permanecer no caminho tRPC legado em vez de usar a função HTTP Vercel.
+
+A página de acompanhamento agora reutiliza `isVercelRuntime()`, o mesmo seletor resiliente adotado no checkout. No domínio de produção da Vercel, ela chama `GET /api/public/orders`; em desenvolvimento, preserva o caminho legado. A regressão foi escrita antes da alteração e falhou enquanto a página dependia diretamente da variável de build. Após a correção, essa cobertura, o seletor e o adaptador de acompanhamento passaram. A suíte completa registrou **221 testes aprovados e 2 pulados**, em 75 arquivos, e o build PWA com runtime Vercel foi concluído sem erros.
+
+A consulta do pedido já existente é a única validação restante desse fluxo após uma publicação autorizada. Ela não criará novo pedido, não acionará cobrança, impressão ou mudança de status.
+
 ## Situação consolidada de prontidão
 
 > **Conclusão técnica:** a aplicação publicada está apta para uma apresentação guiada e para o roteiro de aceite. A confirmação de prontidão operacional completa permanece condicionada aos testes autenticados de equipe e administração, ao pedido de teste combinado e à verificação local da impressora.

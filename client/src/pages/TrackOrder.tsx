@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ArrowLeft, CircleCheck, Clock3, CreditCard, PackageCheck, Search, ShieldCheck } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { apiRequest } from "@/lib/api";
+import { isVercelRuntime } from "@/lib/runtimeConfig";
 import { createVercelTrackingService, type PublicTracking } from "@/services/trackingService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,7 +25,7 @@ function formatDate(value: Date | string) {
 }
 
 export default function TrackOrder() {
-  const useVercelApi = import.meta.env.VITE_API_RUNTIME === "vercel" && import.meta.env.PROD;
+  const useVercelApi = isVercelRuntime();
   const params = new URLSearchParams(window.location.search);
   const [phone, setPhone] = useState("");
   const [submittedPhone, setSubmittedPhone] = useState<string | null>(null);

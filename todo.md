@@ -191,3 +191,5 @@
 - [x] Corrigir a criação pública de pedidos em produção para usar a função HTTP Vercel, eliminando a chamada incompatível a `/api/trpc/orders.create`.
 - [x] Corrigir a incompatibilidade de validação do endpoint público que retorna “Dados do pedido inválidos” para o pedido de homologação já revisado.
 - [x] Corrigir a incompatibilidade de validação do endpoint público que retorna “Dados do pedido inválidos” para o pedido de homologação já revisado.
+- [x] Corrigir o acompanhamento público em produção para usar a função HTTP Vercel, eliminando a consulta tRPC legada após o pedido confirmado.
+- [x] Corrigir o acompanhamento público em produção para usar a função HTTP Vercel, eliminando a consulta tRPC legada após o pedido confirmado.

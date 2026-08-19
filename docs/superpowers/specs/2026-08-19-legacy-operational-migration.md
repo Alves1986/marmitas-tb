@@ -1,7 +1,7 @@
 # Migração do histórico operacional legado para Supabase
 
-**Status:** especificação de preparação; nenhuma gravação foi executada no Supabase nesta etapa.  
-**Decisão de escopo:** importar o histórico operacional legado, mediante aprovação explícita imediatamente antes de qualquer escrita.  
+**Status:** encerrada para a origem atualmente conectada; nenhuma gravação foi executada no Supabase.  
+**Decisão de escopo:** não executar migração SQL, DDL, DML ou qualquer escrita no Supabase para esta origem, por determinação explícita do responsável após o inventário vazio.  
 **Data do inventário:** 19 de agosto de 2026, em modo somente leitura.
 
 ## Inventário confirmado
@@ -17,7 +17,7 @@ O banco MySQL/TiDB legado foi consultado exclusivamente com agregações `SELECT
 | `printJobs` | 0 | 0 | Não há filas de impressão históricas a importar. |
 | `storeSettings` | 0 | 0 | Não há configurações históricas a importar. |
 
-> O inventário confirma que a importação aprovada terá efeito operacional nulo no estado atual. A preparação continua necessária para tornar uma futura migração repetível, caso a origem correta passe a conter registros.
+> O inventário confirma que a importação teria efeito operacional nulo no estado atual. Por decisão explícita do responsável, a etapa foi encerrada sem aplicar alterações de esquema, inserções, atualizações, exclusões ou qualquer outra escrita no Supabase.
 
 O catálogo já existe no destino, com **8 categorias**, **18 produtos** e **90 opções**. Há um perfil administrativo no Supabase, mas nenhum dado operacional vinculado a ele. O resultado agregado pode ser repetido com `pnpm exec tsx scripts/inventory-legacy-operational-data.mjs`; o comando exige `DATABASE_URL` e não contém instruções de escrita.
 
@@ -134,14 +134,16 @@ A primeira importação real não apagará registros como método de reversão. 
 | Conteúdo | Dados JSON válidos convertidos para `jsonb`; textos inválidos contados como exceção, nunca descartados silenciosamente. |
 | Relatório | Saída agregada com execução, hash do snapshot, contagens, conflitos e nenhuma informação pessoal identificável. |
 
-## Pré-condições para autorizar uma escrita futura
+## Encerramento e condições para uma futura reabertura
 
-Para o inventário atual, não existe dado para inserir. Se uma nova origem com registros for apresentada, a autorização precisará cobrir a migração de esquema proposta, a importação de dados e a política de tratamento das exceções. Antes disso, será preparado um teste automatizado de importação idempotente e uma simulação que não chama o Supabase.
+Em 19 de agosto de 2026, o responsável determinou que não seja aplicada migração SQL nem escrita no Supabase. Como o snapshot contém seis coleções vazias, não existe alteração operacional pendente para esta origem. O checkpoint `ac22de3b` preserva as evidências e o código de leitura/simulação, sem deploy, push ou operação no banco de destino.
+
+Se uma nova origem com histórico for apresentada no futuro, será necessária uma nova autorização explícita que cubra separadamente a migração de esquema proposta, a importação de dados e a política para exceções. Nenhuma aprovação anterior deve ser reutilizada para essa nova origem.
 
 | Pré-condição | Estado atual |
 |---|---|
 | Snapshot somente leitura com contagens e hash | Atendido para o banco atualmente conectado, com seis contagens iguais a zero. |
-| Esquema de mapas versionado e testado | Pendente; será apenas preparado, não aplicado, na próxima fase. |
-| Simulação de importação e reconciliação | Pendente; será executada sem credenciais de escrita. |
-| Aprovação explícita para DDL e DML | Pendente e obrigatória, mesmo que uma futura origem contenha poucos registros. |
-| Confirmação de dados de origem não vazios | Pendente; o banco legado atualmente conectado não contém histórico operacional. |
+| Esquema de mapas versionado e testado | Não aplicado por decisão explícita de não executar SQL nesta origem. |
+| Simulação de importação e reconciliação | Atendida para o snapshot vazio; resultado com zero registros planejados, conflitos e referências pendentes. |
+| Autorização para DDL e DML | Negada explicitamente para esta origem. Uma futura origem exige nova autorização. |
+| Confirmação de dados de origem não vazios | Não atendida; o banco legado atualmente conectado não contém histórico operacional. |

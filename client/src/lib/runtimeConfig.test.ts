@@ -11,4 +11,8 @@ describe("configuração pública de runtime", () => {
     expect(isVercelRuntime({ apiRuntime: "vercel", isProduction: false })).toBe(false);
     expect(isVercelRuntime({ apiRuntime: "local", isProduction: true })).toBe(false);
   });
+
+  it("mantém o transporte HTTP Vercel no domínio publicado mesmo sem variável de build", () => {
+    expect(isVercelRuntime({ apiRuntime: undefined, isProduction: true, hostname: "marmitastb.vercel.app" })).toBe(true);
+  });
 });

@@ -71,6 +71,32 @@ O sistema pode ser considerado **apto para apresentação operacional** quando t
 
 O Asaas continua em ambiente Sandbox e sem chaves de produção; portanto, não há cobrança real habilitada nesta fase. O envio de links de equipe depende da configuração de e-mail transacional do Supabase. A impressão automática deve ser comprovada no computador dedicado à cozinha, porque a disponibilidade da impressora é específica daquele dispositivo. Esses pontos não invalidam a vitrine ou a gestão, mas precisam ser comunicados ao cliente como condições de homologação antes de qualquer operação comercial efetiva.
 
+## Protocolo autorizado de teste operacional
+
+Em 19 de agosto de 2026, a responsável autorizou um único fluxo em produção com **dados de homologação**, sob as seguintes condições: não acionar impressão e não realizar cobrança real. O pedido será identificado como teste nas observações, usará uma forma de pagamento de demonstração já suportada pelo sistema e servirá exclusivamente para conferir criação, consulta pública e atualização controlada de status. Nenhuma despesa financeira, alteração de cardápio ou ajuste de configuração faz parte deste protocolo.
+
+Durante o início controlado do fluxo, o primeiro acionamento automatizado do controle de adição da opção “Panqueca de carne + Coca 200 ml” não alterou o indicador da sacola, que permaneceu em zero. Nenhum pedido, dado financeiro ou impressão foi criado por essa tentativa. O teste será retomado pela rota de montagem do pedido, mantendo a regra de um único pedido confirmado.
+
+A retomada pelo controle visual do card abriu corretamente o configurador da “Panqueca de carne + Coca 200 ml”, com preço exibido de R$ 23,00, alternativas de embalagem, acompanhamento, observação de cozinha e quantidade. A embalagem padrão “Isopor” foi selecionada; o item ainda não havia sido inserido na sacola nesta etapa.
+
+Na configuração do teste, foi escolhido o acompanhamento “Batata frita” e incluída a observação: “HOMOLOGAÇÃO — pedido de teste autorizado; não preparar e não imprimir.” A quantidade permaneceu em uma unidade. O próximo passo é somente adicionar essa configuração à sacola; não houve confirmação de pedido até este ponto.
+
+O item foi incluído com sucesso na sacola, que passou a indicar uma unidade. A conferência mostrou produto, opções e observação corretos. Inicialmente a modalidade de entrega aplicava taxa estimada de R$ 5,00; ela foi substituída por **retirada no local**, reduzindo o total de homologação para R$ 23,00 e evitando a coleta de endereço. O pedido ainda não foi confirmado.
+
+O checkout aceitou os dados sintéticos “HOMOLOGAÇÃO — NÃO PREPARAR” e telefone `00000000000`, sem associar dados de uma pessoa real. A etapa de recebimento confirmou a modalidade de retirada na Marmitas TB, Telêmaco Borba/PR. Não houve cobrança, impressão ou confirmação de pedido nessas transições.
+
+Na etapa de pagamento, o sistema exibiu explicitamente: “**Ambiente de teste. Este pedido é uma simulação: nenhuma cobrança real será realizada.**” A modalidade PIX foi selecionada somente para validar o fluxo de simulação. A revisão final confirmou uma unidade de Panqueca de carne + Coca 200 ml, embalagem Isopor, batata frita, retirada no local, subtotal e total de R$ 23,00, e a identificação de homologação. O pedido está pronto para a única confirmação previamente autorizada, sem impressão.
+
+Ao acionar a única confirmação autorizada, a interface não criou pedido e exibiu o erro de interpretação `Unexpected token 'T', "The page c"... is not valid JSON`. Não houve redirecionamento, número de pedido, cobrança ou impressão; o botão não foi acionado novamente. A inspeção passiva do navegador identificou a requisição `POST /api/trpc/orders.create?batch=1`, cuja resposta não é JSON em produção. Isso caracteriza uma falha de integração do cliente publicado: o fluxo de criação ainda tenta usar a rota tRPC, enquanto a produção Vercel expõe funções HTTP próprias. O teste foi interrompido para não duplicar qualquer registro.
+
+A inspeção do bundle JavaScript servido por `marmitastb.vercel.app` confirmou que ele contém a referência `orders.create`, mas **não contém** a string `/api/public/orders`. Logo, a ramificação do adaptador Vercel foi eliminada durante a compilação de produção e o cliente publicado sempre segue para tRPC. A correção deverá tornar a escolha de transporte resiliente à ausência da variável de build e garantir um teste de regressão do artefato compilado antes de uma nova publicação autorizada.
+
+### Correção local pendente de publicação
+
+O checkout agora centraliza a seleção do transporte em `isVercelRuntime()`. Além da variável `VITE_API_RUNTIME=vercel`, o seletor reconhece o domínio publicado `*.vercel.app` exclusivamente em build de produção. Assim, caso a variável pública não seja incorporada pela Vercel, o cliente ainda escolhe `POST /api/public/orders`; em desenvolvimento local, mantém o fluxo legado sem atingir a API publicada.
+
+O teste de regressão foi escrito antes da alteração e falhou ao simular `marmitastb.vercel.app` sem variável de build. Após a correção, ele passou. A suíte integral registrou **219 testes aprovados e 2 pulados**, em 74 arquivos, e a checagem TypeScript foi concluída sem erros. Por fim, um build com `VITE_API_RUNTIME` vazio gerou o bundle contendo `/api/public/orders`, evidenciando que a ramificação HTTP deixa de ser removida pela otimização de compilação. Essa alteração ainda precisa de publicação autorizada e de novo teste do pedido em produção.
+
 ## Situação consolidada de prontidão
 
 > **Conclusão técnica:** a aplicação publicada está apta para uma apresentação guiada e para o roteiro de aceite. A confirmação de prontidão operacional completa permanece condicionada aos testes autenticados de equipe e administração, ao pedido de teste combinado e à verificação local da impressora.

@@ -187,3 +187,5 @@
 - [x] Aplicar a migração estrutural autorizada para despesas e auditoria administrativa, sem importar ou alterar registros históricos legados.
 - [x] Expor para a equipe operacional a tela de lançamento de despesas em rascunho e, para administradores, a fila de revisão com aprovação ou rejeição auditável.
 - [x] Completar o dashboard com pedidos por situação e atalhos para os módulos de relatórios e configurações, conforme a arquitetura profissional escolhida.
+- [ ] Executar um único pedido controlado de homologação em produção, sem cobrança real e sem impressão, validando criação, acompanhamento e transição operacional com dados de teste.
+- [x] Corrigir a criação pública de pedidos em produção para usar a função HTTP Vercel, eliminando a chamada incompatível a `/api/trpc/orders.create`.

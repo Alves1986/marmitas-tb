@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import type { CheckoutDraft, OrderConfirmation, PaymentMethod } from "@shared/order";
 import { useOrder } from "@/contexts/OrderContext";
 import { formatCurrency } from "@/lib/order";
+import { isVercelRuntime } from "@/lib/runtimeConfig";
 import { trpc } from "@/lib/trpc";
 import { apiRequest } from "@/lib/api";
 import { createVercelOrderService } from "@/services/orderService";
@@ -51,7 +52,7 @@ export function CheckoutFlow({ onSuccess, onBack }: CheckoutFlowProps) {
       const customer = form.getValues();
       setCheckoutDraft(customer);
       try {
-        if (import.meta.env.VITE_API_RUNTIME === "vercel" && import.meta.env.PROD) {
+        if (isVercelRuntime()) {
           const confirmation = await createVercelOrderService({
             request: (path, options) => apiRequest<OrderConfirmation>(path, {
               method: options.method,

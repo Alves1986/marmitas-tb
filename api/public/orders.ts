@@ -37,6 +37,8 @@ export type PublicOrderConfirmation = {
   estimatedTime: string;
   submittedAt: string;
   trackingCode?: string;
+  paymentReference?: string;
+  paymentUrl?: string;
   paymentStatus: "pending" | "confirmed";
   isTestPayment: boolean;
 };

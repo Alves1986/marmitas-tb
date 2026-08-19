@@ -7,6 +7,7 @@ dist/
 build/
 *.dist
 server/vercel/_lib/*.js
+server/services/*.js
 shared/operations.js
 
 # Environment variables

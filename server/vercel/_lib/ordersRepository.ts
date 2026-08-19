@@ -1,5 +1,6 @@
 import { createTemporaryOrderCode } from "./orders.js";
 import { createSupabaseAdmin } from "./supabaseAdmin.js";
+import { createAsaasSandboxPixPayment } from "./asaasSandboxPayments.js";
 import type { CreatePublicOrderInput, PublicOrderConfirmation, PublicTrackingOrder } from "../../../api/public/orders";
 
 type ProductRecord = { id: string; name: string; price_in_cents: number };
@@ -118,11 +119,45 @@ export async function createSupabaseOrder(input: CreatePublicOrderInput): Promis
   });
   if (eventError) throw new Error("Não foi possível registrar o histórico do pedido.");
 
+  let paymentReference = `test_${code}_${now.getTime()}`;
+  let paymentUrl: string | undefined;
+  if (input.paymentMethod === "pix") {
+    const sandboxPayment = await createAsaasSandboxPixPayment({
+      environment: process.env,
+      input: {
+        orderCode: code,
+        customer: { name: input.customer.name, phone: input.customer.phone },
+        totalInCents: subtotalInCents + deliveryFeeInCents,
+      },
+    });
+
+    if (sandboxPayment.available) {
+      const { error: paymentUpdateError } = await client
+        .from("orders")
+        .update({ payment_reference: sandboxPayment.paymentId })
+        .eq("id", order.id);
+      if (paymentUpdateError) throw new Error("Não foi possível vincular a cobrança Pix ao pedido.");
+
+      const { error: paymentEventError } = await client.from("order_events").insert({
+        order_id: order.id,
+        event_type: "payment_created",
+        to_status: "aguardando_pagamento",
+        message: "Cobrança PIX emitida no ambiente de teste.",
+      });
+      if (paymentEventError) throw new Error("Não foi possível registrar a emissão da cobrança Pix.");
+
+      paymentReference = sandboxPayment.paymentId;
+      paymentUrl = sandboxPayment.paymentUrl;
+    }
+  }
+
   return {
     orderNumber: order.code,
     trackingCode: order.code,
     estimatedTime: "35 a 45 min",
     submittedAt: order.created_at,
+    paymentReference,
+    paymentUrl,
     paymentStatus: "pending",
     isTestPayment: true,
   };

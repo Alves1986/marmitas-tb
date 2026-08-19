@@ -99,6 +99,23 @@ describe("avisos de modo de pagamento nos fluxos públicos", () => {
     expect(screen.getByText(/pagamento oficial ativo/i)).toBeTruthy();
   });
 
+  it("oferece acesso à cobrança PIX Sandbox somente quando o servidor retorna o link de pagamento", () => {
+    const confirmation = {
+      orderNumber: "TB-20260819-A1B2C3",
+      trackingCode: "TB-20260819-A1B2C3",
+      paymentReference: "pay_asaas_001",
+      paymentUrl: "https://sandbox.asaas.com/i/pay_asaas_001",
+      paymentStatus: "pending" as const,
+      isTestPayment: true,
+      estimatedTime: "35 a 45 min",
+      submittedAt: new Date().toISOString(),
+    } as import("@shared/order").OrderConfirmation & { paymentUrl: string };
+
+    render(<CheckoutSuccess confirmation={confirmation} items={[]} summary={{ subtotal: 0, deliveryFee: 0, total: 0, savings: 0 }} deliveryMode="pickup" onClose={vi.fn()} />);
+
+    expect(screen.getByRole("link", { name: /abrir cobrança pix de teste/i }).getAttribute("href")).toBe("https://sandbox.asaas.com/i/pay_asaas_001");
+  });
+
   it("mostra o aviso oficial no acompanhamento conforme o provedor persistido", () => {
     render(<TrackOrder />);
 

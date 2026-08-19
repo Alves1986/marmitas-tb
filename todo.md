@@ -197,3 +197,5 @@
 - [x] Adicionar retorno explícito à gestão e à operação nas telas internas, evitando que a única saída leve ao cardápio público.
 - [x] Diagnosticar a expiração imediata dos magic links de equipe e viabilizar uma sessão autenticada para concluir a homologação operacional.
 - [x] Corrigir a reimpressão de comandas em navegadores móveis, com retorno visível quando a abertura de impressão não for suportada.
+- [x] Orientar o responsável a cadastrar diretamente na Vercel as credenciais Asaas de Sandbox, sem compartilhar segredos no projeto ou no atendimento.
+- [x] Conectar o checkout Vercel à criação real de cobranças no Asaas Sandbox, substituindo a referência simulada por uma integração testada antes de qualquer cobrança real.

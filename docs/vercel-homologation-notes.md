@@ -29,3 +29,9 @@ Após identificação de que `Alves1986/ministral` hospeda outro sistema, o remo
 Fonte consultada: <https://vercel.com/docs/git>.
 
 Com autorização explícita, foi criado o repositório privado dedicado [`Alves1986/marmitas-tb`](https://github.com/Alves1986/marmitas-tb). A branch `feat/supabase-vercel-migration` foi publicada exclusivamente nele e tornou-se a branch padrão do novo repositório. A cópia local mantém apenas o remoto interno do projeto e o remoto `github` destinado a esse repositório dedicado; `Alves1986/ministral` não permanece configurado como remoto nem conectado à Vercel.
+
+## Retomada controlada da prévia — 19 de agosto de 2026
+
+Após a confirmação explícita do responsável, a reorganização de funções foi concluída e a branch `feat/supabase-vercel-migration` passou a conter somente nove handlers TypeScript em `api/`; as bibliotecas internas e os testes foram transferidos para `server/vercel/`. A validação local registrou 180 testes aprovados, dois pulados intencionalmente, checagem TypeScript e build de produção concluídos. O commit correspondente foi enviado exclusivamente ao repositório privado dedicado `Alves1986/marmitas-tb`.
+
+Para impedir nova classificação da branch de migração como produção, foi criada a branch `main` mínima e ela foi definida como a branch padrão do repositório dedicado. A branch `feat/supabase-vercel-migration` permanece destinada somente à prévia autorizada. No painel autenticado, o projeto Vercel `marmitas-tb` foi confirmado sem repositório conectado e o seletor GitHub apresentou tanto `marmitas-tb` quanto `ministral`; a conexão pendente é deliberadamente restrita a `Alves1986/marmitas-tb`.

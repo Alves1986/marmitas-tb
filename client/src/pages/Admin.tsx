@@ -34,12 +34,17 @@ export function AdminView({ actorRole }: { actorRole: OperationalRole }) {
   );
 }
 
+export function getAdminRedirectTarget(role: OperationalRole | undefined): string | null {
+  return role === "admin" ? null : "/acesso";
+}
+
 export default function Admin() {
   const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
 
   useEffect(() => {
-    if (!loading && user?.role !== "admin") setLocation("/");
+    const redirectTarget = getAdminRedirectTarget(user?.role);
+    if (!loading && redirectTarget) setLocation(redirectTarget);
   }, [loading, setLocation, user?.role]);
 
   if (loading || user?.role !== "admin") return null;

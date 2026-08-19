@@ -2,7 +2,7 @@
 
 ## Escopo e método
 
-Esta evidência registra verificações **não destrutivas** realizadas em `https://marmitastb.vercel.app`. Nenhuma solicitação de pedido foi confirmada e nenhuma alteração de cardápio, equipe, configuração ou dado financeiro foi enviada nesta etapa.
+Esta evidência registra as verificações iniciais **não destrutivas** realizadas em `https://marmitastb.vercel.app` e, em seção posterior, o único pedido controlado de homologação autorizado. Nenhuma alteração de cardápio, equipe, configuração ou dado financeiro foi enviada; o pedido de teste não acionou cobrança real, impressão ou entrega.
 
 ## Resultados públicos
 
@@ -119,7 +119,13 @@ A consulta do pedido confirmado `TB-20260819-C82294251937` foi preparada com o c
 
 A página de acompanhamento agora reutiliza `isVercelRuntime()`, o mesmo seletor resiliente adotado no checkout. No domínio de produção da Vercel, ela chama `GET /api/public/orders`; em desenvolvimento, preserva o caminho legado. A regressão foi escrita antes da alteração e falhou enquanto a página dependia diretamente da variável de build. Após a correção, essa cobertura, o seletor e o adaptador de acompanhamento passaram. A suíte completa registrou **221 testes aprovados e 2 pulados**, em 75 arquivos, e o build PWA com runtime Vercel foi concluído sem erros.
 
-A consulta do pedido já existente é a única validação restante desse fluxo após uma publicação autorizada. Ela não criará novo pedido, não acionará cobrança, impressão ou mudança de status.
+A consulta do pedido já existente foi concluída após a publicação autorizada. Ela não criou novo pedido, não acionou cobrança, impressão ou mudança de status.
+
+### Consulta pública concluída em produção
+
+Após a propagação adicional do bundle da Vercel, a consulta específica de `TB-20260819-C82294251937` retornou corretamente na interface. A função `GET /api/public/orders` respondeu HTTP 200 com JSON válido para o código e telefone sintéticos, e a tela exibiu o estado **Aguardando pagamento**, pagamento pendente, retirada na Marmitas TB, total de **R$ 23,00**, modalidade PIX em ambiente de teste e o evento inicial “Pedido recebido.”.
+
+O aviso temporário de rede visto na primeira tentativa não representava falha da função pública: a leitura direta já retornava HTTP 200 e, após a propagação completa, a própria interface passou a renderizar o resultado. Portanto, não foi necessária alteração adicional de código, nem uma nova publicação. A única continuação operacional possível é a transição de status pela equipe autenticada, que permanece fora do escopo autorizado deste teste; a impressão segue deliberadamente não verificada.
 
 ## Situação consolidada de prontidão
 
@@ -135,8 +141,8 @@ Após percorrer a grade até o fim, a inspeção do DOM confirmou **18 de 18** i
 
 | Área | Evidência atual | Estado para apresentação | Condição para aceite operacional |
 |---|---|---|---|
-| Vitrine, cardápio, PWA e acompanhamento | Rotas públicas e interface verificadas sem criar pedido. | Apta para demonstração. | Executar um pedido de teste e acompanhar seu código. |
+| Vitrine, cardápio, PWA e acompanhamento | Rotas públicas, 18 imagens, pedido controlado e acompanhamento por código verificados em produção. | Apta para demonstração guiada. | Validar a atualização do rastreio depois de uma transição executada pela equipe autenticada. |
 | Proteção de API e rotas internas | Sete endpoints protegidos responderam HTTP 401 JSON quando acessados sem sessão. | Apta para demonstrar controle de acesso. | Validar com o e-mail autorizado e cada papel aplicável. |
 | Administração, financeiro e auditoria | Código, migração, testes locais, build e endpoints protegidos validados; acesso real já foi confirmado pela responsável. | Apta para apresentação da interface. | Validar um rascunho de despesa, aprovação/rejeição, auditoria e relatório com dados de teste. |
-| Fila operacional e impressão | Interface e endpoints publicados; não foi criado pedido real nesta rodada. | Apta para demonstração visual. | Criar pedido de teste e confirmar mudanças de estado, alerta e impressão no computador dedicado. |
+| Fila operacional e impressão | Pedido de teste criado e rastreio público confirmado; impressão foi excluída do protocolo autorizado. | Apta para demonstração visual. | Localizar o pedido com sessão de equipe, confirmar mudanças de estado e verificar alerta e impressão no computador dedicado. |
 | Pagamento real | Asaas permanece em Sandbox sem chaves de produção. | Não demonstrar cobrança real. | Configurar credenciais e realizar homologação específica de pagamento antes de cobrar clientes. |

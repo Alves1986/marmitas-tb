@@ -193,3 +193,4 @@
 - [x] Corrigir a incompatibilidade de validação do endpoint público que retorna “Dados do pedido inválidos” para o pedido de homologação já revisado.
 - [x] Corrigir o acompanhamento público em produção para usar a função HTTP Vercel, eliminando a consulta tRPC legada após o pedido confirmado.
 - [x] Corrigir o acompanhamento público em produção para usar a função HTTP Vercel, eliminando a consulta tRPC legada após o pedido confirmado.
+- [x] Investigar a aparente falha HTTP do acompanhamento; a função respondeu corretamente após a propagação do bundle publicado, sem necessidade de alteração adicional.

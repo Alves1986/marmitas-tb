@@ -35,3 +35,15 @@ Com autorização explícita, foi criado o repositório privado dedicado [`Alves
 Após a confirmação explícita do responsável, a reorganização de funções foi concluída e a branch `feat/supabase-vercel-migration` passou a conter somente nove handlers TypeScript em `api/`; as bibliotecas internas e os testes foram transferidos para `server/vercel/`. A validação local registrou 180 testes aprovados, dois pulados intencionalmente, checagem TypeScript e build de produção concluídos. O commit correspondente foi enviado exclusivamente ao repositório privado dedicado `Alves1986/marmitas-tb`.
 
 Para impedir nova classificação da branch de migração como produção, foi criada a branch `main` mínima e ela foi definida como a branch padrão do repositório dedicado. A branch `feat/supabase-vercel-migration` permanece destinada somente à prévia autorizada. No painel autenticado, o projeto Vercel `marmitas-tb` foi confirmado sem repositório conectado e o seletor GitHub apresentou tanto `marmitas-tb` quanto `ministral`; a conexão pendente é deliberadamente restrita a `Alves1986/marmitas-tb`.
+
+O painel confirmou o vínculo concluído exclusivamente com `Alves1986/marmitas-tb`. Após o envio do commit `878fe83` para `feat/supabase-vercel-migration`, a Vercel iniciou uma implantação desse commit identificada como ambiente **Preview**. A implantação histórica `4f76d4b`, que aparece como **Production** e em erro, foi mantida apenas como registro do incidente anterior; o domínio de produção continua sem deployment ativo.
+
+No acompanhamento inicial, a nova prévia permaneceu em compilação por cerca de um minuto. Nenhuma URL de produção foi ativada, e a tela de deployments continuou a classificá-la como **Preview**.
+
+A implantação de Preview `878fe83` concluiu com o estado **Ready** e recebeu a URL `https://marmitas-le2ffl28q-andersonalves.vercel.app/`. Na primeira abertura pública da raiz, porém, a extração exibiu o conteúdo-fonte de `server/_core/vite.ts`, em vez da vitrine React esperada. Esse comportamento exige diagnóstico da configuração de rotas/publicação antes de considerar a homologação funcionalmente validada; nenhuma ação de produção foi realizada.
+
+### Diagnóstico e correção local da resposta da raiz
+
+A investigação reproduziu a estrutura produzida pelo build: o Vite gravava a vitrine em `dist/public/index.html`, enquanto o projeto Vercel estava configurado para publicar `dist`. No mesmo diretório de publicação havia apenas o bundle legado `dist/index.js`, de modo que a reescrita para `/index.html` não encontrava a página estática no nível configurado. A causa, portanto, era o desencontro entre os diretórios de saída, e não os nove handlers de `api/` nem a conexão com o repositório.
+
+Foi aplicada a correção mínima em `vite.config.ts`, definindo `outDir` como `dist`. Um teste estrutural novo impede regressão dessa configuração. A validação local confirmou `dist/index.html` no nível de publicação, 181 testes aprovados e 2 pulados, TypeScript aprovado, build concluído e integridade do diff. A nova prévia continua pendente de autorização explícita antes de qualquer push adicional.

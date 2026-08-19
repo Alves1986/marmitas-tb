@@ -128,3 +128,4 @@
 - [x] Publicar a cópia local exclusivamente no repositório privado `Alves1986/marmitas-tb` e confirmar que nenhum remoto aponta ao sistema existente.
 - [x] Consolidar os endpoints Vercel em até 12 funções serverless compatíveis com o plano Hobby, preservando os contratos HTTP existentes.
 - [x] Mover bibliotecas e testes internos para fora de `api/`, mantendo apenas os nove handlers HTTP Vercel nesse diretório.
+- [ ] Corrigir o desencontro entre a saída Vite e o diretório de publicação Vercel, evitando a exposição do bundle server-side na raiz da prévia.

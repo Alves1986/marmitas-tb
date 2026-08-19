@@ -126,3 +126,5 @@
 - [x] Interromper novos envios ao repositório `Alves1986/ministral` e desvincular esse repositório do projeto Vercel Marmitas TB.
 - [x] Criar um repositório GitHub privado e dedicado para Marmitas TB somente após aprovação explícita do nome e da separação do sistema existente.
 - [x] Publicar a cópia local exclusivamente no repositório privado `Alves1986/marmitas-tb` e confirmar que nenhum remoto aponta ao sistema existente.
+- [ ] Consolidar os endpoints Vercel em até 12 funções serverless compatíveis com o plano Hobby, preservando os contratos HTTP existentes.
+- [ ] Mover bibliotecas e testes internos para fora de `api/`, mantendo apenas os nove handlers HTTP Vercel nesse diretório.

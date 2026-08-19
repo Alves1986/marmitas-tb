@@ -154,3 +154,5 @@
 - [ ] Inspecionar na Preview o estado de carregamento efetivo dos elementos de imagem dos cards (`currentSrc`, `complete` e `naturalWidth`).
 - [ ] Capturar e arquivar evidência visual utilizável da grade do catálogo na Preview com cards e fotos carregadas.
 - [x] Encerrar a homologação protegida por decisão explícita do usuário, com inspeção autenticada, atributos no DOM e respostas HTTP registradas, sem reduzir a proteção de acesso da Vercel.
+- [x] Criar um guia completo em português brasileiro para clientes, equipe operacional e administradores utilizarem o sistema Marmitas TB.
+- [ ] Publicar a versão validada da Marmitas TB em produção na Vercel, exclusivamente a partir do repositório dedicado, e registrar a verificação pós-publicação.

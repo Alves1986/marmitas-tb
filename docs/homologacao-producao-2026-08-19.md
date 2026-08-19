@@ -77,6 +77,12 @@ O Asaas continua em ambiente Sandbox e sem chaves de produção; portanto, não 
 
 Como verificação de regressão posterior à consolidação deste relatório, a suíte automatizada foi executada novamente no código correspondente: **218 testes aprovados**, **2 testes pulados** e **74 arquivos de teste** processados. Esse resultado reforça a integridade técnica das regras cobertas, mas não substitui os testes de navegador autenticado e de dispositivo físico previstos no roteiro.
 
+## Evidência visual pública complementar
+
+Na inspeção visual direta da página inicial em produção, a marca, o bloco principal, a sacola, os atalhos de navegação e os primeiros cards do catálogo foram renderizados de forma legível. A árvore acessível do navegador identificou as oito categorias, os 18 controles de adição e os textos alternativos das imagens de produto. Na primeira viewport do catálogo, seis imagens de produto já visíveis retornaram `complete: true`, URL pública do Supabase Storage e largura natural diferente de zero. Os outros cards permaneceram em carregamento sob demanda por ainda estarem fora da área visível; eles devem ser confirmados após rolagem, sem interpretar esse estado inicial como imagem quebrada.
+
+Após percorrer a grade até o fim, a inspeção do DOM confirmou **18 de 18** imagens de cards carregadas, sem itens pendentes. Todas apresentaram `complete: true`, `naturalWidth` maior que zero e URL pública do bucket `marmitas-tb-assets` do Supabase. A captura final também mostrou os cards de sobremesa e bebidas renderizados com suas imagens e controles de adição. Essa evidência encerra a pendência de carregamento visual do catálogo em produção, sem criar pedidos nem modificar dados.
+
 | Área | Evidência atual | Estado para apresentação | Condição para aceite operacional |
 |---|---|---|---|
 | Vitrine, cardápio, PWA e acompanhamento | Rotas públicas e interface verificadas sem criar pedido. | Apta para demonstração. | Executar um pedido de teste e acompanhar seu código. |

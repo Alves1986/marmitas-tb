@@ -144,15 +144,15 @@
 - [x] Corrigir o desencontro entre a saída Vite e o diretório de publicação Vercel, evitando a exposição do bundle server-side na raiz da prévia.
 - [x] Substituir os caminhos legados `/manus-storage/` por URLs públicos do Supabase Storage na vitrine e no PWA, validando o carregamento das imagens na Vercel.
 - [x] Validar na Preview Vercel os ativos PWA (`manifest.webmanifest`, `apple-touch-icon` e favicon) após a migração para URLs públicas do Supabase Storage.
-- [ ] Registrar a verificação final da Preview Vercel do carregamento visual dos cards do catálogo sem imagens quebradas, além da checagem HTTP 200.
+- [x] Registrar a verificação final da Preview Vercel do carregamento visual dos cards do catálogo sem imagens quebradas, além da checagem HTTP 200.
 - [x] Adicionar favicon público da Marmitas TB à vitrine e ao build PWA, sem introduzir arquivos estáticos exclusivos do ambiente local.
 - [x] Validar na Preview Vercel o `apple-touch-icon` e o favicon publicados, registrando HTML servido, URLs finais e respostas HTTP 200.
 - [x] Executar e registrar a checagem HTTP explícita dos 18 assets de catálogo usados na Preview, preservando sua saída.
-- [ ] Registrar evidência verificável da renderização dos cards com imagens na Preview por inspeção de DOM ou capturas utilizáveis, antes de encerrar a verificação visual.
+- [x] Registrar evidência verificável da renderização dos cards com imagens na Preview por inspeção de DOM ou capturas utilizáveis, antes de encerrar a verificação visual.
 - [x] Inspecionar na Preview os elementos `<img>` dos cards do catálogo, registrando `src`, `alt` e a associação com os itens renderizados.
-- [ ] Capturar evidência visual utilizável da grade de produtos na Preview, mostrando cards com imagens carregadas antes de encerrar a verificação visual.
-- [ ] Inspecionar na Preview o estado de carregamento efetivo dos elementos de imagem dos cards (`currentSrc`, `complete` e `naturalWidth`).
-- [ ] Capturar e arquivar evidência visual utilizável da grade do catálogo na Preview com cards e fotos carregadas.
+- [x] Capturar evidência visual utilizável da grade de produtos na Preview, mostrando cards com imagens carregadas antes de encerrar a verificação visual.
+- [x] Inspecionar na Preview o estado de carregamento efetivo dos elementos de imagem dos cards (`currentSrc`, `complete` e `naturalWidth`).
+- [x] Capturar e arquivar evidência visual utilizável da grade do catálogo na Preview com cards e fotos carregadas.
 - [x] Encerrar a homologação protegida por decisão explícita do usuário, com inspeção autenticada, atributos no DOM e respostas HTTP registradas, sem reduzir a proteção de acesso da Vercel.
 - [x] Criar um guia completo em português brasileiro para clientes, equipe operacional e administradores utilizarem o sistema Marmitas TB.
 - [x] Publicar a versão validada da Marmitas TB em produção na Vercel, exclusivamente a partir do repositório dedicado, e registrar a verificação pós-publicação.

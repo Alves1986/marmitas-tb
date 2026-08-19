@@ -165,3 +165,21 @@
 - [x] Corrigir o fluxo de acesso da equipe em `/acesso`, que exibe `Load failed` e não envia ou valida o código OTP do e-mail autorizado.
 - [x] Impedir que o envio de link de acesso permaneça indefinidamente em `Enviando link...`, com limite de espera e mensagem clara de recuperação ao usuário.
 - [x] Impedir que a fila em `/operacao` permaneça indefinidamente em carregamento após o acesso da equipe, exibindo uma falha recuperável quando a consulta operacional não responder.
+- [ ] Corrigir as falhas de carregamento do catálogo, equipe e configurações exibidas no painel `/admin` em produção.
+- [x] Incluir ação de logout acessível e confirmação visual da sessão administrativa ativa.
+- [ ] Estruturar um dashboard administrativo mobile-first com indicadores de pedidos, faturamento, ticket médio e situação operacional.
+- [x] Implementar visão financeira por período, com receitas por forma de pagamento, pedidos e status de pagamento, sem registrar dados financeiros fictícios.
+- [x] Criar relatórios administrativos filtráveis e exportáveis a partir dos dados reais de pedidos e pagamentos autorizados.
+- [ ] Incluir navegação administrativa por módulos para visão geral, pedidos, cardápio, equipe, financeiro, relatórios e configurações.
+- [x] Exibir situação da sessão administrativa, papel ativo e logout também em telas móveis, sem depender apenas da barra lateral recolhida.
+- [x] Definir indicadores financeiros e operacionais com origem, período e regras de cálculo explícitos, sem estimativas apresentadas como dados reais.
+- [ ] Registrar ações administrativas relevantes em auditoria consultável, preservando autoria e horários em UTC.
+- [x] Corrigir a prévia visual de opções administrativas para que a aprovação de layout seja acessível e utilizável no navegador do responsável.
+- [ ] Adotar a estrutura administrativa profissional por módulos escolhida: visão geral, pedidos, financeiro, relatórios, cardápio, equipe e configurações.
+- [x] Implementar fluxo de caixa administrativo com receitas conciliadas de pedidos e despesas lançadas manualmente em categorias financeiras.
+- [ ] Permitir que a equipe registre despesas como rascunho e exigir aprovação ou rejeição administrativa auditável antes de afetar o fluxo de caixa.
+- [x] Disponibilizar relatórios filtráveis no painel com exportação CSV e PDF baseada nos dados financeiros e operacionais reais.
+- [ ] Corrigir a publicação Vercel para que as nove funções em `/api` sejam efetivamente atendidas, em vez de retornarem a tela SPA de página inexistente.
+- [x] Aplicar a migração estrutural autorizada para despesas e auditoria administrativa, sem importar ou alterar registros históricos legados.
+- [ ] Expor para a equipe operacional a tela de lançamento de despesas em rascunho e, para administradores, a fila de revisão com aprovação ou rejeição auditável.
+- [ ] Completar o dashboard com pedidos por situação e atalhos para os módulos de relatórios e configurações, conforme a arquitetura profissional escolhida.

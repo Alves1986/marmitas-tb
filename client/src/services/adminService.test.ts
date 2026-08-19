@@ -46,4 +46,25 @@ describe("VercelAdminService", () => {
     expect(api).toHaveBeenNthCalledWith(3, "/api/admin/staff", { method: "PATCH", body: { userId: "f37a4e26-ae35-4f9d-824e-e4c348e5b7e3", role: "admin" } });
     expect(api).toHaveBeenNthCalledWith(4, "/api/admin/settings", { method: "PATCH", body: settings });
   });
+
+  it("consulta o resumo financeiro pelo período selecionado", async () => {
+    const api = vi.fn().mockResolvedValue({ revenueInCents: 4500, expenseInCents: 1200, netCashInCents: 3300 });
+    const service = createVercelAdminService(api);
+
+    await expect(service.getFinance({ from: "2026-08-01", to: "2026-08-31" })).resolves.toMatchObject({ netCashInCents: 3300 });
+
+    expect(api).toHaveBeenCalledWith("/api/admin/finance?from=2026-08-01&to=2026-08-31");
+  });
+
+  it("envia despesas como rascunho e encaminha a revisão administrativa ao endpoint financeiro", async () => {
+    const api = vi.fn().mockResolvedValue({ id: "62cc75fb-1772-4d47-acfb-c76798fc9aa5", status: "draft" });
+    const service = createVercelAdminService(api);
+    const expense = { description: "Gás", category: "Insumos", amountInCents: 12000, incurredOn: "2026-08-19", notes: "Botijão da cozinha" };
+
+    await service.createExpense(expense);
+    await service.reviewExpense({ expenseId: "62cc75fb-1772-4d47-acfb-c76798fc9aa5", decision: "approved" });
+
+    expect(api).toHaveBeenNthCalledWith(1, "/api/admin/finance", { method: "POST", body: expense });
+    expect(api).toHaveBeenNthCalledWith(2, "/api/admin/finance", { method: "PATCH", body: { expenseId: "62cc75fb-1772-4d47-acfb-c76798fc9aa5", decision: "approved" } });
+  });
 });

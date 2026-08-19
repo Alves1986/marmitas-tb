@@ -32,6 +32,35 @@ export const dashboardMenuItems = [
   { icon: Store, label: "Cardápio público", path: "/" },
 ];
 
+export function MobileSessionActions({
+  userName,
+  onLogout,
+}: {
+  userName?: string | null;
+  onLogout: () => void;
+}) {
+  const label = userName?.trim() || "Equipe";
+
+  return (
+    <div className="flex items-center gap-1.5">
+      <span className="hidden max-w-28 truncate text-xs text-muted-foreground sm:inline">
+        Sessão: {label}
+      </span>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        onClick={onLogout}
+        aria-label="Sair da sessão"
+        className="min-h-10 gap-1.5 px-2 text-destructive hover:text-destructive"
+      >
+        <LogOut className="h-4 w-4" />
+        <span className="text-xs font-semibold">Sair</span>
+      </Button>
+    </div>
+  );
+}
+
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
 const DEFAULT_WIDTH = 280;
 const MIN_WIDTH = 200;
@@ -253,6 +282,7 @@ function DashboardLayoutContent({
                 </div>
               </div>
             </div>
+            <MobileSessionActions userName={user?.name} onLogout={logout} />
           </div>
         )}
         <main className="flex-1 p-4">{children}</main>

@@ -22,9 +22,10 @@ async function listTypeScriptFiles(directory: string, relativeDirectory = ""): P
 }
 
 describe("fronteira de funções Vercel", () => {
-  it("mantém somente os nove handlers HTTP em api", async () => {
+  it("mantém os dez handlers HTTP necessários em api, abaixo do limite Hobby", async () => {
     await expect(listTypeScriptFiles(apiRoot)).resolves.toEqual([
       "admin/catalog.ts",
+      "admin/finance.ts",
       "admin/settings.ts",
       "admin/staff.ts",
       "operations/alerts.ts",
@@ -51,5 +52,19 @@ describe("fronteira de funções Vercel", () => {
       "{server/vercel/_lib/**/*.js,shared/operations.js}",
     );
     expect(packageJson.scripts?.build).toContain("build:vercel-runtime");
+  });
+
+  it("preserva as funções /api fora do fallback da aplicação de página única", async () => {
+    const vercelConfigText = await readFile(path.join(projectRoot, "vercel.json"), "utf8");
+    const vercelConfig = JSON.parse(vercelConfigText) as {
+      rewrites?: Array<{ source?: string; destination?: string }>;
+    };
+
+    expect(vercelConfig.rewrites).toEqual([
+      {
+        source: "/:path((?!api/).*)",
+        destination: "/index.html",
+      },
+    ]);
   });
 });

@@ -1,0 +1,39 @@
+<h2>Qual organização deve guiar a nova administração?</h2>
+<p class="subtitle">Todas as opções incluem logout visível, controle de acesso e mensagens de erro recuperáveis. Escolha a estrutura que melhor combina com o dia a dia da Marmitas TB.</p>
+
+<div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(250px,1fr));">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#fbf4e7;padding:16px;color:#432027;min-height:210px;">
+      <div style="border-radius:14px;background:#4d2023;color:#fff7eb;padding:10px 12px;font-weight:700;">Marmitas TB <span style="float:right;font-size:12px;opacity:.8;">Admin</span></div>
+      <div style="display:flex;gap:10px;margin-top:12px;font-size:12px;">
+        <div style="width:35%;border-radius:10px;background:#fffdf8;padding:10px;line-height:2;box-shadow:0 1px 3px #0001;">Visão geral<br>Pedidos<br>Financeiro<br>Relatórios<br>Cardápio<br>Equipe<br>Configurações</div>
+        <div style="flex:1;display:grid;gap:8px;"><div style="background:#fffdf8;border-radius:10px;padding:9px;font-weight:600;">Faturamento hoje<br><strong style="font-size:20px;">R$ —</strong></div><div style="background:#fffdf8;border-radius:10px;padding:9px;">Pedidos em andamento</div><div style="background:#fffdf8;border-radius:10px;padding:9px;">Atalhos da operação</div></div>
+      </div>
+    </div>
+    <div class="card-body"><h3>A. Painel profissional por módulos</h3><p>Barra lateral permanente no desktop e menu completo no celular. Melhor para crescer sem misturar operação, finanças e configurações.</p></div>
+  </div>
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#fbf4e7;padding:16px;color:#432027;min-height:210px;">
+      <div style="border-radius:14px;background:#4d2023;color:#fff7eb;padding:10px 12px;font-weight:700;">Marmitas TB <span style="float:right;font-size:12px;opacity:.8;">Sair</span></div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:12px;">
+        <div style="background:#fffdf8;border-radius:10px;padding:14px;font-weight:600;">Pedidos<br><span style="font-size:22px;">—</span></div><div style="background:#fffdf8;border-radius:10px;padding:14px;font-weight:600;">Faturamento<br><span style="font-size:22px;">R$ —</span></div><div style="background:#fffdf8;border-radius:10px;padding:14px;font-weight:600;">Cardápio</div><div style="background:#fffdf8;border-radius:10px;padding:14px;font-weight:600;">Equipe</div>
+      </div>
+      <div style="margin-top:10px;background:#7b8d40;color:white;border-radius:10px;padding:10px;text-align:center;font-size:12px;">Financeiro e relatórios em cartões de atalho</div>
+    </div>
+    <div class="card-body"><h3>B. Central de gestão em cartões</h3><p>Entrada simples e rápida para celular, com módulos como cartões. Funciona bem para pouca navegação, mas pode ficar limitada ao ganhar mais relatórios.</p></div>
+  </div>
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#fbf4e7;padding:16px;color:#432027;min-height:210px;">
+      <div style="border-radius:14px;background:#4d2023;color:#fff7eb;padding:10px 12px;font-weight:700;">Resumo do dia <span style="float:right;font-size:12px;opacity:.8;">Sair</span></div>
+      <div style="display:flex;gap:7px;margin-top:12px;overflow:hidden;"><div style="background:#fffdf8;border-radius:9px;padding:10px;min-width:105px;font-size:12px;">Pedidos<br><strong style="font-size:20px;">—</strong></div><div style="background:#fffdf8;border-radius:9px;padding:10px;min-width:105px;font-size:12px;">Receita<br><strong style="font-size:20px;">R$ —</strong></div><div style="background:#fffdf8;border-radius:9px;padding:10px;min-width:105px;font-size:12px;">Ticket<br><strong style="font-size:20px;">R$ —</strong></div></div>
+      <div style="margin-top:10px;background:#fffdf8;border-radius:10px;padding:10px;font-size:12px;">Linha do tempo: novos pedidos, pagamentos e alertas</div>
+      <div style="margin-top:10px;display:flex;gap:6px;font-size:11px;"><span style="padding:7px;background:#7b8d40;color:white;border-radius:8px;">Operação</span><span style="padding:7px;background:#fffdf8;border-radius:8px;">Financeiro</span><span style="padding:7px;background:#fffdf8;border-radius:8px;">Relatórios</span></div>
+    </div>
+    <div class="card-body"><h3>C. Resumo diário com ações contextuais</h3><p>Prioriza o dia atual e apresenta ações conforme a situação. É ágil para quem opera, porém menos direto para auditoria e consultas históricas.</p></div>
+  </div>
+</div>
+
+<div class="section" style="margin-top:24px;">
+  <p class="label">Recomendação</p>
+  <p><strong>Opção A</strong> é a recomendada: separa as responsabilidades do negócio e sustenta a expansão para financeiro e relatórios sem reintroduzir a sensação de painel improvisado.</p>
+</div>

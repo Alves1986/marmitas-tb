@@ -128,5 +128,8 @@
 - [x] Publicar a cópia local exclusivamente no repositório privado `Alves1986/marmitas-tb` e confirmar que nenhum remoto aponta ao sistema existente.
 - [x] Consolidar os endpoints Vercel em até 12 funções serverless compatíveis com o plano Hobby, preservando os contratos HTTP existentes.
 - [x] Mover bibliotecas e testes internos para fora de `api/`, mantendo apenas os nove handlers HTTP Vercel nesse diretório.
-- [ ] Corrigir o desencontro entre a saída Vite e o diretório de publicação Vercel, evitando a exposição do bundle server-side na raiz da prévia.
-- [ ] Substituir os caminhos legados `/manus-storage/` por URLs públicos do Supabase Storage na vitrine e no PWA, validando o carregamento das imagens na Vercel.
+- [x] Corrigir o desencontro entre a saída Vite e o diretório de publicação Vercel, evitando a exposição do bundle server-side na raiz da prévia.
+- [x] Substituir os caminhos legados `/manus-storage/` por URLs públicos do Supabase Storage na vitrine e no PWA, validando o carregamento das imagens na Vercel.
+- [ ] Validar na Preview Vercel os ativos PWA (`manifest.webmanifest`, `apple-touch-icon` e favicon) após a migração para URLs públicas do Supabase Storage.
+- [ ] Registrar a verificação final da Preview Vercel do carregamento visual dos cards do catálogo sem imagens quebradas, além da checagem HTTP 200.
+- [x] Adicionar favicon público da Marmitas TB à vitrine e ao build PWA, sem introduzir arquivos estáticos exclusivos do ambiente local.

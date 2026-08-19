@@ -47,3 +47,15 @@ A implantação de Preview `878fe83` concluiu com o estado **Ready** e recebeu a
 A investigação reproduziu a estrutura produzida pelo build: o Vite gravava a vitrine em `dist/public/index.html`, enquanto o projeto Vercel estava configurado para publicar `dist`. No mesmo diretório de publicação havia apenas o bundle legado `dist/index.js`, de modo que a reescrita para `/index.html` não encontrava a página estática no nível configurado. A causa, portanto, era o desencontro entre os diretórios de saída, e não os nove handlers de `api/` nem a conexão com o repositório.
 
 Foi aplicada a correção mínima em `vite.config.ts`, definindo `outDir` como `dist`. Um teste estrutural novo impede regressão dessa configuração. A validação local confirmou `dist/index.html` no nível de publicação, 181 testes aprovados e 2 pulados, TypeScript aprovado, build concluído e integridade do diff. A nova prévia continua pendente de autorização explícita antes de qualquer push adicional.
+
+Após autorização explícita, o checkpoint `106aaf6` foi enviado exclusivamente a `feat/supabase-vercel-migration`. A Vercel iniciou a implantação correspondente como **Preview** na URL a ser confirmada `marmitas-7y8lrfioj-andersonalves.vercel.app`. A branch `main`, o domínio configurado e a implantação histórica em produção não foram modificados.
+
+A implantação `106aaf6` foi concluída com estado **Ready** como **Preview**. O próximo passo é verificar a resposta pública da nova URL; a implantação histórica `4f76d4b` continua separada, marcada como produção e em erro, sem ter sido promovida, atualizada ou removida durante esta homologação.
+
+A verificação pública confirmou que a rota raiz da nova prévia entrega a aplicação React, com título da Marmitas TB, navegação, catálogo de 18 itens e sacola disponíveis. Isso confirma a correção do diretório de publicação. Na mesma inspeção visual, algumas imagens do destaque apareceram sem carregamento, embora o conteúdo textual do catálogo estivesse disponível. Esse defeito visual será investigado separadamente antes de considerar a prévia pronta para homologação funcional.
+
+### Diagnóstico e correção local dos ativos visuais
+
+A falha visual foi atribuída a referências remanescentes a `/manus-storage/`, uma rota atendida somente pelo servidor de desenvolvimento legado e inexistente no ambiente Vercel. A inspeção somente leitura do projeto Supabase `marmitas-tb` confirmou que os 18 produtos ativos já apontam para URLs públicas do bucket `marmitas-tb-assets`, enquanto a logo está disponível em `brand/logo-marmitastb.jpg`.
+
+Foi criado um resolvedor único de ativos públicos no cliente e foram atualizados os 18 cards, o destaque, o cabeçalho, o ícone Apple Touch e o manifesto PWA para utilizar exclusivamente o bucket Supabase. A proteção de catálogo agora exige URLs públicas desse bucket; a validação local registrou 181 testes aprovados, 2 pulados, checagem TypeScript, build, integridade do diff, ausência de `/manus-storage/` nos arquivos públicos e presença do ícone oficial no manifesto gerado. A confirmação visual permanece pendente de uma nova implantação Preview explicitamente autorizada.

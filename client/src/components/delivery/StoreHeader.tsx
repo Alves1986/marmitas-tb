@@ -1,4 +1,5 @@
 import { ShoppingBag } from "lucide-react";
+import { brandAsset } from "@/data/assets";
 import { useOrder } from "@/contexts/OrderContext";
 
 function scrollToSection(id: string) {
@@ -18,7 +19,7 @@ export function StoreHeader() {
           aria-label="Voltar ao início"
         >
           <span className="grid size-10 place-items-center overflow-hidden rounded-2xl bg-[#8e1718] shadow-[0_8px_20px_rgba(142,23,24,0.2)] transition-transform duration-200 group-active:scale-95">
-            <img src="/manus-storage/logo-marmitastb_9d67f9be.jpg" alt="" className="size-full object-cover" />
+            <img src={brandAsset("logo-marmitastb.jpg")} alt="" className="size-full object-cover" />
           </span>
           <span className="leading-none">
             <strong className="font-display block text-[15px] tracking-tight text-[#481e1f]">Marmitas TB</strong>

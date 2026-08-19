@@ -167,15 +167,15 @@ const plugins = [
       theme_color: "#481e1f",
       background_color: "#fffaf1",
       icons: [
-        { src: "/manus-storage/logo-marmitastb_9d67f9be.jpg", sizes: "192x192", type: "image/jpeg", purpose: "any" },
-        { src: "/manus-storage/logo-marmitastb_9d67f9be.jpg", sizes: "512x512", type: "image/jpeg", purpose: "any maskable" },
+        { src: "https://hwkgplnzvcaobjozfmqx.supabase.co/storage/v1/object/public/marmitas-tb-assets/brand/logo-marmitastb.jpg", sizes: "192x192", type: "image/jpeg", purpose: "any" },
+        { src: "https://hwkgplnzvcaobjozfmqx.supabase.co/storage/v1/object/public/marmitas-tb-assets/brand/logo-marmitastb.jpg", sizes: "512x512", type: "image/jpeg", purpose: "any maskable" },
       ],
     },
     workbox: {
       navigateFallback: "/index.html",
       runtimeCaching: [
         {
-          urlPattern: ({ request, url }) => request.destination === "image" || url.pathname.startsWith("/manus-storage/"),
+          urlPattern: ({ request }) => request.destination === "image",
           handler: "CacheFirst",
           options: {
             cacheName: "marmitas-tb-imagens",

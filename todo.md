@@ -155,9 +155,9 @@
 - [ ] Capturar e arquivar evidência visual utilizável da grade do catálogo na Preview com cards e fotos carregadas.
 - [x] Encerrar a homologação protegida por decisão explícita do usuário, com inspeção autenticada, atributos no DOM e respostas HTTP registradas, sem reduzir a proteção de acesso da Vercel.
 - [x] Criar um guia completo em português brasileiro para clientes, equipe operacional e administradores utilizarem o sistema Marmitas TB.
-- [ ] Publicar a versão validada da Marmitas TB em produção na Vercel, exclusivamente a partir do repositório dedicado, e registrar a verificação pós-publicação.
-- [ ] Diagnosticar e corrigir o incidente de produção no domínio `marmitastb.vercel.app`, que retorna `DEPLOYMENT_NOT_FOUND` após a promoção autorizada da branch `main`.
-- [ ] Corrigir a leitura server-side das variáveis Supabase e da URL pública para aceitar a configuração já presente na Vercel e eliminar o `FUNCTION_INVOCATION_FAILED` do catálogo público.
-- [ ] Fazer o endpoint público de cardápio usar somente a chave publicável e a política RLS anônima, sem depender de credencial administrativa no runtime de produção.
-- [ ] Corrigir o empacotamento Vercel das bibliotecas em `server/vercel/_lib`, pois o runtime não encontra `http` ao carregar as funções em `api/`.
-- [ ] Adaptar os nove handlers Vercel ao contrato Node `(req, res)`, pois o runtime confirmou que ignora o `Response` retornado pelo export padrão atual.
+- [x] Publicar a versão validada da Marmitas TB em produção na Vercel, exclusivamente a partir do repositório dedicado, e registrar a verificação pós-publicação.
+- [x] Diagnosticar e corrigir o incidente de produção no domínio `marmitastb.vercel.app`, que retorna `DEPLOYMENT_NOT_FOUND` após a promoção autorizada da branch `main`.
+- [x] Corrigir a leitura server-side das variáveis Supabase e da URL pública para aceitar a configuração já presente na Vercel e eliminar o `FUNCTION_INVOCATION_FAILED` do catálogo público.
+- [x] Fazer o endpoint público de cardápio usar somente a chave publicável e a política RLS anônima, sem depender de credencial administrativa no runtime de produção.
+- [x] Corrigir o empacotamento Vercel das bibliotecas em `server/vercel/_lib`, pois o runtime não encontra `http` ao carregar as funções em `api/`.
+- [x] Adaptar os nove handlers Vercel ao contrato Node `(req, res)`, pois o runtime confirmou que ignora o `Response` retornado pelo export padrão atual.

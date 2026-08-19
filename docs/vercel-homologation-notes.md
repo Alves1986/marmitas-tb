@@ -14,6 +14,8 @@ A primeira tentativa de corrigir o empacotamento, no commit `a147173`, gerou o d
 
 O deployment `EhTgmjwRHTC1VDvJAsuXJCaybBCV` foi aceito e tornou a vitrine acessível, mas o log de runtime do catálogo registrou: `default export returned a Response`; para o runtime Node atual da Vercel, a assinatura padrão deve ser `(req, res) => void`, pois retornos são ignorados. A correção pendente de publicação introduz `asVercelNodeHandler`, que converte a requisição Node em `Request` e grava o `Response` no objeto `res`. Os nove exports padrão de `api/` passam a usar esse adaptador, enquanto as funções de negócio baseadas em `Request`/`Response` e seus testes permanecem preservados. A validação local foi concluída com 190 testes aprovados, 2 pulados, TypeScript e build de produção aprovados.
 
+**Recuperação confirmada em produção (19/08/2026):** o commit `22b9d75` foi publicado em `main`. Após a implantação, `https://marmitastb.vercel.app/`, `/manifest.webmanifest` e `/api/public/menu` responderam com HTTP 200. A inspeção visual pública confirmou a vitrine carregada, as imagens do Supabase Storage e o cardápio com 18 opções, sem o erro de servidor anterior.
+
 Em 18 de agosto de 2026, a branch `feat/supabase-vercel-migration` foi confirmada no repositório `Alves1986/ministral` no commit `e1d2d49c1b3ceed86ee8eb42ec8a204121f72b2a`.
 
 A sessão autenticada na Vercel reconhece o repositório `Alves1986/ministral`. A tela de importação apresenta explicitamente o botão **Deploy** e informa que a implantação começa após essa ação. A documentação oficial também registra que integrações Git fazem implantações automáticas em pushes de branches suportadas. Portanto, nenhuma importação foi concluída, preservando a exigência do projeto de não realizar deploy automático.

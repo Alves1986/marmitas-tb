@@ -5,13 +5,14 @@ export type ReadonlyLegacyDatabase = {
 };
 
 export type LegacyOperationalSnapshot = {
-  formatVersion: 1;
+  formatVersion: 2;
   exportedAt: string;
   orders: LegacyRow[];
   orderItems: LegacyRow[];
   orderEvents: LegacyRow[];
   paymentEvents: LegacyRow[];
   printJobs: LegacyRow[];
+  storeSettings: LegacyRow[];
 };
 
 function parsePreservingRawJson(value: unknown): unknown {
@@ -39,21 +40,23 @@ export async function createLegacyOperationalSnapshot(
   database: ReadonlyLegacyDatabase,
   exportedAt = new Date(),
 ): Promise<LegacyOperationalSnapshot> {
-  const [orders, orderItems, orderEvents, paymentEvents, printJobs] = await Promise.all([
+  const [orders, orderItems, orderEvents, paymentEvents, printJobs, storeSettings] = await Promise.all([
     readTable(database, "orders"),
     readTable(database, "orderItems"),
     readTable(database, "orderEvents"),
     readTable(database, "paymentEvents"),
     readTable(database, "printJobs"),
+    readTable(database, "storeSettings"),
   ]);
 
   return {
-    formatVersion: 1,
+    formatVersion: 2,
     exportedAt: exportedAt.toISOString(),
     orders,
     orderItems: orderItems.map(row => deserializeJsonField(row, "configurationJson")),
     orderEvents,
     paymentEvents: paymentEvents.map(row => deserializeJsonField(row, "payloadJson")),
     printJobs,
+    storeSettings: storeSettings.map(row => deserializeJsonField(row, "settingValue")),
   };
 }

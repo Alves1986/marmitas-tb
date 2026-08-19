@@ -24,6 +24,7 @@ try {
     orderEvents: snapshot.orderEvents.length,
     paymentEvents: snapshot.paymentEvents.length,
     printJobs: snapshot.printJobs.length,
+    storeSettings: snapshot.storeSettings.length,
   }));
 } finally {
   await connection.end();

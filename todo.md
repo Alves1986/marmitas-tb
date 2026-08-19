@@ -93,12 +93,12 @@
 - [ ] Executar e registrar a sonda de leitura do Asaas Sandbox sem cobrança após o cadastro das credenciais válidas.
 - [ ] Executar a guarda de configuração com segredos injetados e revalidar a homologação completa sem expor valores.
 - [x] Avaliar e definir a arquitetura de migração da Marmitas TB para Supabase e Vercel.
-- [ ] Migrar persistência, autenticação, API e variáveis de ambiente para serviços compatíveis com Supabase e Vercel.
-- [ ] Preparar configuração, documentação e validação de deploy externo na Vercel sem publicar automaticamente.
-- [ ] Substituir Manus OAuth por Supabase Auth, preservando os papéis de cliente, operação e administrador.
+- [x] Migrar persistência, autenticação, API e variáveis de ambiente para serviços compatíveis com Supabase e Vercel.
+- [x] Preparar configuração, documentação e validação de deploy externo na Vercel sem publicar automaticamente.
+- [x] Substituir Manus OAuth por Supabase Auth, preservando os papéis de cliente, operação e administrador.
 - [ ] Converter o esquema e os dados operacionais de MySQL/TiDB para Supabase Postgres com integridade e reversibilidade.
-- [ ] Transferir os ativos persistentes da aplicação para Supabase Storage e remover dependências exclusivas da infraestrutura atual.
-- [ ] Conectar e validar os projetos existentes de Supabase e Vercel para a Marmitas TB antes da migração de produção.
+- [x] Transferir os ativos persistentes da aplicação para Supabase Storage e remover dependências exclusivas da infraestrutura atual.
+- [x] Conectar e validar os projetos existentes de Supabase e Vercel para a Marmitas TB antes da migração de produção.
 - [x] Implementar login interno por código OTP de e-mail no Supabase, sem cadastro público automático da equipe.
 - [x] Configurar URLs de retorno do Supabase Auth para o domínio vercel.app e os deploys de prévia da homologação.
 - [x] Definir o Site URL do Supabase Auth como `https://marmitastb.vercel.app` e permitir somente localhost, esse domínio e previews `marmitas-*-andersonalves.vercel.app`.
@@ -106,7 +106,12 @@
 - [ ] Ajustar o template de e-mail de autenticação do Supabase para incluir o token OTP de seis dígitos esperado pelo formulário, sem mudar a política de cadastro automático.
 - [ ] Configurar um SMTP transacional no Supabase e validar o envio de token OTP de seis dígitos para a equipe antes de liberar o acesso operacional em produção.
 - [x] Manter o fluxo de acesso por código OTP e adiar sua validação final até a configuração de SMTP próprio, sem adaptar a aplicação para magic link.
-- [ ] Adaptar a aplicação Vite para a Vercel com funções TypeScript server-side para pedidos, Asaas, webhook e impressão.
+- [x] Adaptar a aplicação Vite para a Vercel com funções TypeScript server-side para pedidos, Asaas, webhook e impressão.
+- [x] Decidir se o histórico operacional legado deverá ser importado ao Supabase nesta fase ou preservado como exportação reversível fora do banco produtivo.
+- [ ] Se a importação for autorizada, migrar os dados operacionais necessários (`orders`, itens, eventos, pagamentos, fila de impressão e configurações), com reconciliação e validação de integridade.
+- [x] Exportar e contabilizar, em modo somente leitura, os dados legados de pedidos, itens, eventos, pagamentos, fila de impressão e configurações antes da importação.
+- [x] Documentar o mapeamento entre os identificadores numéricos legados e os UUIDs Supabase, as regras de normalização e os critérios de reconciliação.
+- [ ] Criar e testar uma importação idempotente do histórico operacional no Supabase, com rollback lógico e relatório de integridade antes da gravação autorizada.
 - [x] Provisionar e validar um projeto Supabase exclusivo para a Marmitas TB antes de aplicar migrações de banco ou Storage.
 - [x] Manter a criação do projeto Marmitas TB na Vercel para após a validação final, o checkpoint e o envio da branch de migração ao GitHub, sem deploy automático.
 - [x] Migrar os contratos de autoria de auditoria para UUIDs do Supabase sem alterar os identificadores de domínio ainda numéricos no legado.

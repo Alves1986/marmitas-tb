@@ -181,6 +181,9 @@
 - [x] Disponibilizar relatórios filtráveis no painel com exportação CSV e PDF baseada nos dados financeiros e operacionais reais.
 - [x] Corrigir a publicação Vercel para que as nove funções em `/api` sejam efetivamente atendidas, em vez de retornarem a tela SPA de página inexistente.
 - [x] Publicar a correção autorizada na branch `main` do repositório dedicado e validar as rotas administrativas e de API em `marmitastb.vercel.app`.
+- [x] Restaurar o alias de produção `marmitastb.vercel.app`, que passou a responder 404 de plataforma após a publicação autorizada.
+- [ ] Executar homologação não destrutiva dos fluxos públicos, administrativos e operacionais em produção antes da apresentação ao cliente.
+- [x] Entregar roteiro de aceite por perfil com critérios verificáveis, evidências, pendências e orientação de retorno após o teste do cliente.
 - [x] Aplicar a migração estrutural autorizada para despesas e auditoria administrativa, sem importar ou alterar registros históricos legados.
 - [x] Expor para a equipe operacional a tela de lançamento de despesas em rascunho e, para administradores, a fila de revisão com aprovação ou rejeição auditável.
 - [x] Completar o dashboard com pedidos por situação e atalhos para os módulos de relatórios e configurações, conforme a arquitetura profissional escolhida.

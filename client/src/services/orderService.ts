@@ -1,4 +1,4 @@
-import type { OrderConfirmation, OrderPayload } from "@shared/order";
+import type { CartItem, OrderConfirmation, OrderPayload } from "@shared/order";
 
 export type OrderService = {
   submit: (payload: OrderPayload) => Promise<OrderConfirmation>;
@@ -30,11 +30,46 @@ export function createLocalOrderService(options: LocalOrderServiceOptions = {}):
 
 type VercelOrderServiceOptions = {
   request: (path: string, options: { method: "POST"; body: unknown }) => Promise<OrderConfirmation>;
+  loadMenu?: () => Promise<PublicMenu>;
 };
+
+export type PublicMenu = {
+  products: Array<{
+    id: string;
+    name: string;
+    options: Array<{ id: string; groupName: string; label: string }>;
+  }>;
+};
+
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function hasSupabaseIds(item: CartItem) {
+  return uuidPattern.test(item.productId) && item.selections.every((selection) => uuidPattern.test(selection.optionId));
+}
+
+async function resolveItemsForPublicOrder(items: CartItem[], loadMenu?: () => Promise<PublicMenu>) {
+  if (items.every(hasSupabaseIds)) return items;
+  if (!loadMenu) throw new Error("Não foi possível validar os itens do cardápio. Atualize a página e tente novamente.");
+
+  const menu = await loadMenu();
+  return items.map((item) => {
+    const product = menu.products.find((candidate) => candidate.id === item.productId || candidate.name === item.name);
+    if (!product) throw new Error(`O item “${item.name}” não está mais disponível. Atualize a página e revise a sacola.`);
+
+    const selections = item.selections.map((selection) => {
+      const option = product.options.find((candidate) => candidate.id === selection.optionId || (candidate.groupName === selection.groupLabel && candidate.label === selection.optionLabel));
+      if (!option) throw new Error(`A opção “${selection.optionLabel}” não está mais disponível para “${item.name}”. Atualize a página e revise a sacola.`);
+      return { ...selection, optionId: option.id };
+    });
+
+    return { ...item, productId: product.id, selections };
+  });
+}
 
 export function createVercelOrderService(options: VercelOrderServiceOptions): OrderService {
   return {
-    submit(payload) {
+    async submit(payload) {
+      const items = await resolveItemsForPublicOrder(payload.items, options.loadMenu);
       const paymentMethod = payload.customer.paymentMethod === "card" ? "credit_card" : payload.customer.paymentMethod === "food_voucher" ? "voucher" : payload.customer.paymentMethod;
       return options.request("/api/public/orders", {
         method: "POST",
@@ -47,7 +82,7 @@ export function createVercelOrderService(options: VercelOrderServiceOptions): Or
           },
           fulfillmentMethod: payload.deliveryMode,
           paymentMethod,
-          items: payload.items.map((item) => ({ productId: item.productId, quantity: item.quantity, optionIds: item.selections.map((selection) => selection.optionId), note: item.note })),
+          items: items.map((item) => ({ productId: item.productId, quantity: item.quantity, optionIds: item.selections.map((selection) => selection.optionId), note: item.note })),
         },
       });
     },

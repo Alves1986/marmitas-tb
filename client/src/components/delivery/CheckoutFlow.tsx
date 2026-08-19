@@ -7,7 +7,7 @@ import { formatCurrency } from "@/lib/order";
 import { isVercelRuntime } from "@/lib/runtimeConfig";
 import { trpc } from "@/lib/trpc";
 import { apiRequest } from "@/lib/api";
-import { createVercelOrderService } from "@/services/orderService";
+import { createVercelOrderService, type PublicMenu } from "@/services/orderService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -59,6 +59,7 @@ export function CheckoutFlow({ onSuccess, onBack }: CheckoutFlowProps) {
               headers: { "content-type": "application/json" },
               body: JSON.stringify(options.body),
             }),
+            loadMenu: () => apiRequest<PublicMenu>("/api/public/menu"),
           }).submit({
             id: crypto.randomUUID(),
             createdAt: new Date().toISOString(),

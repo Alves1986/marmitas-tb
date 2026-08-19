@@ -60,6 +60,55 @@ describe("local order service", () => {
 });
 
 describe("Vercel order service", () => {
+  it("resolve os identificadores estáticos do carrinho pelo cardápio público antes de enviar o pedido", async () => {
+    let submittedBody: unknown;
+    const service = createVercelOrderService({
+      request: async (_path, options) => {
+        submittedBody = options.body;
+        return { orderNumber: "TB-20260819-TESTE", estimatedTime: "15 a 25 min", submittedAt: "2026-08-19T20:00:00.000Z" };
+      },
+      loadMenu: async () => ({
+        products: [{
+          id: "39d49829-9a02-4e97-b19c-602582131771",
+          name: "Panqueca de carne + Coca 200 ml",
+          options: [
+            { id: "56ee2e8e-649b-4aa1-9c1f-f8efa3e547d7", groupName: "Escolha a embalagem", label: "Isopor" },
+            { id: "f58bd94f-98a9-4246-b6b5-75436419e425", groupName: "Acompanhamento", label: "Batata frita" },
+          ],
+        }],
+      }),
+    });
+
+    await service.submit({
+      id: "local-order-static-ids",
+      createdAt: "2026-08-19T20:00:00.000Z",
+      deliveryMode: "pickup",
+      customer: { name: "Homologação Marmitas TB", phone: "42999990000", address: "", neighborhood: "", reference: "", paymentMethod: "pix", changeFor: "" },
+      items: [{
+        id: "panqueca-coca::package:foam|side:fries",
+        productId: "panqueca-coca",
+        name: "Panqueca de carne + Coca 200 ml",
+        unitPrice: 23,
+        quantity: 1,
+        selections: [
+          { groupId: "package", groupLabel: "Escolha a embalagem", optionId: "foam", optionLabel: "Isopor" },
+          { groupId: "side", groupLabel: "Acompanhamento", optionId: "fries", optionLabel: "Batata frita" },
+        ],
+        note: "HOMOLOGAÇÃO",
+      }],
+      summary: { subtotal: 23, savings: 0, deliveryFee: 0, total: 23 },
+    });
+
+    expect(submittedBody).toMatchObject({
+      fulfillmentMethod: "pickup",
+      paymentMethod: "pix",
+      items: [{
+        productId: "39d49829-9a02-4e97-b19c-602582131771",
+        optionIds: ["56ee2e8e-649b-4aa1-9c1f-f8efa3e547d7", "f58bd94f-98a9-4246-b6b5-75436419e425"],
+      }],
+    });
+  });
+
   it("converte o contrato atual do checkout e usa a confirmação do servidor", async () => {
     const request = async (_path: string, options: { body?: unknown }) => {
       expect(options.body).toMatchObject({ fulfillmentMethod: "delivery", paymentMethod: "credit_card" });

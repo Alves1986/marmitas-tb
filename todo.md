@@ -189,3 +189,5 @@
 - [x] Completar o dashboard com pedidos por situação e atalhos para os módulos de relatórios e configurações, conforme a arquitetura profissional escolhida.
 - [ ] Executar um único pedido controlado de homologação em produção, sem cobrança real e sem impressão, validando criação, acompanhamento e transição operacional com dados de teste.
 - [x] Corrigir a criação pública de pedidos em produção para usar a função HTTP Vercel, eliminando a chamada incompatível a `/api/trpc/orders.create`.
+- [x] Corrigir a incompatibilidade de validação do endpoint público que retorna “Dados do pedido inválidos” para o pedido de homologação já revisado.
+- [x] Corrigir a incompatibilidade de validação do endpoint público que retorna “Dados do pedido inválidos” para o pedido de homologação já revisado.

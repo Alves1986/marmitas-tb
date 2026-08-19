@@ -97,6 +97,14 @@ O checkout agora centraliza a seleção do transporte em `isVercelRuntime()`. Al
 
 O teste de regressão foi escrito antes da alteração e falhou ao simular `marmitastb.vercel.app` sem variável de build. Após a correção, ele passou. A suíte integral registrou **219 testes aprovados e 2 pulados**, em 74 arquivos, e a checagem TypeScript foi concluída sem erros. Por fim, um build com `VITE_API_RUNTIME` vazio gerou o bundle contendo `/api/public/orders`, evidenciando que a ramificação HTTP deixa de ser removida pela otimização de compilação. Essa alteração ainda precisa de publicação autorizada e de novo teste do pedido em produção.
 
+### Correção local de identificadores pendente de publicação
+
+O pedido controlado alcançou a função HTTP atualizada, mas foi rejeitado por “Dados do pedido inválidos”. A inspeção passiva da sacola confirmou a causa: a vitrine ainda mantém identificadores legados, como `panqueca-coca`, `foam` e `fries`, enquanto a função pública exige UUIDs Supabase para produto e opções. Nenhum pedido, cobrança ou impressão foi criado; o envio não foi repetido.
+
+O adaptador HTTP agora consulta o cardápio público somente quando identifica IDs legados no carrinho. Antes de enviar, resolve cada produto e opção para o UUID devolvido pelo Supabase, usando o nome do produto e os rótulos exibidos como referência. Carrinhos que já contêm UUIDs não fazem consulta adicional. Se o cardápio tiver mudado entre a seleção e a confirmação, a interface interrompe o envio e instrui a atualização, sem reduzir a validação UUID do endpoint.
+
+A regressão foi escrita antes da implementação e falhou com os slugs do pedido de teste; após a correção, confirmou a transformação dos IDs de produto e opções. A suíte integral registrou **220 testes aprovados e 2 pulados**, em 74 arquivos, a checagem TypeScript foi concluída sem erros e os builds PWA/Vercel foram gerados com êxito. A alteração ainda precisa de publicação autorizada e, somente então, o pedido único de homologação poderá ser retomado.
+
 ## Situação consolidada de prontidão
 
 > **Conclusão técnica:** a aplicação publicada está apta para uma apresentação guiada e para o roteiro de aceite. A confirmação de prontidão operacional completa permanece condicionada aos testes autenticados de equipe e administração, ao pedido de teste combinado e à verificação local da impressora.

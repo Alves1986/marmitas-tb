@@ -1,0 +1,39 @@
+<h2>Foto do produto: qual fluxo fica mais claro?</h2>
+<p class="subtitle">A recomendação é a opção A: ela substitui o campo de URL por um envio guiado, mostra o limite e confirma a conversão para WebP antes de salvar.</p>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#fff8ec;padding:18px">
+      <div style="background:#fff;border:1px solid #ead8c0;border-radius:18px;padding:16px;text-align:left;color:#481e1f">
+        <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#a58f7a;text-transform:uppercase">Foto do produto</div>
+        <div style="border:2px dashed #c4a57e;border-radius:14px;margin-top:10px;padding:22px 12px;text-align:center;background:#fffaf1">
+          <div style="font-size:28px">▧</div><strong>Selecionar imagem</strong><br><span style="font-size:12px;color:#765f50">JPG, PNG ou WebP · até 5 MB</span>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:12px;align-items:center"><div style="width:48px;height:48px;background:linear-gradient(135deg,#e8d1ad,#8a4d32);border-radius:10px"></div><div><strong style="font-size:13px">marmita-da-casa.webp</strong><br><span style="font-size:12px;color:#68703d">Convertida para WebP · pronta para salvar</span></div></div>
+      </div>
+    </div>
+    <div class="card-body"><h3>A. Envio guiado</h3><p>Único caminho principal: escolher, pré-visualizar, converter e salvar.</p></div>
+  </div>
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#fff8ec;padding:18px">
+      <div style="background:#fff;border:1px solid #ead8c0;border-radius:18px;padding:16px;text-align:left;color:#481e1f">
+        <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#a58f7a;text-transform:uppercase">Foto do produto</div>
+        <button style="margin-top:10px;width:100%;padding:11px;border-radius:10px;border:1px solid #a82926;background:#fff;color:#a82926;font-weight:800">Enviar imagem</button>
+        <div style="font-size:12px;margin:12px 0;color:#765f50;text-align:center">ou informe uma URL existente</div>
+        <div style="border:1px solid #ead8c0;border-radius:10px;padding:10px;color:#a58f7a;font-size:12px">https://...</div>
+      </div>
+    </div>
+    <div class="card-body"><h3>B. Envio + URL</h3><p>Mantém compatibilidade com URLs externas, mas aumenta decisões e pode gerar inconsistência.</p></div>
+  </div>
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#fff8ec;padding:18px">
+      <div style="background:#fff;border:1px solid #ead8c0;border-radius:18px;padding:16px;text-align:left;color:#481e1f">
+        <div style="display:flex;justify-content:space-between;align-items:center"><div><strong>Foto atual</strong><br><span style="font-size:12px;color:#765f50">Nenhuma imagem enviada</span></div><div style="width:56px;height:56px;border-radius:12px;background:#f4ead8;display:grid;place-items:center">＋</div></div>
+        <button style="margin-top:14px;width:100%;padding:11px;border-radius:10px;border:none;background:#a82926;color:white;font-weight:800">Alterar foto</button>
+      </div>
+    </div>
+    <div class="card-body"><h3>C. Cartão compacto</h3><p>Ocupa menos espaço, mas a regra de tamanho e conversão só aparece após o clique.</p></div>
+  </div>
+</div>
+
+<div class="section"><p><strong>Recomendação:</strong> A, com limite de 5 MB antes da conversão, redução de dimensão quando necessário e persistência somente da URL WebP no catálogo.</p></div>

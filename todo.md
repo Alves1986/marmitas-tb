@@ -159,3 +159,4 @@
 - [ ] Diagnosticar e corrigir o incidente de produção no domínio `marmitastb.vercel.app`, que retorna `DEPLOYMENT_NOT_FOUND` após a promoção autorizada da branch `main`.
 - [ ] Corrigir a leitura server-side das variáveis Supabase e da URL pública para aceitar a configuração já presente na Vercel e eliminar o `FUNCTION_INVOCATION_FAILED` do catálogo público.
 - [ ] Fazer o endpoint público de cardápio usar somente a chave publicável e a política RLS anônima, sem depender de credencial administrativa no runtime de produção.
+- [ ] Corrigir o empacotamento Vercel das bibliotecas em `server/vercel/_lib`, pois o runtime não encontra `http` ao carregar as funções em `api/`.

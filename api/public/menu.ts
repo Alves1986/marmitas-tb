@@ -1,5 +1,5 @@
-import { json, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http";
-import { createSupabasePublic } from "../../server/vercel/_lib/supabasePublic";
+import { json, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http.js";
+import { createSupabasePublic } from "../../server/vercel/_lib/supabasePublic.js";
 
 type MenuCategory = {
   id: string;

@@ -1,4 +1,12 @@
 {
+  "functions": {
+    "api/**/*.ts": {
+      "includeFiles": [
+        "server/vercel/_lib/**/*.js",
+        "shared/operations.js"
+      ]
+    }
+  },
   "rewrites": [
     {
       "source": "/((?!api/).*)",

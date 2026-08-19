@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { ApiAuthError, createSupabaseAuthGuards, type AuthenticatedProfile } from "../../server/vercel/_lib/auth";
-import { json, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http";
-import { createSupabaseAdmin } from "../../server/vercel/_lib/supabaseAdmin";
+import { ApiAuthError, createSupabaseAuthGuards, type AuthenticatedProfile } from "../../server/vercel/_lib/auth.js";
+import { json, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http.js";
+import { createSupabaseAdmin } from "../../server/vercel/_lib/supabaseAdmin.js";
 
 const availabilityInput = z.object({ productId: z.string().uuid(), isActive: z.boolean() });
 const categoryInput = z.object({

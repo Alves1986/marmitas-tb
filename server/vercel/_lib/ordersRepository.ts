@@ -1,5 +1,5 @@
-import { createTemporaryOrderCode } from "./orders";
-import { createSupabaseAdmin } from "./supabaseAdmin";
+import { createTemporaryOrderCode } from "./orders.js";
+import { createSupabaseAdmin } from "./supabaseAdmin.js";
 import type { CreatePublicOrderInput, PublicOrderConfirmation, PublicTrackingOrder } from "../../../api/public/orders";
 
 type ProductRecord = { id: string; name: string; price_in_cents: number };

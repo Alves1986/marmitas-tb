@@ -1,4 +1,4 @@
-import { readdir } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
@@ -34,5 +34,23 @@ describe("fronteira de funções Vercel", () => {
       "public/orders.ts",
       "webhooks/asaas.ts",
     ]);
+  });
+
+  it("inclui os módulos JavaScript compartilhados no bundle de cada função", async () => {
+    const [vercelConfigText, packageJsonText] = await Promise.all([
+      readFile(path.join(projectRoot, "vercel.json"), "utf8"),
+      readFile(path.join(projectRoot, "package.json"), "utf8"),
+    ]);
+
+    const vercelConfig = JSON.parse(vercelConfigText) as {
+      functions?: Record<string, { includeFiles?: string[] }>;
+    };
+    const packageJson = JSON.parse(packageJsonText) as { scripts?: Record<string, string> };
+
+    expect(vercelConfig.functions?.["api/**/*.ts"]?.includeFiles).toEqual([
+      "server/vercel/_lib/**/*.js",
+      "shared/operations.js",
+    ]);
+    expect(packageJson.scripts?.build).toContain("build:vercel-runtime");
   });
 });

@@ -6,7 +6,9 @@ Após a promoção autorizada da versão validada para a branch `main` do reposi
 
 O endpoint público `GET /api/public/menu`, porém, respondeu `500 FUNCTION_INVOCATION_FAILED`, mesmo com a vitrine estática disponível. A análise do handler apontou uma incompatibilidade entre a configuração server-side e as variáveis já cadastradas na Vercel: a função exigia `SUPABASE_URL` e `APP_URL`, enquanto a configuração previamente registrada fornece `VITE_SUPABASE_URL` e o ambiente Vercel expõe o hostname em `VERCEL_URL`.
 
-Foi preparada uma correção testada que aceita `SUPABASE_URL` ou `VITE_SUPABASE_URL` como URL do projeto Supabase e deriva `APP_URL` de `VERCEL_URL` quando necessário, sem remover validações para `SUPABASE_SERVICE_ROLE_KEY`. A correção ainda precisa ser enviada para `main` e ter o endpoint público revalidado em produção. Nenhuma alteração foi feita no Supabase durante o diagnóstico.
+Foram enviadas duas correções testadas para `main`: `324b809` amplia a leitura de `SUPABASE_URL` e `APP_URL`, e `b0efa56` separa o catálogo público da credencial administrativa, utilizando somente a URL e a chave publicável do Supabase. O painel autenticado confirma que o deployment da segunda correção (`dpl_8F2prDGRyP65FfdhFXDcyPufjKMX`, URL `https://marmitas-gfb7sh4g6-andersonalves.vercel.app`) ficou **Ready** em produção e foi associado a `marmitastb.vercel.app`.
+
+O log de runtime desse deployment confirmou a causa do `FUNCTION_INVOCATION_FAILED`: `ERR_MODULE_NOT_FOUND: Cannot find module '/var/task/server/vercel/_lib/http' imported from /var/task/api/public/menu.js`. Portanto, a falha não é de autenticação ou de dados do Supabase. As funções em `api/` foram implantadas sem o pacote local compartilhado sob `server/vercel/_lib`. A próxima correção deve alterar o empacotamento Vercel para incluir e resolver essas bibliotecas em runtime, preservando os nove handlers públicos em `api/`. Nenhuma alteração foi feita no Supabase durante o diagnóstico.
 
 Em 18 de agosto de 2026, a branch `feat/supabase-vercel-migration` foi confirmada no repositório `Alves1986/ministral` no commit `e1d2d49c1b3ceed86ee8eb42ec8a204121f72b2a`.
 

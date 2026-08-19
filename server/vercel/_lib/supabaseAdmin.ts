@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { readServerConfig, type ServerConfig } from "./config";
+import { readServerConfig, type ServerConfig } from "./config.js";
 
 export function createSupabaseAdmin(config: ServerConfig = readServerConfig()) {
   return createClient(config.supabaseUrl, config.supabaseServiceRoleKey, {

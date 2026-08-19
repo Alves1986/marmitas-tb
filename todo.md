@@ -161,11 +161,11 @@
 - [x] Fazer o endpoint público de cardápio usar somente a chave publicável e a política RLS anônima, sem depender de credencial administrativa no runtime de produção.
 - [x] Corrigir o empacotamento Vercel das bibliotecas em `server/vercel/_lib`, pois o runtime não encontra `http` ao carregar as funções em `api/`.
 - [x] Adaptar os nove handlers Vercel ao contrato Node `(req, res)`, pois o runtime confirmou que ignora o `Response` retornado pelo export padrão atual.
-- [ ] Corrigir o acesso a `/admin` em produção, que retorna ao cardápio por sessão ou autorização administrativa não reconhecida.
+- [x] Corrigir o acesso a `/admin` em produção, que retorna ao cardápio por sessão ou autorização administrativa não reconhecida.
 - [x] Corrigir o fluxo de acesso da equipe em `/acesso`, que exibe `Load failed` e não envia ou valida o código OTP do e-mail autorizado.
 - [x] Impedir que o envio de link de acesso permaneça indefinidamente em `Enviando link...`, com limite de espera e mensagem clara de recuperação ao usuário.
 - [x] Impedir que a fila em `/operacao` permaneça indefinidamente em carregamento após o acesso da equipe, exibindo uma falha recuperável quando a consulta operacional não responder.
-- [ ] Corrigir as falhas de carregamento do catálogo, equipe e configurações exibidas no painel `/admin` em produção.
+- [x] Corrigir as falhas de carregamento do catálogo, equipe e configurações exibidas no painel `/admin` em produção.
 - [x] Incluir ação de logout acessível e confirmação visual da sessão administrativa ativa.
 - [x] Estruturar um dashboard administrativo mobile-first com indicadores de pedidos, faturamento, ticket médio e situação operacional.
 - [x] Implementar visão financeira por período, com receitas por forma de pagamento, pedidos e status de pagamento, sem registrar dados financeiros fictícios.
@@ -179,8 +179,8 @@
 - [x] Implementar fluxo de caixa administrativo com receitas conciliadas de pedidos e despesas lançadas manualmente em categorias financeiras.
 - [x] Permitir que a equipe registre despesas como rascunho e exigir aprovação ou rejeição administrativa auditável antes de afetar o fluxo de caixa.
 - [x] Disponibilizar relatórios filtráveis no painel com exportação CSV e PDF baseada nos dados financeiros e operacionais reais.
-- [ ] Corrigir a publicação Vercel para que as nove funções em `/api` sejam efetivamente atendidas, em vez de retornarem a tela SPA de página inexistente.
-- [ ] Publicar a correção autorizada na branch `main` do repositório dedicado e validar as rotas administrativas e de API em `marmitastb.vercel.app`.
+- [x] Corrigir a publicação Vercel para que as nove funções em `/api` sejam efetivamente atendidas, em vez de retornarem a tela SPA de página inexistente.
+- [x] Publicar a correção autorizada na branch `main` do repositório dedicado e validar as rotas administrativas e de API em `marmitastb.vercel.app`.
 - [x] Aplicar a migração estrutural autorizada para despesas e auditoria administrativa, sem importar ou alterar registros históricos legados.
 - [x] Expor para a equipe operacional a tela de lançamento de despesas em rascunho e, para administradores, a fila de revisão com aprovação ou rejeição auditável.
 - [x] Completar o dashboard com pedidos por situação e atalhos para os módulos de relatórios e configurações, conforme a arquitetura profissional escolhida.

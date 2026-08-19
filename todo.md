@@ -115,7 +115,7 @@
 - [x] Provisionar e validar um projeto Supabase exclusivo para a Marmitas TB antes de aplicar migrações de banco ou Storage.
 - [x] Manter a criação do projeto Marmitas TB na Vercel para após a validação final, o checkpoint e o envio da branch de migração ao GitHub, sem deploy automático.
 - [x] Registrar o encerramento da migração do histórico atualmente conectado sem migração SQL nem escrita no Supabase, por decisão explícita do responsável.
-- [ ] Enviar ao repositório privado dedicado `Alves1986/marmitas-tb` as alterações validadas do inventário e encerramento da migração, sem tocar em `Alves1986/ministral`.
+- [x] Enviar ao repositório privado dedicado `Alves1986/marmitas-tb` as alterações validadas do inventário e encerramento da migração, sem tocar em `Alves1986/ministral`.
 - [x] Migrar os contratos de autoria de auditoria para UUIDs do Supabase sem alterar os identificadores de domínio ainda numéricos no legado.
 - [x] Manter isoladas as rotas tRPC/MySQL legadas até que suas substitutas Vercel/Supabase estejam implementadas, impedindo a gravação de UUID em auditoria inteira.
 - [x] Retomar a inspeção de dados e Storage pelo conector Supabase quando o serviço MCP externo voltar a responder, antes da migração de produção.

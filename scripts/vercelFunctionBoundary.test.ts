@@ -47,10 +47,9 @@ describe("fronteira de funções Vercel", () => {
     };
     const packageJson = JSON.parse(packageJsonText) as { scripts?: Record<string, string> };
 
-    expect(vercelConfig.functions?.["api/**/*.ts"]?.includeFiles).toEqual([
-      "server/vercel/_lib/**/*.js",
-      "shared/operations.js",
-    ]);
+    expect(vercelConfig.functions?.["api/**/*.ts"]?.includeFiles).toBe(
+      "{server/vercel/_lib/**/*.js,shared/operations.js}",
+    );
     expect(packageJson.scripts?.build).toContain("build:vercel-runtime");
   });
 });

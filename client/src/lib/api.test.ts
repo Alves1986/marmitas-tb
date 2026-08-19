@@ -10,6 +10,7 @@ import { ApiError, apiRequest } from "./api";
 
 describe("cliente HTTP das funções Vercel", () => {
   afterEach(() => {
+    vi.useRealTimers();
     vi.unstubAllGlobals();
     vi.clearAllMocks();
   });
@@ -29,5 +30,22 @@ describe("cliente HTTP das funções Vercel", () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({ error: "Acesso restrito." }), { status: 403 })));
 
     await expect(apiRequest("/api/admin/catalog")).rejects.toEqual(new ApiError(403, "Acesso restrito."));
+  });
+
+  it("encerra a requisição pendente da fila operacional em vez de deixá-la carregando", async () => {
+    vi.useFakeTimers();
+    getSession.mockResolvedValue({ data: { session: { access_token: "jwt-access-token" } } });
+    let requestSignal: AbortSignal | undefined;
+    vi.stubGlobal("fetch", vi.fn((_path: string, init?: RequestInit) => new Promise((_resolve, reject) => {
+      requestSignal = init?.signal ?? undefined;
+      requestSignal?.addEventListener("abort", () => reject(requestSignal?.reason));
+    })));
+
+    const request = apiRequest("/api/operations/orders");
+    const expectedFailure = expect(request).rejects.toThrow("A solicitação demorou mais do que o esperado");
+    await vi.advanceTimersByTimeAsync(15_000);
+
+    await expectedFailure;
+    expect(requestSignal?.aborted).toBe(true);
   });
 });

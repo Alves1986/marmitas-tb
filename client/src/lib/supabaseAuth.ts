@@ -43,7 +43,28 @@ type OtpClient = {
   };
 };
 
+type RequestTeamOtpOptions = {
+  timeoutMs?: number;
+};
+
 const validRoles = new Set<SessionUser["role"]>(["user", "staff", "admin"]);
+const OTP_REQUEST_TIMEOUT_MS = 15_000;
+
+function awaitWithTimeout<T>(operation: Promise<T>, timeoutMs: number): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timeoutId = setTimeout(() => reject(new Error("O envio do link atingiu o tempo limite. Tente novamente.")), timeoutMs);
+    void operation.then(
+      (result) => {
+        clearTimeout(timeoutId);
+        resolve(result);
+      },
+      (error: unknown) => {
+        clearTimeout(timeoutId);
+        reject(error);
+      },
+    );
+  });
+}
 
 export function toSessionUser(profile: SupabaseProfile, email: string): SessionUser {
   if (!validRoles.has(profile.role as SessionUser["role"])) {
@@ -81,20 +102,24 @@ export async function loadSessionUser(
   }, data.user.email || "");
 }
 
-export async function requestTeamOtp(client: OtpClient, email: string): Promise<void> {
+export async function requestTeamOtp(
+  client: OtpClient,
+  email: string,
+  { timeoutMs = OTP_REQUEST_TIMEOUT_MS }: RequestTeamOtpOptions = {},
+): Promise<void> {
   const normalizedEmail = email.trim().toLowerCase();
 
   if (!normalizedEmail) throw new Error("Informe o e-mail da equipe");
 
   const origin = typeof window === "undefined" ? undefined : window.location?.origin;
   const emailRedirectTo = origin ? `${origin}/operacao` : undefined;
-  const { error } = await client.auth.signInWithOtp({
+  const { error } = await awaitWithTimeout(client.auth.signInWithOtp({
     email: normalizedEmail,
     options: {
       shouldCreateUser: false,
       ...(emailRedirectTo ? { emailRedirectTo } : {}),
     },
-  });
+  }), timeoutMs);
 
   if (error) throw new Error(error.message);
 }

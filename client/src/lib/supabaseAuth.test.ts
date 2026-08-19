@@ -131,4 +131,16 @@ describe("requestTeamOtp", () => {
       },
     ]);
   });
+
+  it("encerra com erro controlado quando o pedido de link não responde", async () => {
+    const client = {
+      auth: {
+        signInWithOtp: () => new Promise<never>(() => undefined),
+      },
+    };
+
+    await expect(
+      requestTeamOtp(client, "cassia.andinho@gmail.com", { timeoutMs: 5 }),
+    ).rejects.toThrow("tempo limite");
+  });
 });

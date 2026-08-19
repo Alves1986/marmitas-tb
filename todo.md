@@ -162,4 +162,6 @@
 - [x] Corrigir o empacotamento Vercel das bibliotecas em `server/vercel/_lib`, pois o runtime não encontra `http` ao carregar as funções em `api/`.
 - [x] Adaptar os nove handlers Vercel ao contrato Node `(req, res)`, pois o runtime confirmou que ignora o `Response` retornado pelo export padrão atual.
 - [ ] Corrigir o acesso a `/admin` em produção, que retorna ao cardápio por sessão ou autorização administrativa não reconhecida.
-- [ ] Corrigir o fluxo de acesso da equipe em `/acesso`, que exibe `Load failed` e não envia ou valida o código OTP do e-mail autorizado.
+- [x] Corrigir o fluxo de acesso da equipe em `/acesso`, que exibe `Load failed` e não envia ou valida o código OTP do e-mail autorizado.
+- [x] Impedir que o envio de link de acesso permaneça indefinidamente em `Enviando link...`, com limite de espera e mensagem clara de recuperação ao usuário.
+- [x] Impedir que a fila em `/operacao` permaneça indefinidamente em carregamento após o acesso da equipe, exibindo uma falha recuperável quando a consulta operacional não responder.

@@ -20,6 +20,12 @@ O deployment `EhTgmjwRHTC1VDvJAsuXJCaybBCV` foi aceito e tornou a vitrine acess�
 
 As requisições diretas para `/admin` e `/acesso` devolvem `index.html` com HTTP 200, confirmando que o rewrite SPA está ativo. A rota administrativa, entretanto, contém um redirecionamento explícito para `/` quando a sessão não produz um perfil com papel `admin`; por isso o retorno ao cardápio é consequência do estado de autenticação, não de uma rota ausente. A tela `/acesso` abre corretamente, mas a tentativa de solicitar acesso a partir do dispositivo da equipe exibiu `Load failed`. A investigação separará a resolução de perfil, a configuração do cliente Supabase, a entrega de e-mail e o formato de autenticação antes de aplicar qualquer alteração.
 
+Após a atualização de produção, `https://marmitastb.vercel.app/acesso?verificacao=admin` carregou visualmente o fluxo por link de e-mail, sem a antiga etapa de código numérico. A primeira tentativa de navegação em `/admin`, ainda sem parâmetro de cache, exibiu o cardápio; a rota administrativa será reavaliada isoladamente após a propagação do commit `e94463b`.
+
+Com autorização explícita, um teste de solicitação de link foi iniciado para o e-mail administrativo já autorizado. A interface passou ao estado `Enviando link...` e permaneceu nele após a requisição, sem confirmação de sucesso nem erro visível. A causa deve ser isolada pela requisição de autenticação e seus logs; nenhum dado, perfil ou configuração do Supabase foi alterado.
+
+Durante o estado pendente, a inspeção do navegador não encontrou nenhuma chamada registrada a `/auth/v1/` ou ao domínio Supabase. Isso desloca o diagnóstico para a inicialização ou publicação do cliente de autenticação no browser, antes da tentativa efetiva de envio de e-mail.
+
 Em 18 de agosto de 2026, a branch `feat/supabase-vercel-migration` foi confirmada no repositório `Alves1986/ministral` no commit `e1d2d49c1b3ceed86ee8eb42ec8a204121f72b2a`.
 
 A sessão autenticada na Vercel reconhece o repositório `Alves1986/ministral`. A tela de importação apresenta explicitamente o botão **Deploy** e informa que a implantação começa após essa ação. A documentação oficial também registra que integrações Git fazem implantações automáticas em pushes de branches suportadas. Portanto, nenhuma importação foi concluída, preservando a exigência do projeto de não realizar deploy automático.

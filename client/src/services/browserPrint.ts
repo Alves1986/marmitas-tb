@@ -15,5 +15,9 @@ export function printReceipt(html: string): void {
   popup.document.write(html);
   popup.document.close();
   popup.focus();
+  if (typeof popup.print !== "function") {
+    popup.close();
+    throw new Error("A impressão não é suportada neste navegador. Use Compartilhar > Imprimir para enviar a comanda.");
+  }
   popup.print();
 }

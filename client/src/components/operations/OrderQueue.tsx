@@ -141,6 +141,7 @@ export function OrderQueue({ onOrdersChange }: OrderQueueProps) {
   const [vercelError, setVercelError] = useState<string | null>(null);
   const [pendingOrderId, setPendingOrderId] = useState<string | number | null>(null);
   const [pendingPrintOrderId, setPendingPrintOrderId] = useState<string | number | null>(null);
+  const [printFeedback, setPrintFeedback] = useState<Record<string, string>>({});
 
   const refreshVercelQueue = useCallback(async () => {
     const [orders, jobs] = await Promise.all([vercelOperationsService.listOrders(), vercelOperationsService.listPrintJobs()]);
@@ -193,17 +194,32 @@ export function OrderQueue({ onOrdersChange }: OrderQueueProps) {
     }
   };
 
-  const handleReprint = async (orderId: string | number) => {
+  const handleReprint = async (order: OperationalOrder) => {
+    const orderId = order.id;
     if (!useVercelApi) {
       queuePrint.mutate(getManualPrintRequest(Number(orderId)));
       return;
     }
     setPendingPrintOrderId(orderId);
+    let printStatus: "printed" | "failed" = "printed";
     try {
-      await vercelOperationsService.requeuePrint(String(orderId));
+      printReceipt(buildReceiptDocument(order));
+      setPrintFeedback((current) => ({
+        ...current,
+        [String(orderId)]: "A janela de impressão foi aberta. Se ela não aparecer, permita pop-ups neste navegador.",
+      }));
+    } catch (error) {
+      printStatus = "failed";
+      setPrintFeedback((current) => ({ ...current, [String(orderId)]: toPrintFailureMessage(error) }));
+    }
+
+    try {
+      const job = await vercelOperationsService.requeuePrint(String(orderId));
+      printedJobIds.current.add(job.id);
+      await vercelOperationsService.markPrintJob(job.id, printStatus, "Navegador do posto");
       await refreshVercelQueue();
     } catch (error) {
-      setVercelError(error instanceof Error ? error.message : "Não foi possível reenviar a comanda.");
+      setPrintFeedback((current) => ({ ...current, [String(orderId)]: toPrintFailureMessage(error) }));
     } finally {
       setPendingPrintOrderId(null);
     }
@@ -278,10 +294,11 @@ export function OrderQueue({ onOrdersChange }: OrderQueueProps) {
               {order.customerNotes ? <p className="mt-3 rounded-lg bg-[#fff7e8] p-2 text-xs"><strong>Observação:</strong> {order.customerNotes}</p> : null}
               <p className="mt-4 text-xs"><strong>Pagamento:</strong> {paymentLabels[order.paymentMethod] ?? order.paymentMethod} · {order.paymentStatus === "confirmed" ? "confirmado" : "pendente"} · <strong>Total:</strong> {formatBRL(order.totalInCents)}</p>
               <OrderReceiptPreview order={order} />
+              {printFeedback[String(order.id)] ? <p role="status" className="mt-3 rounded-lg bg-[#fff7e8] p-3 text-sm text-[#4c382e]">{printFeedback[String(order.id)]}</p> : null}
             </div>
 
             <div className="mt-5 flex flex-wrap gap-2 border-t border-[#eee3d3] pt-4">
-              <Button type="button" size="sm" variant="outline" disabled={useVercelApi ? pendingPrintOrderId === order.id : queuePrint.isPending && queuePrint.variables?.orderId === Number(order.id)} className="border-[#c2ad91] text-[#481e1f] hover:bg-[#fff7e8]" onClick={() => void handleReprint(order.id)}>
+              <Button type="button" size="sm" variant="outline" disabled={useVercelApi ? pendingPrintOrderId === order.id : queuePrint.isPending && queuePrint.variables?.orderId === Number(order.id)} className="border-[#c2ad91] text-[#481e1f] hover:bg-[#fff7e8]" onClick={() => void handleReprint(order)}>
                 <Printer aria-hidden="true" className="mr-1.5 size-4" />Reimprimir
               </Button>
               {actions.map((action) => <Button key={action.nextStatus} type="button" size="sm" disabled={isMutating} variant={action.nextStatus === "cancelado" ? "outline" : "default"} className={action.nextStatus === "cancelado" ? "border-[#e0ada9] text-[#a82926] hover:bg-[#fff1eb]" : "bg-[#68703d] text-white hover:bg-[#4e5729]"} onClick={() => void handleTransition(order.id, action.nextStatus)}>{isMutating ? <RefreshCw aria-hidden="true" className="mr-1.5 size-4 animate-spin" /> : null}{action.label}</Button>)}

@@ -195,3 +195,5 @@
 - [x] Corrigir o acompanhamento público em produção para usar a função HTTP Vercel, eliminando a consulta tRPC legada após o pedido confirmado.
 - [x] Investigar a aparente falha HTTP do acompanhamento; a função respondeu corretamente após a propagação do bundle publicado, sem necessidade de alteração adicional.
 - [x] Adicionar retorno explícito à gestão e à operação nas telas internas, evitando que a única saída leve ao cardápio público.
+- [ ] Diagnosticar a expiração imediata dos magic links de equipe e viabilizar uma sessão autenticada para concluir a homologação operacional.
+- [x] Corrigir a reimpressão de comandas em navegadores móveis, com retorno visível quando a abertura de impressão não for suportada.

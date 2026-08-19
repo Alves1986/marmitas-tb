@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
-import { render, screen, waitFor } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   legacyListQuery: vi.fn(() => ({ data: [], isLoading: false, error: null })),
@@ -21,7 +21,8 @@ vi.mock("@/lib/trpc", () => ({
     },
   },
 }));
-vi.mock("@/services/browserPrint", () => ({ printReceipt: vi.fn() }));
+const browserPrintMocks = vi.hoisted(() => ({ printReceipt: vi.fn() }));
+vi.mock("@/services/browserPrint", () => ({ printReceipt: browserPrintMocks.printReceipt }));
 vi.mock("@/services/operationsService", () => ({
   vercelOperationsService: {
     listOrders: vi.fn().mockResolvedValue([{
@@ -36,6 +37,11 @@ vi.mock("@/services/operationsService", () => ({
 }));
 
 import { OrderQueue } from "./OrderQueue";
+
+afterEach(() => {
+  cleanup();
+  vi.clearAllMocks();
+});
 
 describe("OrderQueue no runtime Vercel", () => {
   it("desativa as consultas tRPC legadas", async () => {
@@ -52,5 +58,22 @@ describe("OrderQueue no runtime Vercel", () => {
 
     await waitFor(() => expect(mocks.markPrintJob).toHaveBeenCalledWith("print-1", "printed", "Navegador do posto"));
     expect(await screen.findByText("Impressora indisponível")).toBeTruthy();
+  });
+
+  it("informa ao operador quando a reimpressão manual não abre no navegador", async () => {
+    const service = await import("@/services/operationsService");
+    vi.mocked(service.vercelOperationsService.listPrintJobs).mockResolvedValueOnce([]);
+    vi.mocked(service.vercelOperationsService.requeuePrint).mockResolvedValueOnce({
+      id: "print-manual", order_id: "8f2c5c62-a27d-49ef-a6d6-d1db97002631", status: "queued", orders: { code: "TB-0001" },
+    });
+    browserPrintMocks.printReceipt.mockImplementationOnce(() => {
+      throw new Error("Não foi possível abrir a janela de impressão. Permita pop-ups para imprimir a comanda.");
+    });
+
+    render(<OrderQueue />);
+    expect(await screen.findByText("TB-0001")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Reimprimir" }));
+
+    expect(await screen.findByText("Não foi possível abrir a janela de impressão. Permita pop-ups para imprimir a comanda.")).toBeTruthy();
   });
 });

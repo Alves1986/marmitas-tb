@@ -54,7 +54,7 @@ export function createVercelOperationsService(api: OperationsApi = vercelApi) {
       return api<VercelPrintJob[]>("/api/operations/printJobs");
     },
     requeuePrint(orderId: string) {
-      return api("/api/operations/printJobs", {
+      return api<VercelPrintJob>("/api/operations/printJobs", {
         method: "POST",
         body: { orderId },
       });

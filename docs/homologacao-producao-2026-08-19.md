@@ -150,3 +150,9 @@ Após percorrer a grade até o fim, a inspeção do DOM confirmou **18 de 18** i
 ## Retorno à gestão publicado
 
 Após a publicação autorizada da melhoria de navegação, a primeira leitura da rota `/acesso` ainda serviu o bundle anterior. Depois da propagação completa, a mesma rota exibiu os dois atalhos independentes: **“Ir para gestão”**, direcionando para `/admin`, e **“Voltar ao cardápio”**, direcionando para `/`. A confirmação foi realizada em produção sem solicitar novo link de acesso, sem alterar usuários ou pedidos e sem afetar a sessão operacional.
+
+## Correção local da reimpressão móvel pendente de publicação
+
+A sessão de equipe foi confirmada visualmente no Safari móvel: a Fila operacional exibiu o pedido `TB-20260819-C82294251937`, a pré-visualização da comanda foi expandida e os dados sintéticos foram renderizados corretamente. O botão **Reimprimir**, porém, não apresentava resposta visível. O diagnóstico mostrou que ele criava primeiro um job de impressão de modo assíncrono; no Safari móvel, a abertura de janela iniciada após essa espera pode ser bloqueada como pop-up e não gera retorno ao operador.
+
+A correção dispara a abertura da comanda diretamente no gesto do clique, preserva a criação e a baixa auditável do job de reimpressão e apresenta uma mensagem visível por pedido. Caso o navegador bloqueie pop-ups ou não suporte `window.print`, o operador recebe orientação explícita para permitir pop-ups ou usar **Compartilhar > Imprimir**. A regressão TDD passou, a suíte integral registrou **223 testes aprovados e 2 pulados**, a verificação TypeScript não apontou erros e os builds PWA/Vercel foram concluídos. A validação real desse retorno no Safari móvel permanece pendente de publicação autorizada.

@@ -75,6 +75,8 @@ O Asaas continua em ambiente Sandbox e sem chaves de produção; portanto, não 
 
 > **Conclusão técnica:** a aplicação publicada está apta para uma apresentação guiada e para o roteiro de aceite. A confirmação de prontidão operacional completa permanece condicionada aos testes autenticados de equipe e administração, ao pedido de teste combinado e à verificação local da impressora.
 
+Como verificação de regressão posterior à consolidação deste relatório, a suíte automatizada foi executada novamente no código correspondente: **218 testes aprovados**, **2 testes pulados** e **74 arquivos de teste** processados. Esse resultado reforça a integridade técnica das regras cobertas, mas não substitui os testes de navegador autenticado e de dispositivo físico previstos no roteiro.
+
 | Área | Evidência atual | Estado para apresentação | Condição para aceite operacional |
 |---|---|---|---|
 | Vitrine, cardápio, PWA e acompanhamento | Rotas públicas e interface verificadas sem criar pedido. | Apta para demonstração. | Executar um pedido de teste e acompanhar seu código. |

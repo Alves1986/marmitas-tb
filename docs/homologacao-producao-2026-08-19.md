@@ -157,6 +157,8 @@ A sessão de equipe foi confirmada visualmente no Safari móvel: a Fila operacio
 
 A correção dispara a abertura da comanda diretamente no gesto do clique, preserva a criação e a baixa auditável do job de reimpressão e apresenta uma mensagem visível por pedido. Caso o navegador bloqueie pop-ups ou não suporte `window.print`, o operador recebe orientação explícita para permitir pop-ups ou usar **Compartilhar > Imprimir**. A regressão TDD passou, a suíte integral registrou **223 testes aprovados e 2 pulados**, a verificação TypeScript não apontou erros e os builds PWA/Vercel foram concluídos. A validação real desse retorno no Safari móvel permanece pendente de publicação autorizada.
 
+A publicação foi autorizada e enviada ao repositório dedicado `Alves1986/marmitas-tb` na branch `main`, sem alteração em outros repositórios, dados, pedidos, pagamentos ou configurações do Supabase. Após a propagação da Vercel, o bundle público `index-BePOlao8.js` passou a conter a mensagem “A janela de impressão foi aberta”, confirmando que o artefato de produção inclui a correção. A confirmação manual final continua restrita a uma sessão de equipe no navegador móvel, pois depende do gesto de reimpressão e das regras de pop-up daquele dispositivo.
+
 ## Diagnóstico do acesso por e-mail da equipe
 
 Uma inspeção somente leitura dos logs de autenticação do projeto Supabase identificou que o problema relatado como expiração imediata não decorre de indisponibilidade do serviço nem de bloqueio de cadastro: houve respostas bem-sucedidas de `POST /otp` e redirecionamentos `303` de `/verify` para a rota operacional. Nos mesmos instantes de várias tentativas, um segundo acesso ao mesmo link retornou `403` com “Email link is invalid or has expired” e “One-time token not found”.

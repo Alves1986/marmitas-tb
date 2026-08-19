@@ -6,7 +6,7 @@
 
 A Marmitas TB deve permanecer compatível com o limite de funções serverless do plano Vercel Hobby sem reduzir recursos, sem alterar URLs públicas e sem disparar nova implantação durante esta etapa. O incidente anterior confirmou que a descoberta de módulos sob `api/` excedeu o limite aceito pelo plano e interrompeu a compilação antes de disponibilizar conteúdo.
 
-> A solução aprovada preserva os handlers HTTP em `api/` e retira apenas bibliotecas, repositórios e testes internos desse diretório.
+> A solução aprovada preserva exclusivamente os nove handlers HTTP em `api/` e retira bibliotecas, repositórios e todos os testes TypeScript desse diretório.
 
 ## Arquitetura aprovada
 
@@ -29,7 +29,7 @@ Falhas de importação, método inválido, sessão inexistente, papel insuficien
 
 ## Estratégia de validação
 
-Primeiro, uma especificação automatizada verificará a contagem de arquivos de entrada sob `api/` e a ausência de módulos internos nesse diretório. Depois, a suíte existente será transferida com seus módulos, preservando os contratos de cada handler. Por fim, serão executados testes completos, checagem TypeScript e build de produção. A prévia Vercel continua bloqueada até aprovação explícita posterior.
+Primeiro, uma especificação automatizada verificará que `api/` contém exatamente os nove handlers de entrada e nenhum arquivo de teste ou módulo interno. Depois, a suíte existente será transferida para `server/vercel/`, preservando os contratos de cada handler. Por fim, serão executados testes completos, checagem TypeScript e build de produção. A prévia Vercel continua bloqueada até aprovação explícita posterior.
 
 ## Limites de escopo
 

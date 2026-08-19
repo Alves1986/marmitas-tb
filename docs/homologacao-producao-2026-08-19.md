@@ -71,6 +71,14 @@ O sistema pode ser considerado **apto para apresentação operacional** quando t
 
 O Asaas continua em ambiente Sandbox e sem chaves de produção; portanto, não há cobrança real habilitada nesta fase. O envio de links de equipe depende da configuração de e-mail transacional do Supabase. A impressão automática deve ser comprovada no computador dedicado à cozinha, porque a disponibilidade da impressora é específica daquele dispositivo. Esses pontos não invalidam a vitrine ou a gestão, mas precisam ser comunicados ao cliente como condições de homologação antes de qualquer operação comercial efetiva.
 
+## Publicação da integração PIX Sandbox
+
+Após autorização explícita, a integração de emissão de cobrança PIX em Sandbox foi enviada ao repositório dedicado `Alves1986/marmitas-tb`, na branch `main`, pela revisão `0b31c45`. A confirmação de pedido agora aceita, de modo condicional, um link de cobrança retornado pelo Asaas somente quando o pedido for PIX, o ambiente for Sandbox e as credenciais privadas estiverem presentes.
+
+Nenhuma credencial foi cadastrada, nenhuma cobrança foi criada e nenhuma alteração foi enviada ao Supabase durante a publicação. Sem `ASAAS_API_KEY` e `ASAAS_WEBHOOK_TOKEN`, o checkout preserva o fluxo de teste anterior e não faz chamada ao Asaas. Após a propagação da Vercel, o bundle público `index-Dlp6Xnwf.js` passou a conter o texto “Abrir cobrança PIX de teste”, confirmando que a versão com o novo retorno condicional foi servida por `https://marmitastb.vercel.app/`.
+
+> A validação de ponta a ponta depende, exclusivamente, do cadastro posterior das credenciais de **Sandbox** pelo responsável na Vercel e da autorização de uma cobrança de teste controlada. A integração de produção continua inativa.
+
 ## Protocolo autorizado de teste operacional
 
 Em 19 de agosto de 2026, a responsável autorizou um único fluxo em produção com **dados de homologação**, sob as seguintes condições: não acionar impressão e não realizar cobrança real. O pedido será identificado como teste nas observações, usará uma forma de pagamento de demonstração já suportada pelo sistema e servirá exclusivamente para conferir criação, consulta pública e atualização controlada de status. Nenhuma despesa financeira, alteração de cardápio ou ajuste de configuração faz parte deste protocolo.

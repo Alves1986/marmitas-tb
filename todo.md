@@ -199,3 +199,4 @@
 - [x] Corrigir a reimpressão de comandas em navegadores móveis, com retorno visível quando a abertura de impressão não for suportada.
 - [x] Orientar o responsável a cadastrar diretamente na Vercel as credenciais Asaas de Sandbox, sem compartilhar segredos no projeto ou no atendimento.
 - [x] Conectar o checkout Vercel à criação real de cobranças no Asaas Sandbox, substituindo a referência simulada por uma integração testada antes de qualquer cobrança real.
+- [x] Publicar a integração PIX Asaas Sandbox validada no repositório dedicado e confirmar a propagação em produção, sem cadastrar credenciais ou ativar cobrança real.

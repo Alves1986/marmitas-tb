@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { createAsaasWebhookHandler, createConfiguredAsaasWebhookHandler } from "./asaas";
+import { createAsaasWebhookHandler, createConfiguredAsaasWebhookHandler } from "../../../api/webhooks/asaas";
 
 const validEvent = {
   id: "evt_asaas_20260818_001",

@@ -1,5 +1,5 @@
-import { json, jsonError, methodNotAllowed } from "../_lib/http";
-import { createSupabaseAdmin } from "../_lib/supabaseAdmin";
+import { json, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http";
+import { createSupabaseAdmin } from "../../server/vercel/_lib/supabaseAdmin";
 
 type MenuCategory = {
   id: string;

@@ -1,8 +1,8 @@
 import { timingSafeEqual } from "node:crypto";
 import { z } from "zod";
-import { processAsaasWebhookEvent, type AsaasWebhookRpcClient } from "../_lib/asaasWebhookProcessor";
-import { jsonError, methodNotAllowed } from "../_lib/http";
-import { createSupabaseAdmin } from "../_lib/supabaseAdmin";
+import { processAsaasWebhookEvent, type AsaasWebhookRpcClient } from "../../server/vercel/_lib/asaasWebhookProcessor";
+import { jsonError, methodNotAllowed } from "../../server/vercel/_lib/http";
+import { createSupabaseAdmin } from "../../server/vercel/_lib/supabaseAdmin";
 
 const asaasEventSchema = z.object({
   id: z.string().trim().min(1).max(160),

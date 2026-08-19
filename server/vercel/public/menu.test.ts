@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { createMenuHandler } from "./menu";
+import { createMenuHandler } from "../../../api/public/menu";
 
 describe("GET /api/public/menu", () => {
   it("recusa métodos diferentes de GET", async () => {

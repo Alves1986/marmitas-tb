@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { ApiAuthError } from "../_lib/auth";
-import { createPrintJobsHandler } from "./printJobs";
+import { createPrintJobsHandler } from "../../../api/operations/printJobs";
 
 describe("/api/operations/print-jobs", () => {
   it("exige papel operacional para consultar a fila", async () => {

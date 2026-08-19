@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { createPublicOrdersHandler } from "./orders";
+import { createPublicOrdersHandler } from "../../../api/public/orders";
 
 const validRequest = {
   customer: {

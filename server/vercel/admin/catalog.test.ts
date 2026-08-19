@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { ApiAuthError } from "../_lib/auth";
-import { createAdminCatalogHandler } from "./catalog";
+import { createAdminCatalogHandler } from "../../../api/admin/catalog";
 
 const admin = {
   id: "a68c3d5e-2b56-4462-96e8-5d05d1b19bc0",

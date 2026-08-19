@@ -1,6 +1,6 @@
 import { createTemporaryOrderCode } from "./orders";
 import { createSupabaseAdmin } from "./supabaseAdmin";
-import type { CreatePublicOrderInput, PublicOrderConfirmation, PublicTrackingOrder } from "../public/orders";
+import type { CreatePublicOrderInput, PublicOrderConfirmation, PublicTrackingOrder } from "../../../api/public/orders";
 
 type ProductRecord = { id: string; name: string; price_in_cents: number };
 type OptionRecord = {

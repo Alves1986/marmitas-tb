@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { canTransitionOrderStatus, type OrderStatus } from "../../shared/operations";
+import { canTransitionOrderStatus, type OrderStatus } from "../../../shared/operations";
 
 export function normalizePhoneForLookup(phone: string): string {
   return phone.replace(/\D/g, "");

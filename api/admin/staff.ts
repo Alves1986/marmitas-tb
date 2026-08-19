@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { ApiAuthError, createSupabaseAuthGuards, type AuthenticatedProfile } from "../_lib/auth";
-import { json, jsonError, methodNotAllowed } from "../_lib/http";
-import { createSupabaseAdmin } from "../_lib/supabaseAdmin";
+import { ApiAuthError, createSupabaseAuthGuards, type AuthenticatedProfile } from "../../server/vercel/_lib/auth";
+import { json, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http";
+import { createSupabaseAdmin } from "../../server/vercel/_lib/supabaseAdmin";
 
 const roleInput = z.object({ userId: z.string().uuid(), role: z.enum(["customer", "staff", "admin"]) });
 

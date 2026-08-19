@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { createAdminSettingsHandler } from "./settings";
+import { createAdminSettingsHandler } from "../../../api/admin/settings";
 
 const admin = { id: "f8a1240b-5d57-4c98-9a3d-45d94f6ddc5e", role: "admin" as const, displayName: "Gestora" };
 

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { ApiAuthError } from "../_lib/auth";
-import { createOperationsAlertsHandler } from "./alerts";
+import { createOperationsAlertsHandler } from "../../../api/operations/alerts";
 
 const staff = {
   id: "d9071683-ba84-45a8-bb4d-3f026d356fe0",

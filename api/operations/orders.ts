@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { ApiAuthError, createSupabaseAuthGuards, type AuthenticatedProfile } from "../_lib/auth";
-import { json, jsonError, methodNotAllowed } from "../_lib/http";
-import { assertTransition, OrderTransitionError } from "../_lib/orders";
+import { ApiAuthError, createSupabaseAuthGuards, type AuthenticatedProfile } from "../../server/vercel/_lib/auth";
+import { json, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http";
+import { assertTransition, OrderTransitionError } from "../../server/vercel/_lib/orders";
 import { orderStatuses, type OrderStatus } from "../../shared/operations";
-import { createSupabaseAdmin } from "../_lib/supabaseAdmin";
+import { createSupabaseAdmin } from "../../server/vercel/_lib/supabaseAdmin";
 
 const transitionInput = z.object({
   orderId: z.string().uuid(),

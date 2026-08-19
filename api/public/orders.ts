@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { json, jsonError, methodNotAllowed } from "../_lib/http";
-import { normalizePhoneForLookup, phoneTrackingInput, trackingInput } from "../_lib/orders";
-import { createSupabaseOrder, findSupabaseTracking, findSupabaseTrackingByPhone } from "../_lib/ordersRepository";
+import { json, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http";
+import { normalizePhoneForLookup, phoneTrackingInput, trackingInput } from "../../server/vercel/_lib/orders";
+import { createSupabaseOrder, findSupabaseTracking, findSupabaseTrackingByPhone } from "../../server/vercel/_lib/ordersRepository";
 
 const itemInput = z.object({
   productId: z.string().uuid(),

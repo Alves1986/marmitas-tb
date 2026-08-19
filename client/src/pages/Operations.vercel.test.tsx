@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { useEffect } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({ acknowledgeAlert: vi.fn(), legacyAcknowledge: vi.fn() }));
 
@@ -33,6 +33,15 @@ vi.mock("@/components/operations/OrderAlert", () => ({
 import Operations from "./Operations";
 
 describe("Operations no runtime Vercel", () => {
+  afterEach(() => cleanup());
+
+  it("oferece à equipe um atalho para registrar uma despesa em rascunho", async () => {
+    render(<Operations />);
+
+    expect((await screen.findByRole("link", { name: "Registrar despesa" })).getAttribute("href")).toBe("/operacao/despesas");
+    expect(screen.getByText("Lançamentos seguem como rascunho até revisão administrativa.")).toBeTruthy();
+  });
+
   it("mantém o pedido pendente e mostra o erro quando o reconhecimento falha", async () => {
     mocks.acknowledgeAlert.mockRejectedValueOnce(new Error("Serviço indisponível"));
     render(<Operations />);

@@ -15,6 +15,65 @@ const staff = {
 };
 
 describe("/api/admin/finance", () => {
+  it("expõe decisões financeiras auditadas somente para administradores", async () => {
+    const financeModule = await import("../../../api/admin/finance");
+    const listAuditLogs = vi.fn().mockResolvedValue([
+      {
+        id: "audit-1",
+        action: "expense.approved",
+        entityId: "expense-1",
+        actorName: "Gestora",
+        createdAt: "2026-08-19T14:00:00.000Z",
+      },
+    ]);
+    const handler = financeModule.createAdminFinanceHandler({
+      requireAdmin: vi.fn().mockResolvedValue(admin),
+      requireStaff: vi.fn(),
+      getSnapshot: vi.fn(),
+      createExpense: vi.fn(),
+      reviewExpense: vi.fn(),
+      writeAuditLog: vi.fn(),
+      listAuditLogs,
+    });
+
+    const response = await handler(new Request("https://marmitas-tb.vercel.app/api/admin/finance?view=audit"));
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({ auditLogs: [{
+      id: "audit-1",
+      action: "expense.approved",
+      entityId: "expense-1",
+      actorName: "Gestora",
+      createdAt: "2026-08-19T14:00:00.000Z",
+    }] });
+    expect(listAuditLogs).toHaveBeenCalledTimes(1);
+  });
+
+  it("lista somente despesas em rascunho para revisão administrativa", async () => {
+    const financeModule = await import("../../../api/admin/finance");
+    const handler = financeModule.createAdminFinanceHandler({
+      requireAdmin: vi.fn().mockResolvedValue(admin),
+      requireStaff: vi.fn(),
+      getSnapshot: vi.fn().mockResolvedValue({
+        orders: [],
+        expenses: [
+          { id: "draft-1", description: "Gás", category: "Insumos", amountInCents: 11500, status: "draft", incurredOn: "2026-08-19", submittedByName: "Operação" },
+          { id: "approved-1", description: "Embalagens", category: "Insumos", amountInCents: 8900, status: "approved", incurredOn: "2026-08-19", submittedByName: "Operação" },
+        ],
+      }),
+      createExpense: vi.fn(),
+      reviewExpense: vi.fn(),
+      writeAuditLog: vi.fn(),
+    });
+
+    const response = await handler(new Request("https://marmitas-tb.vercel.app/api/admin/finance?view=review"));
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({
+      expenses: [{ id: "draft-1", description: "Gás", category: "Insumos", amountInCents: 11500, status: "draft", incurredOn: "2026-08-19", submittedByName: "Operação" }],
+    });
+  });
+
   it("considera apenas receitas confirmadas e despesas aprovadas no fluxo de caixa", async () => {
     const financeModule = await import("../../../api/admin/finance").catch(() => null);
 

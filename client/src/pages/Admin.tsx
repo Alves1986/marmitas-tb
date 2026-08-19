@@ -3,12 +3,16 @@ import { useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import DashboardLayout from "@/components/DashboardLayout";
 import { AdminDashboardOverview } from "@/components/admin/AdminDashboardOverview";
+import { AdminOperationsOverview } from "@/components/admin/AdminOperationsOverview";
 import { ExpenseDraftForm } from "@/components/admin/ExpenseDraftForm";
+import { ExpenseReviewQueue } from "@/components/admin/ExpenseReviewQueue";
+import { FinanceAuditLog } from "@/components/admin/FinanceAuditLog";
 import { FinanceReportActions } from "@/components/admin/FinanceReportActions";
 import { MenuManager } from "@/components/admin/MenuManager";
 import { StaffManager } from "@/components/admin/StaffManager";
 import { StoreSettingsForm } from "@/components/admin/StoreSettingsForm";
-import { createVercelAdminService, type AdminExpenseInput, type AdminFinanceSummary } from "@/services/adminService";
+import { createVercelAdminService, type AdminExpenseForReview, type AdminExpenseInput, type AdminExpenseReview, type AdminFinanceAuditLog, type AdminFinanceSummary } from "@/services/adminService";
+import { createVercelOperationsService, type VercelOperationalOrder } from "@/services/operationsService";
 import { canManageCatalog, type OperationalRole } from "@shared/permissions";
 
 function currentMonthPeriod() {
@@ -20,6 +24,18 @@ function currentMonthPeriod() {
   };
 }
 
+export const adminModuleLinks = [
+  ["Visão geral", "#admin-overview"],
+  ["Pedidos", "/operacao"],
+  ["Financeiro", "#admin-finance"],
+  ["Revisões", "#admin-reviews"],
+  ["Auditoria", "#admin-audit"],
+  ["Relatórios", "#admin-reports"],
+  ["Cardápio", "#admin-catalog"],
+  ["Equipe", "#admin-team"],
+  ["Configurações", "#admin-settings"],
+] as const;
+
 function AdminFinanceDashboard() {
   const [summary, setSummary] = useState<AdminFinanceSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -27,19 +43,44 @@ function AdminFinanceDashboard() {
   const [expensePending, setExpensePending] = useState(false);
   const [expenseErrorMessage, setExpenseErrorMessage] = useState<string>();
   const [expenseSuccessMessage, setExpenseSuccessMessage] = useState<string>();
+  const [reviewExpenses, setReviewExpenses] = useState<AdminExpenseForReview[]>([]);
+  const [reviewPendingId, setReviewPendingId] = useState<string>();
+  const [reviewErrorMessage, setReviewErrorMessage] = useState<string>();
+  const [auditLogs, setAuditLogs] = useState<AdminFinanceAuditLog[]>([]);
+  const [auditErrorMessage, setAuditErrorMessage] = useState<string>();
+  const [orders, setOrders] = useState<VercelOperationalOrder[] | null>(null);
+  const [ordersErrorMessage, setOrdersErrorMessage] = useState<string>();
   const period = currentMonthPeriod();
 
   const loadFinance = useCallback(async () => {
     setLoading(true);
     setErrorMessage(undefined);
-    try {
-      setSummary(await createVercelAdminService().getFinance(period));
-    } catch {
+    setReviewErrorMessage(undefined);
+    setAuditErrorMessage(undefined);
+    setOrdersErrorMessage(undefined);
+    const service = createVercelAdminService();
+    const [summaryResult, reviewResult, auditResult, ordersResult] = await Promise.allSettled([
+      service.getFinance(period),
+      service.listReviewExpenses(),
+      service.listFinanceAudit(),
+      createVercelOperationsService().listOrders(),
+    ]);
+    if (summaryResult.status === "fulfilled") {
+      setSummary(summaryResult.value);
+    } else {
       setSummary(null);
       setErrorMessage("Não foi possível carregar o resumo financeiro agora. Verifique a conexão e tente novamente.");
-    } finally {
-      setLoading(false);
     }
+    if (reviewResult.status === "fulfilled") setReviewExpenses(reviewResult.value.expenses);
+    else setReviewErrorMessage("Não foi possível carregar a fila de revisão agora. Tente novamente.");
+    if (auditResult.status === "fulfilled") setAuditLogs(auditResult.value.auditLogs);
+    else setAuditErrorMessage("Não foi possível carregar a auditoria financeira agora. Tente novamente.");
+    if (ordersResult.status === "fulfilled") setOrders(ordersResult.value);
+    else {
+      setOrders(null);
+      setOrdersErrorMessage("Não foi possível carregar a situação operacional agora. Tente novamente.");
+    }
+    setLoading(false);
   }, [period.from, period.to]);
 
   useEffect(() => {
@@ -61,14 +102,34 @@ function AdminFinanceDashboard() {
     }
   }, [loadFinance]);
 
+  const reviewExpense = useCallback(async (review: AdminExpenseReview) => {
+    setReviewPendingId(review.expenseId);
+    setReviewErrorMessage(undefined);
+    try {
+      await createVercelAdminService().reviewExpense(review);
+      await loadFinance();
+    } catch {
+      setReviewErrorMessage("Não foi possível concluir a revisão agora. Verifique a conexão e tente novamente.");
+    } finally {
+      setReviewPendingId(undefined);
+    }
+  }, [loadFinance]);
+
   return (
     <div id="admin-overview" className="space-y-3 scroll-mt-24">
       <AdminDashboardOverview summary={summary} loading={loading} errorMessage={errorMessage} />
+      <AdminOperationsOverview orders={orders} loading={loading} errorMessage={ordersErrorMessage} />
       {errorMessage ? <button type="button" onClick={() => void loadFinance()} className="rounded-xl border border-[#b52a25] bg-white px-4 py-2 text-sm font-semibold text-[#8e2522] transition hover:bg-[#fff5f3] active:scale-[0.97]">Tentar novamente</button> : null}
       <div id="admin-finance" className="scroll-mt-24">
         <ExpenseDraftForm onSubmit={(expense) => void submitExpense(expense)} pending={expensePending} errorMessage={expenseErrorMessage} successMessage={expenseSuccessMessage} />
       </div>
-      <FinanceReportActions summary={summary} />
+      <div id="admin-reviews" className="scroll-mt-24">
+        <ExpenseReviewQueue expenses={reviewExpenses} onReview={reviewExpense} pendingId={reviewPendingId} errorMessage={reviewErrorMessage} />
+      </div>
+      <FinanceAuditLog auditLogs={auditLogs} loading={loading} errorMessage={auditErrorMessage} />
+      <div id="admin-reports" className="scroll-mt-24">
+        <FinanceReportActions summary={summary} />
+      </div>
     </div>
   );
 }
@@ -92,13 +153,7 @@ export function AdminView({ actorRole }: { actorRole: OperationalRole }) {
       </header>
 
       <nav aria-label="Módulos administrativos" className="grid grid-cols-2 gap-2 rounded-2xl border border-[#ead7bc] bg-[#fffaf1] p-3 sm:grid-cols-4">
-        {[
-          ["Visão geral", "#admin-overview"],
-          ["Financeiro", "#admin-finance"],
-          ["Cardápio", "#admin-catalog"],
-          ["Equipe", "#admin-team"],
-          ["Configurações", "#admin-settings"],
-        ].map(([label, target]) => (
+        {adminModuleLinks.map(([label, target]) => (
           <a key={label} href={target} className="rounded-xl px-3 py-2 text-center text-sm font-semibold text-[#6b4c42] transition hover:bg-[#f4eadb] hover:text-[#481e1f] focus:outline-none focus:ring-2 focus:ring-[#b52a25]">
             {label}
           </a>

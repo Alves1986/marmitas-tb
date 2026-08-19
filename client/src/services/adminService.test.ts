@@ -67,4 +67,26 @@ describe("VercelAdminService", () => {
     expect(api).toHaveBeenNthCalledWith(1, "/api/admin/finance", { method: "POST", body: expense });
     expect(api).toHaveBeenNthCalledWith(2, "/api/admin/finance", { method: "PATCH", body: { expenseId: "62cc75fb-1772-4d47-acfb-c76798fc9aa5", decision: "approved" } });
   });
+
+  it("consulta a fila de despesas em rascunho para revisão", async () => {
+    const api = vi.fn().mockResolvedValue({ expenses: [{ id: "draft-1", status: "draft" }] });
+    const service = createVercelAdminService(api);
+
+    expect("listReviewExpenses" in service).toBe(true);
+    const reviewService = service as typeof service & { listReviewExpenses(): Promise<{ expenses: Array<{ id: string; status: "draft" }> }> };
+    await expect(reviewService.listReviewExpenses()).resolves.toEqual({ expenses: [{ id: "draft-1", status: "draft" }] });
+
+    expect(api).toHaveBeenCalledWith("/api/admin/finance?view=review");
+  });
+
+  it("consulta o histórico de auditoria financeira para administração", async () => {
+    const api = vi.fn().mockResolvedValue({ auditLogs: [{ id: "audit-1", action: "expense.approved" }] });
+    const service = createVercelAdminService(api);
+
+    expect("listFinanceAudit" in service).toBe(true);
+    const auditService = service as typeof service & { listFinanceAudit(): Promise<{ auditLogs: Array<{ id: string; action: string }> }> };
+    await expect(auditService.listFinanceAudit()).resolves.toEqual({ auditLogs: [{ id: "audit-1", action: "expense.approved" }] });
+
+    expect(api).toHaveBeenCalledWith("/api/admin/finance?view=audit");
+  });
 });

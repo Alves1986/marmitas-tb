@@ -105,11 +105,15 @@ export default function Operations() {
               <p className="text-xs font-extrabold uppercase tracking-[0.15em] text-[#68703d]">Marmitas TB · equipe</p>
               <h1 className="mt-1 font-display text-3xl font-bold">Fila operacional</h1>
             </div>
-            <Button asChild variant="outline" className="border-[#c9b28f] text-[#481e1f] hover:bg-[#fff5df]"><a href="/"><ArrowLeft aria-hidden="true" className="mr-2 size-4" />Cardápio</a></Button>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button asChild variant="outline" className="border-[#c9b28f] text-[#481e1f] hover:bg-[#fff5df]"><a href="/operacao/despesas">Registrar despesa</a></Button>
+              <Button asChild variant="outline" className="border-[#c9b28f] text-[#481e1f] hover:bg-[#fff5df]"><a href="/"><ArrowLeft aria-hidden="true" className="mr-2 size-4" />Cardápio</a></Button>
+            </div>
           </div>
         </header>
 
         <div className="container space-y-5 py-7">
+          <p className="rounded-xl border border-[#ead7bc] bg-[#fff7e8] px-4 py-3 text-sm text-[#6b4c42]">Lançamentos seguem como rascunho até revisão administrativa.</p>
           {operationError ? <div role="alert" className="rounded-xl border border-[#f2b4a2] bg-[#fff1eb] p-4 text-sm font-medium text-[#7e1f1d]">{operationError}</div> : null}
           <OrderAlert orders={alertOrders} onAcknowledge={onAcknowledge} />
           <OrderQueue onOrdersChange={onOrdersChange} />

@@ -14,14 +14,25 @@ type FinancialOrder = {
 
 type FinancialExpense = {
   id: string;
+  description?: string;
+  category?: string;
   amountInCents: number;
   status: "draft" | "approved" | "rejected";
   incurredOn: string;
+  submittedByName?: string | null;
 };
 
 type FinancialSnapshot = {
   orders: FinancialOrder[];
   expenses: FinancialExpense[];
+};
+
+type FinancialAuditLog = {
+  id: string;
+  action: "expense.approved" | "expense.rejected";
+  entityId: string | null;
+  actorName: string | null;
+  createdAt: string;
 };
 
 export type AdminFinanceDependencies = {
@@ -31,6 +42,7 @@ export type AdminFinanceDependencies = {
   createExpense(input: ExpenseDraftInput): Promise<{ id: string; status: "draft" }>;
   reviewExpense(input: ExpenseReviewInput): Promise<{ id: string; status: "approved" | "rejected" }>;
   writeAuditLog(input: AuditLogInput): Promise<void>;
+  listAuditLogs?(): Promise<FinancialAuditLog[]>;
 };
 
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
@@ -118,9 +130,15 @@ export function createAdminFinanceHandler(dependencies: AdminFinanceDependencies
     try {
       if (request.method === "GET") {
         await dependencies.requireAdmin(request);
+        const view = new URL(request.url).searchParams.get("view");
+        if (view === "audit") return json(200, { auditLogs: await dependencies.listAuditLogs?.() ?? [] });
         const period = getPeriod(request);
         if (!period) return jsonError(400, "Período financeiro inválido.");
-        return json(200, { period, ...summarizeFinance(await dependencies.getSnapshot(period)) });
+        const snapshot = await dependencies.getSnapshot(period);
+        if (view === "review") {
+          return json(200, { expenses: snapshot.expenses.filter((expense) => expense.status === "draft") });
+        }
+        return json(200, { period, ...summarizeFinance(snapshot) });
       }
 
       if (request.method === "POST") {
@@ -162,7 +180,7 @@ async function getSupabaseSnapshot(period: { from: string; to: string }): Promis
       .lte("created_at", `${period.to}T23:59:59.999Z`),
     client
       .from("expense_entries")
-      .select("id, amount_in_cents, status, incurred_on")
+      .select("id, description, category, amount_in_cents, status, incurred_on")
       .gte("incurred_on", period.from)
       .lte("incurred_on", period.to),
   ]);
@@ -177,11 +195,13 @@ async function getSupabaseSnapshot(period: { from: string; to: string }): Promis
       status: order.status,
       createdAt: order.created_at,
     })),
-    expenses: (expensesResult.data ?? []).map((expense) => ({
-      id: expense.id,
-      amountInCents: expense.amount_in_cents,
-      status: expense.status as FinancialExpense["status"],
-      incurredOn: expense.incurred_on,
+      expenses: (expensesResult.data ?? []).map((expense) => ({
+        id: expense.id,
+        description: expense.description,
+        category: expense.category,
+        amountInCents: expense.amount_in_cents,
+        status: expense.status as FinancialExpense["status"],
+        incurredOn: expense.incurred_on,
     })),
   };
 }
@@ -240,6 +260,32 @@ async function writeSupabaseAuditLog(input: AuditLogInput): Promise<void> {
   if (error) throw new Error("Não foi possível registrar a auditoria administrativa.");
 }
 
+async function listSupabaseAuditLogs(): Promise<FinancialAuditLog[]> {
+  const client = createSupabaseAdmin();
+  const { data: auditRows, error: auditError } = await client
+    .from("admin_audit_logs")
+    .select("id, action, entity_id, actor_user_id, created_at")
+    .in("action", ["expense.approved", "expense.rejected"])
+    .order("created_at", { ascending: false })
+    .limit(50);
+  if (auditError) throw new Error("Não foi possível carregar a auditoria administrativa.");
+
+  const actorIds = Array.from(new Set((auditRows ?? []).map((row) => row.actor_user_id).filter((id): id is string => Boolean(id))));
+  const { data: profiles, error: profilesError } = actorIds.length
+    ? await client.from("profiles").select("id, display_name").in("id", actorIds)
+    : { data: [], error: null };
+  if (profilesError) throw new Error("Não foi possível identificar os responsáveis pela auditoria.");
+  const namesById = new Map((profiles ?? []).map((profile) => [profile.id, profile.display_name]));
+
+  return (auditRows ?? []).map((row) => ({
+    id: row.id,
+    action: row.action as FinancialAuditLog["action"],
+    entityId: row.entity_id,
+    actorName: row.actor_user_id ? namesById.get(row.actor_user_id) ?? null : null,
+    createdAt: row.created_at,
+  }));
+}
+
 function defaultAdminFinanceHandler(request: Request): Promise<Response> {
   const client = createSupabaseAdmin();
   const guards = createSupabaseAuthGuards(client);
@@ -250,6 +296,7 @@ function defaultAdminFinanceHandler(request: Request): Promise<Response> {
     createExpense: createSupabaseExpense,
     reviewExpense: reviewSupabaseExpense,
     writeAuditLog: writeSupabaseAuditLog,
+    listAuditLogs: listSupabaseAuditLogs,
   })(request);
 }
 

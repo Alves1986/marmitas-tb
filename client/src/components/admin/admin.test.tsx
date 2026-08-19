@@ -32,6 +32,16 @@ describe("AdminView", () => {
     expect(screen.queryByRole("button", { name: /novo produto/i })).toBeNull();
   });
 
+  it("oferece acesso direto ao módulo de revisões financeiras", async () => {
+    const adminModule = await import("@/pages/Admin");
+
+    expect("adminModuleLinks" in adminModule).toBe(true);
+    const links = (adminModule as typeof adminModule & { adminModuleLinks: Array<readonly [string, string]> }).adminModuleLinks;
+    expect(links).toContainEqual(["Pedidos", "/operacao"]);
+    expect(links).toContainEqual(["Revisões", "#admin-reviews"]);
+    expect(links).toContainEqual(["Relatórios", "#admin-reports"]);
+  });
+
   it("apresenta uma visão geral com receitas, despesas e caixa sem valores simulados", async () => {
     const dashboardModulePath = "./AdminDashboardOverview";
     const dashboardModule = await import(dashboardModulePath).catch(() => null);
@@ -47,6 +57,32 @@ describe("AdminView", () => {
     expect(screen.getByText(/aguardando dados financeiros reais/i)).toBeTruthy();
   });
 
+  it("apresenta a situação operacional a partir da fila real de pedidos", async () => {
+    const modulePath = "./AdminOperationsOverview";
+    const operationsModule = await import(modulePath).catch(() => null);
+
+    expect(operationsModule).not.toBeNull();
+    const AdminOperationsOverview = (operationsModule as { AdminOperationsOverview: any }).AdminOperationsOverview;
+    render(<AdminOperationsOverview orders={[{ id: "order-1", code: "TB-001", status: "pending" }]} />);
+
+    expect(screen.getByRole("heading", { name: /situação operacional/i })).toBeTruthy();
+    expect(screen.getByText(/aguardando/i)).toBeTruthy();
+    expect(screen.getAllByText(/1 pedido/i).length).toBeGreaterThan(0);
+  });
+
+  it("exibe a auditoria de decisões financeiras administrativas", async () => {
+    const modulePath = "./FinanceAuditLog";
+    const auditModule = await import(modulePath).catch(() => null);
+
+    expect(auditModule).not.toBeNull();
+    const FinanceAuditLog = (auditModule as { FinanceAuditLog: any }).FinanceAuditLog;
+    render(<FinanceAuditLog auditLogs={[{ id: "audit-1", action: "expense.approved", entityId: "expense-1", actorName: "Gestora", createdAt: "2026-08-19T14:00:00.000Z" }]} />);
+
+    expect(screen.getByRole("heading", { name: /auditoria financeira/i })).toBeTruthy();
+    expect(screen.getByText(/despesa aprovada/i)).toBeTruthy();
+    expect(screen.getByText(/gestora/i)).toBeTruthy();
+  });
+
   it("registra uma despesa financeira como rascunho com valor convertido em centavos", () => {
     const onSubmit = vi.fn();
     render(<ExpenseDraftForm onSubmit={onSubmit} />);
@@ -58,6 +94,21 @@ describe("AdminView", () => {
     fireEvent.click(screen.getByRole("button", { name: /enviar para aprovação/i }));
 
     expect(onSubmit).toHaveBeenCalledWith({ description: "Gás da cozinha", category: "Insumos", amountInCents: 12000, incurredOn: "2026-08-19", notes: undefined });
+  });
+
+  it("permite à administração aprovar ou rejeitar uma despesa em rascunho", async () => {
+    const modulePath = "./ExpenseReviewQueue";
+    const reviewModule = await import(modulePath).catch(() => null);
+
+    expect(reviewModule).not.toBeNull();
+    const ExpenseReviewQueue = (reviewModule as { ExpenseReviewQueue: any }).ExpenseReviewQueue;
+    const onReview = vi.fn();
+    render(<ExpenseReviewQueue expenses={[{ id: "draft-1", description: "Gás", category: "Insumos", amountInCents: 11500, incurredOn: "2026-08-19", status: "draft" }]} onReview={onReview} />);
+
+    expect(screen.getByRole("heading", { name: /despesas aguardando revisão/i })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: /aprovar despesa gás/i }));
+    expect(onReview).toHaveBeenCalledWith({ expenseId: "draft-1", decision: "approved" });
+    expect(screen.getByRole("button", { name: /rejeitar despesa gás/i })).toBeTruthy();
   });
 
   it("gera CSV financeiro a partir do resumo real e da composição por pagamento", () => {

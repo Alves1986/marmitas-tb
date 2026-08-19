@@ -73,6 +73,24 @@ export type AdminExpenseReview = {
   rejectionReason?: string;
 };
 
+export type AdminExpenseForReview = {
+  id: string;
+  description?: string;
+  category?: string;
+  amountInCents: number;
+  status: "draft";
+  incurredOn: string;
+  submittedByName?: string | null;
+};
+
+export type AdminFinanceAuditLog = {
+  id: string;
+  action: "expense.approved" | "expense.rejected";
+  entityId: string | null;
+  actorName: string | null;
+  createdAt: string;
+};
+
 function vercelApi<T>(path: string, init?: { method?: string; body?: unknown }) {
   return apiRequest<T>(path, {
     method: init?.method,
@@ -94,5 +112,7 @@ export function createVercelAdminService(request: ApiRequest = vercelApi) {
     getFinance: (period: { from: string; to: string }) => request<AdminFinanceSummary>(`/api/admin/finance?from=${encodeURIComponent(period.from)}&to=${encodeURIComponent(period.to)}`),
     createExpense: (expense: AdminExpenseInput) => request<{ id: string; status: "draft" }>("/api/admin/finance", { method: "POST", body: expense }),
     reviewExpense: (review: AdminExpenseReview) => request<{ id: string; status: "approved" | "rejected" }>("/api/admin/finance", { method: "PATCH", body: review }),
+    listReviewExpenses: () => request<{ expenses: AdminExpenseForReview[] }>("/api/admin/finance?view=review"),
+    listFinanceAudit: () => request<{ auditLogs: AdminFinanceAuditLog[] }>("/api/admin/finance?view=audit"),
   };
 }

@@ -9,6 +9,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Admin from "./pages/Admin";
 import Home from "./pages/Home";
 import Operations from "./pages/Operations";
+import OperationsExpenses from "./pages/OperationsExpenses";
 import StaffAccess from "./pages/StaffAccess";
 import TrackOrder from "./pages/TrackOrder";
 
@@ -20,6 +21,7 @@ function Router() {
       <Route path={"/acompanhar"} component={TrackOrder} />
       <Route path={"/acesso"} component={StaffAccess} />
       <Route path={"/operacao"} component={Operations} />
+      <Route path={"/operacao/despesas"} component={OperationsExpenses} />
       <Route path={"/admin"} component={Admin} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}

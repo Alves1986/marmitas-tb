@@ -33,9 +33,14 @@ export default function StaffAccess() {
   return (
     <main className="grid min-h-screen place-items-center bg-[#fffaf1] p-6 text-[#481e1f]">
       <section className="w-full max-w-md rounded-3xl border border-[#ead9c0] bg-white p-7 shadow-[0_18px_50px_rgba(72,30,31,0.10)] md:p-9">
-        <a href="/" className="inline-flex items-center gap-2 text-sm font-semibold text-[#68703d] hover:text-[#4e5729]">
-          <ArrowLeft aria-hidden="true" className="size-4" /> Voltar ao cardápio
-        </a>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <a href="/admin" className="inline-flex items-center gap-2 text-sm font-semibold text-[#a82926] hover:text-[#7e1f1d]">
+            <ArrowLeft aria-hidden="true" className="size-4" /> Ir para gestão
+          </a>
+          <a href="/" className="inline-flex items-center gap-2 text-sm font-semibold text-[#68703d] hover:text-[#4e5729]">
+            Voltar ao cardápio
+          </a>
+        </div>
         <div className="mt-7 flex size-12 items-center justify-center rounded-2xl bg-[#f7ead7] text-[#a82926]">
           {linkRequested ? <ShieldCheck aria-hidden="true" className="size-6" /> : <MailCheck aria-hidden="true" className="size-6" />}
         </div>

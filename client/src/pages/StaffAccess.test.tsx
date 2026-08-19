@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/supabaseAuth", () => ({
   requestTeamOtp: vi.fn().mockResolvedValue(undefined),
@@ -12,7 +12,16 @@ vi.mock("@/lib/supabaseClient", () => ({
 
 import StaffAccess from "./StaffAccess";
 
+afterEach(cleanup);
+
 describe("StaffAccess", () => {
+  it("mantém um caminho explícito para a gestão, além do retorno ao cardápio público", () => {
+    render(<StaffAccess />);
+
+    expect(screen.getByRole("link", { name: /ir para gestão/i }).getAttribute("href")).toBe("/admin");
+    expect(screen.getByRole("link", { name: /voltar ao cardápio/i }).getAttribute("href")).toBe("/");
+  });
+
   it("orienta a equipe a abrir o link enviado por e-mail, sem pedir um código inexistente", async () => {
     render(<StaffAccess />);
 

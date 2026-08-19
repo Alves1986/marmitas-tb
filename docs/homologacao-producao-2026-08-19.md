@@ -146,3 +146,7 @@ Após percorrer a grade até o fim, a inspeção do DOM confirmou **18 de 18** i
 | Administração, financeiro e auditoria | Código, migração, testes locais, build e endpoints protegidos validados; acesso real já foi confirmado pela responsável. | Apta para apresentação da interface. | Validar um rascunho de despesa, aprovação/rejeição, auditoria e relatório com dados de teste. |
 | Fila operacional e impressão | Pedido de teste criado e rastreio público confirmado; impressão foi excluída do protocolo autorizado. | Apta para demonstração visual. | Localizar o pedido com sessão de equipe, confirmar mudanças de estado e verificar alerta e impressão no computador dedicado. |
 | Pagamento real | Asaas permanece em Sandbox sem chaves de produção. | Não demonstrar cobrança real. | Configurar credenciais e realizar homologação específica de pagamento antes de cobrar clientes. |
+
+## Retorno à gestão publicado
+
+Após a publicação autorizada da melhoria de navegação, a primeira leitura da rota `/acesso` ainda serviu o bundle anterior. Depois da propagação completa, a mesma rota exibiu os dois atalhos independentes: **“Ir para gestão”**, direcionando para `/admin`, e **“Voltar ao cardápio”**, direcionando para `/`. A confirmação foi realizada em produção sem solicitar novo link de acesso, sem alterar usuários ou pedidos e sem afetar a sessão operacional.

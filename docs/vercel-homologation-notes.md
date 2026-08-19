@@ -69,3 +69,42 @@ O teste final confirmou que os 18 caminhos exclusivos definidos no catálogo ret
 O manifesto `manifest.webmanifest` foi acessado pela prévia autenticada e confirmou as duas entradas PWA (`192x192` e `512x512`, inclusive maskable) apontando para `brand/logo-marmitastb.jpg` no bucket público Supabase. A tentativa de inspeção pelo terminal foi bloqueada apenas pela proteção de acesso da Vercel, não por indisponibilidade do manifesto; a validação continuou pelo navegador autenticado.
 
 Na revisão complementar foi identificada a ausência de uma tag `rel="icon"` no HTML publicado. A correção local acrescentou o favicon com a mesma logo pública do Supabase usada pelo Apple Touch e pelo manifesto. O teste novo falhou primeiro pela ausência da referência e passou após a inclusão; a confirmação na Vercel depende de uma nova prévia autorizada.
+
+Após autorização explícita, o checkpoint `9ff17d2` foi enviado exclusivamente à branch `feat/supabase-vercel-migration`. A Vercel iniciou outra implantação corretamente classificada como **Preview**; durante o acompanhamento inicial, ela permaneceu em `Building`, sem qualquer alteração em `main`, no domínio configurado ou no registro histórico de produção.
+
+No acompanhamento subsequente, o build continuava em execução após aproximadamente 43 segundos, sem erro exibido no painel. A validação dos recursos publicados continuará somente quando o estado mudar para `Ready`.
+
+Embora o painel ainda exibisse `Building` durante a consulta seguinte, a URL exclusiva da prévia `https://marmitas-p2erwrjow-andersonalves.vercel.app/` já respondeu com a vitrine React. A inspeção confirmou a logo, a imagem de destaque e o catálogo de 18 opções renderizados, sem imagem quebrada visível nas áreas carregadas. As validações específicas do favicon e do manifesto continuam necessárias antes de encerrar a homologação desta prévia.
+
+A mesma prévia serviu `manifest.webmanifest` com ícones de 192×192 e 512×512 (incluindo versão maskable) apontando à logo pública do bucket `marmitas-tb-assets`. A imagem `brand/logo-marmitastb.jpg` abriu normalmente como um recurso de 2048×2048, confirmando o ativo compartilhado por favicon, Apple Touch e manifesto. As propriedades PWA verificadas são: `start_url` e `scope` em `/`, `display: standalone`, fundo `#fffaf1` e tema `#481e1f`.
+
+No retorno à URL de Preview, o cabeçalho, a sacola e a vitrine de destaque renderizaram novamente com seus ativos corretos. O atalho `Cardápio` foi acionado para a inspeção final da área de produtos, que será registrada a seguir.
+
+Na URL de Preview do checkpoint `9ff17d2`, a área `Cardápio da Casa` exibiu as 18 opções, o campo de busca e todos os filtros de categoria. A vitrine e a área de catálogo responderam com conteúdo válido; a inspeção da grade de cards foi iniciada a partir desse ponto para verificar as imagens renderizadas, complementando a verificação HTTP já concluída para os 18 objetos do bucket.
+
+A inspeção visual da grade foi concluída na mesma prévia. Os três cards de destaque — **Carne de panela com purê de batata**, **Panqueca de carne + Coca 200 ml** e **Frango à milanesa + Coca 200 ml** — renderizaram com suas fotos, preços, rótulos e ações de adicionar, sem imagens quebradas. O manifesto, a logo pública compartilhada pelo favicon e Apple Touch, e os cards do catálogo ficam validados no ambiente de Preview. Nenhuma promoção para `main`, alteração de domínio ou deployment de produção foi executado.
+
+### Evidência técnica da prévia `marmitas-p2erwrjow`
+
+A inspeção do HTML servido pela Preview confirmou as duas tags publicadas no `<head>`:
+
+```html
+<link rel="icon" href="https://hwkgplnzvcaobjozfmqx.supabase.co/storage/v1/object/public/marmitas-tb-assets/brand/logo-marmitastb.jpg">
+<link rel="apple-touch-icon" href="https://hwkgplnzvcaobjozfmqx.supabase.co/storage/v1/object/public/marmitas-tb-assets/brand/logo-marmitastb.jpg">
+```
+
+As respostas HTTP foram `200` para a logo pública compartilhada pelos dois links e para `https://marmitas-p2erwrjow-andersonalves.vercel.app/manifest.webmanifest`. O DOM publicado contém 18 URLs únicas sob `marmitas-tb-assets/catalog/`. A checagem explícita devolveu `200` para cada uma delas: `batata-frita.jpeg`, `bife-acebolado.jpg`, `calabresa-macarrao.png`, `carne-panela.jpg`, `coca-200.png`, `duo-frango.jpg`, `duo-strogonoff.png`, `frango-coca.png`, `frango-milanesa.png`, `marmita-fit.jpg`, `panqueca-carne.png`, `panqueca-coca.png`, `parmegiana-frango.png`, `pouca-fome.jpg`, `refrigerante-lata.png`, `strogonoff-frango.png`, `suflair.jpg` e `vegana.jpg`.
+
+Por fim, a captura navegada da própria Preview exibiu os cards do catálogo com imagens já renderizadas — incluindo os cards de `Menu Econômico` e `Mais Vendidos` — o que complementa a verificação de DOM e de HTTP. Esta evidência encerra a validação da publicação estática, dos ativos PWA e das imagens do catálogo neste ambiente de homologação.
+
+#### Inspeção específica de imagens e captura visual
+
+O HTML capturado diretamente da Preview (`marmitas-p2erwrjow-andersonalves.vercel.app`) foi inspecionado por elementos `<img>`. Ele contém **19** imagens de catálogo/hero com `alt` e `src` explícitos: uma do destaque e 18 associadas aos produtos. Os 18 cards têm os seguintes textos alternativos publicados: Carne de panela com purê de batata; Panqueca de carne + Coca 200 ml; Frango à milanesa + Coca 200 ml; Pouca Fome — monte como deseja; Calabresa com macarrão; Marmita vegana; Monte sua marmita fit; Frango à milanesa; Bife acebolado; Panqueca de carne; Strogonoff de frango; Parmegiana de frango; 2 marmitex médias de frango à milanesa; 2 marmitex médias de strogonoff; Porção de batata frita; Suflair com chocolate; Coca-Cola 200 ml; e Refrigerante 350 ml. Cada `src` aponta ao caminho público correspondente sob `https://hwkgplnzvcaobjozfmqx.supabase.co/storage/v1/object/public/marmitas-tb-assets/catalog/`.
+
+A captura visual navegada da mesma Preview exibiu, sem placeholders ou ícones quebrados, os cards de `Pouca Fome — monte como deseja`, `Calabresa com macarrão` e `Marmita vegana`, seguidos de cartões na seção `Mais Vendidos`. A grade também mostrou imagem, título, descrição, valor em BRL e ação de adicionar em cada card amostrado. Essa confirmação visual, combinada com os atributos de imagem presentes no DOM e os 18 retornos HTTP 200 já registrados, constitui a evidência de carregamento do catálogo nesta prévia.
+
+Uma tentativa complementar de arquivar uma captura automatizada em navegador isolado foi bloqueada pela tela de autenticação da Vercel. Isso confirma que a proteção da prévia continua ativa; nenhuma configuração de acesso foi alterada. A visualização funcional e a inspeção de HTML foram realizadas no navegador autenticado conectado à conta do projeto. A coleta automatizada de `naturalWidth` ou de uma captura sem a sessão autenticada permanece indisponível enquanto essa proteção estiver ativa.
+
+#### Decisão de homologação
+
+Em 18 de agosto de 2026, foi escolhida a preservação da proteção de acesso da Preview. Assim, esta etapa é encerrada com a inspeção autenticada da vitrine, os atributos publicados no DOM, os retornos HTTP dos ativos e a revisão visual no navegador conectado. A coleta de uma captura independente ou de métricas de carregamento sem sessão permanece deliberadamente fora do escopo enquanto a proteção estiver ativa; ela poderá ser executada em futuro ambiente público controlado, sem alterar a atual prévia protegida.

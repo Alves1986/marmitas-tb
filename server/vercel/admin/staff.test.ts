@@ -1,10 +1,18 @@
 import { describe, expect, it, vi } from "vitest";
 import { ApiAuthError } from "../_lib/auth";
-import { createAdminStaffHandler } from "../../../api/admin/staff";
+import { canResendInternalInvite, createAdminStaffHandler } from "../../../api/admin/staff";
 
 const admin = { id: "a68c3d5e-2b56-4462-96e8-5d05d1b19bc0", email: "gestao@marmitastb.com.br", displayName: "Gestão", role: "admin" as const };
 
 describe("/api/admin/staff", () => {
+  it("permite reenvio de convite somente para papéis internos", () => {
+    expect(canResendInternalInvite("staff")).toBe(true);
+    expect(canResendInternalInvite("admin")).toBe(true);
+    expect(canResendInternalInvite("customer")).toBe(false);
+    expect(canResendInternalInvite("user")).toBe(false);
+    expect(canResendInternalInvite(null)).toBe(false);
+  });
+
   it("exige administrador para alterar papel da equipe", async () => {
     const handler = createAdminStaffHandler({ requireAdmin: vi.fn().mockRejectedValue(new ApiAuthError(403, "Acesso restrito à administração.")), listStaff: vi.fn(), setRole: vi.fn() });
     expect((await handler(new Request("https://marmitas-tb.vercel.app/api/admin/staff"))).status).toBe(403);

@@ -16,6 +16,10 @@ const resendInviteInput = z.object({ action: z.literal("invite"), userId: z.stri
 type InternalMemberRole = "staff" | "admin";
 type CreateMemberInput = { email: string; displayName: string; role: InternalMemberRole };
 
+export function canResendInternalInvite(role: unknown): role is InternalMemberRole {
+  return role === "staff" || role === "admin";
+}
+
 export type AdminStaffDependencies = {
   requireAdmin(request: Request): Promise<AuthenticatedProfile>;
   listStaff(): Promise<unknown>;
@@ -91,6 +95,15 @@ async function createSupabaseStaff(input: CreateMemberInput) {
 async function inviteSupabaseStaff(input: { userId: string }) {
   const config = readServerConfig();
   const client = createSupabaseAdmin(config);
+  const { data: profile, error: profileError } = await client
+    .from("profiles")
+    .select("role")
+    .eq("id", input.userId)
+    .maybeSingle();
+  if (profileError || !profile || !canResendInternalInvite(profile.role)) {
+    throw new Error("Não foi possível reenviar o convite do membro.");
+  }
+
   const { data: userData, error: userError } = await client.auth.admin.getUserById(input.userId);
   const email = userData.user?.email;
   if (userError || !email) throw new Error("Não foi possível localizar o membro para reenvio.");

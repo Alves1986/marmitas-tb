@@ -8,6 +8,7 @@ Este diretório concentra os materiais necessários para operar, manter e evolui
 | [Guia técnico de arquitetura e manutenção](./guia-tecnico-manutencao.md) | Desenvolvimento e suporte técnico | Arquitetura, segurança, publicação, diagnóstico e retomada de integrações |
 | [Acesso interno por senha](./acesso-interno-por-senha-operacao.md) | Gestores e suporte técnico | Política de credenciais, convite, recuperação e SMTP pendente |
 | [Evidências de publicação da autenticação](./evidencias-publicacao-autenticacao-2026-08-20.md) | Suporte técnico | Histórico da publicação e recuperação do alias de produção |
+| [Diagnóstico dos advisors do Supabase](./diagnostico-advisors-supabase-2026-08-20.md) | Desenvolvimento e suporte técnico | Avisos de segurança e desempenho consultados sem escrita no ambiente |
 | [Homologação Asaas](./operacao/asaas-homologacao.md) | Financeiro e desenvolvimento | PIX Sandbox, variáveis e webhook |
 | [Homologação Supabase e Vercel](./operacao/supabase-vercel-homologacao.md) | Desenvolvimento | Estado da migração e critérios de ambiente |
 

@@ -96,22 +96,22 @@
 - [x] Migrar persistência, autenticação, API e variáveis de ambiente para serviços compatíveis com Supabase e Vercel.
 - [x] Preparar configuração, documentação e validação de deploy externo na Vercel sem publicar automaticamente.
 - [x] Substituir Manus OAuth por Supabase Auth, preservando os papéis de cliente, operação e administrador.
-- [ ] Converter o esquema e os dados operacionais de MySQL/TiDB para Supabase Postgres com integridade e reversibilidade.
+- [x] Encerrar a conversão de esquema e histórico operacional MySQL/TiDB para Supabase Postgres nesta fase, preservando a exportação reversível e sem nova importação por decisão explícita do responsável.
 - [x] Transferir os ativos persistentes da aplicação para Supabase Storage e remover dependências exclusivas da infraestrutura atual.
 - [x] Conectar e validar os projetos existentes de Supabase e Vercel para a Marmitas TB antes da migração de produção.
 - [x] Implementar login interno por código OTP de e-mail no Supabase, sem cadastro público automático da equipe.
 - [x] Configurar URLs de retorno do Supabase Auth para o domínio vercel.app e os deploys de prévia da homologação.
 - [x] Definir o Site URL do Supabase Auth como `https://marmitastb.vercel.app` e permitir somente localhost, esse domínio e previews `marmitas-*-andersonalves.vercel.app`.
 - [x] Diagnosticar e provisionar explicitamente o usuário Auth da equipe para `cassia.andinho@gmail.com`, mantendo `shouldCreateUser: false` no fluxo OTP.
-- [ ] Ajustar o template de e-mail de autenticação do Supabase para incluir o token OTP de seis dígitos esperado pelo formulário, sem mudar a política de cadastro automático.
-- [ ] Configurar um SMTP transacional no Supabase e validar o envio de token OTP de seis dígitos para a equipe antes de liberar o acesso operacional em produção.
+- [x] Encerrar como obsoleto o ajuste do template de e-mail OTP de seis dígitos, pois o fluxo interno foi substituído por e-mail e senha.
+- [x] Encerrar como obsoleta a validação de SMTP para token OTP; a pendência ativa é o SMTP para convites e recuperação de senha, registrado separadamente.
 - [x] Manter o fluxo de acesso por código OTP e adiar sua validação final até a configuração de SMTP próprio, sem adaptar a aplicação para magic link.
 - [x] Adaptar a aplicação Vite para a Vercel com funções TypeScript server-side para pedidos, Asaas, webhook e impressão.
 - [x] Decidir se o histórico operacional legado deverá ser importado ao Supabase nesta fase ou preservado como exportação reversível fora do banco produtivo.
-- [ ] Se a importação for autorizada, migrar os dados operacionais necessários (`orders`, itens, eventos, pagamentos, fila de impressão e configurações), com reconciliação e validação de integridade.
+- [x] Encerrar a possível importação de histórico operacional nesta fase por decisão explícita do responsável, preservando os registros legados exportados e sem escrita adicional no Supabase.
 - [x] Exportar e contabilizar, em modo somente leitura, os dados legados de pedidos, itens, eventos, pagamentos, fila de impressão e configurações antes da importação.
 - [x] Documentar o mapeamento entre os identificadores numéricos legados e os UUIDs Supabase, as regras de normalização e os critérios de reconciliação.
-- [ ] Criar e testar uma importação idempotente do histórico operacional no Supabase, com rollback lógico e relatório de integridade antes da gravação autorizada.
+- [x] Encerrar a implementação de importação idempotente do histórico operacional nesta fase, pois não haverá nova gravação do legado no Supabase sem decisão futura expressa.
 - [x] Provisionar e validar um projeto Supabase exclusivo para a Marmitas TB antes de aplicar migrações de banco ou Storage.
 - [x] Manter a criação do projeto Marmitas TB na Vercel para após a validação final, o checkpoint e o envio da branch de migração ao GitHub, sem deploy automático.
 - [x] Registrar o encerramento da migração do histórico atualmente conectado sem migração SQL nem escrita no Supabase, por decisão explícita do responsável.
@@ -132,9 +132,9 @@
 - [x] Criar e testar o exportador somente leitura do histórico operacional legado, com proteção contra versionamento e documentação de reconciliação por UUID.
 - [x] Projetar, testar e migrar a autoria de auditoria para UUIDs Supabase, mantendo IDs numéricos legados somente como referência histórica compatível.
 - [x] Impedir por contrato que mutações administrativas e operacionais no runtime Vercel alcancem o tRPC/MySQL, usando apenas autoria UUID Supabase.
-- [ ] Conectar a branch de migração e validar uma única implantação Vercel de Preview, sem publicar em produção ou alterar o domínio.
+- [x] Encerrar a validação de uma única Preview da branch de migração, superada por quatro Previews controladas e pelas validações posteriores registradas, sem alteração adicional de domínio nesta etapa.
 - [x] Conectar a branch de migração e validar quatro implantações Vercel de Preview controladas (`878fe83`, `106aaf6`, `672f59f` e `9ff17d2`), sem nova produção nem alteração do domínio.
-- [ ] Cancelar a implantação Vercel classificada indevidamente como produção e corrigir a branch de produção antes de qualquer nova prévia.
+- [x] Encerrar a correção da classificação indevida de implantação Vercel, substituída pela recuperação do alias de produção e pelas publicações posteriores na branch `main` dedicada.
 - [x] Bloquear novos commits, pushes e implantações da Marmitas TB no repositório `Alves1986/ministral`, sem modificar o histórico desse sistema.
 - [x] Interromper novos envios ao repositório `Alves1986/ministral` e desvincular esse repositório do projeto Vercel Marmitas TB.
 - [x] Criar um repositório GitHub privado e dedicado para Marmitas TB somente após aprovação explícita do nome e da separação do sistema existente.
@@ -213,3 +213,5 @@
 - [x] Produzir um manual operacional ilustrado com imagens reais do sistema para os perfis de administração, operação e cliente.
 - [x] Produzir documentação técnica de arquitetura, integrações, rotinas de manutenção, segurança, publicação e diagnóstico futuro.
 - [x] Enviar ao repositório dedicado `Alves1986/marmitas-tb` o commit com a documentação operacional e técnica, sem alterar a pendência de SMTP e domínio.
+- [x] Consultar em modo somente leitura os alertas de segurança e desempenho do projeto Supabase Marmitas TB e registrar o diagnóstico.
+- [x] Classificar no backlog os itens legados de OTP e migração histórica que foram encerrados por decisão do responsável, preservando as pendências externas ativas.

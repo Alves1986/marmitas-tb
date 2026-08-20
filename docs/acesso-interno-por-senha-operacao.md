@@ -43,6 +43,22 @@ Estas configurações não são alteradas automaticamente pelo código e devem s
 
 > Não cadastre `SUPABASE_SERVICE_ROLE_KEY` no cliente. Ela é utilizada somente pelas funções serverless administrativas para criar convites, consultar o usuário alvo e atualizar o perfil autorizado.
 
+## Provedor SMTP selecionado
+
+Para o volume inicial de convites e recuperação de senha, foi selecionado o **Resend** como provedor transacional. A escolha mantém a integração em SMTP padrão, suportada diretamente pelo Supabase, e evita depender do serviço de e-mail padrão do Supabase, que não é indicado para produção e possui restrições de entrega e de taxa. [1]
+
+| Parâmetro | Valor previsto |
+| --- | --- |
+| Host SMTP | `smtp.resend.com` |
+| Porta | `465` |
+| Usuário SMTP | `resend` |
+| Senha SMTP | Chave de API do Resend, registrada somente no painel do Supabase |
+| Remetente | Endereço de um domínio verificado da Marmitas TB |
+
+O plano gratuito informado pelo Resend prevê até 3.000 mensagens por mês e 100 por dia; o consumo deverá ser acompanhado caso a operação cresça. [2] [3] A conexão ainda requer a criação ou o acesso a uma conta Resend e a verificação do domínio/remetente. Essas etapas podem demandar confirmação por e-mail ou alteração de DNS pelo responsável pelo domínio; nenhuma conta, cobrança ou modificação de DNS será criada sem confirmação no respectivo provedor. [2]
+
+Em 20/08/2026, a conta Resend vinculada a `cassia.andinho@gmail.com` foi encontrada autenticada, mas a área **Domains** não possui nenhum domínio cadastrado ou verificado. Portanto, ainda não há remetente próprio que possa ser utilizado com segurança no Supabase; a próxima etapa depende de um domínio que a Marmitas TB controle e de acesso ao DNS correspondente.
+
 ## Ativação inicial do administrador existente
 
 Após a publicação autorizada e a configuração do Supabase, a conta administrativa já existente deve abrir `/operacao`, selecionar **Esqueci minha senha**, informar o próprio e-mail e concluir a definição em `/definir-senha`. A tela confirma a solicitação de modo neutro, sem revelar se um e-mail possui ou não conta cadastrada.
@@ -67,3 +83,11 @@ Depois disso, o administrador entra por e-mail e senha e pode convidar os demais
 O sistema registra a criação e as alterações por meio das rotas administrativas protegidas. A entrega efetiva dos e-mails depende do provedor SMTP configurado no Supabase; falhas de entrega devem ser investigadas no histórico de Auth/SMTP, sem solicitar que colaboradores compartilhem senhas ou links recebidos.
 
 O código local foi validado com testes automatizados, checagem de tipos e builds. A ativação em produção requer publicação autorizada e a confirmação manual do roteiro acima.
+
+## Referências
+
+[1] [Supabase — Send emails with custom SMTP](https://supabase.com/docs/guides/auth/auth-smtp)
+
+[2] [Resend — Send emails using Supabase with SMTP](https://resend.com/docs/send-with-supabase-smtp)
+
+[3] [Resend — What is Resend Pricing](https://resend.com/docs/knowledge-base/what-is-resend-pricing)

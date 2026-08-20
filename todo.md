@@ -208,3 +208,4 @@
 - [x] Migrar a aplicação de acesso interno para e-mail e senha, com criação, desativação e convite de membros apenas por gestores administradores, sem fluxo de auto cadastro na interface e sem magic link de equipe.
 - [x] Desativar no Supabase Auth a permissão de novos cadastros pelo provedor de e-mail e conferir a cobertura das URLs de redirecionamento da definição de senha.
 - [ ] Configurar SMTP transacional no Supabase com credenciais de um provedor e remetente verificado antes de testar convites e recuperação de senha em produção.
+- [ ] Selecionar um provedor de SMTP transacional compatível com o volume inicial, criar ou vincular a conta necessária e validar o remetente antes de inserir credenciais no Supabase.

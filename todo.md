@@ -215,3 +215,7 @@
 - [x] Enviar ao repositório dedicado `Alves1986/marmitas-tb` o commit com a documentação operacional e técnica, sem alterar a pendência de SMTP e domínio.
 - [x] Consultar em modo somente leitura os alertas de segurança e desempenho do projeto Supabase Marmitas TB e registrar o diagnóstico.
 - [x] Classificar no backlog os itens legados de OTP e migração histórica que foram encerrados por decisão do responsável, preservando as pendências externas ativas.
+- [x] Diagnosticar e corrigir a rejeição de senha no acesso interno, com teste de regressão e sem redefinir credenciais ou alterar configuração externa sem autorização.
+- [x] Promover o perfil atual autorizado de cliente para administrador no Supabase, preservando a senha existente e verificando o papel resultante.
+- [x] Diferenciar, na tela de acesso, credencial inválida de conta autenticada sem papel interno, com teste de regressão.
+- [ ] Confirmar, no navegador do responsável, o login da conta administrativa corrigida com a mesma senha e o redirecionamento para `/admin`.

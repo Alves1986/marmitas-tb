@@ -125,6 +125,28 @@ describe("StaffAccess", () => {
     expect(screen.queryByText(/invalid login credentials/i)).toBeNull();
   });
 
+  it("explica que a senha foi aceita quando o perfil autenticado não possui papel interno", async () => {
+    authMocks.loadSessionUser.mockResolvedValueOnce({
+      id: "customer-1",
+      email: "cliente@marmitastb.com.br",
+      name: "Cliente",
+      role: "user",
+    });
+    render(<StaffAccess />);
+
+    fireEvent.change(screen.getByLabelText(/e-mail autorizado/i), {
+      target: { value: "cliente@marmitastb.com.br" },
+    });
+    fireEvent.change(screen.getByLabelText(/^senha$/i), {
+      target: { value: "senha-segura-123" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /entrar na operação/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert").textContent).toMatch(/senha foi aceita.*não possui acesso interno/i);
+    });
+  });
+
   it("solicita a recuperação de senha sem confirmar se o e-mail possui uma conta", async () => {
     render(<StaffAccess />);
 

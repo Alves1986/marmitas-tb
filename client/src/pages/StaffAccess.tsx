@@ -40,8 +40,12 @@ export default function StaffAccess() {
         return;
       }
       throw new Error("Acesso interno não autorizado");
-    } catch {
-      setError("Não foi possível entrar com essas credenciais.");
+    } catch (caughtError) {
+      if (caughtError instanceof Error && caughtError.message === "Acesso interno não autorizado") {
+        setError("Sua senha foi aceita, mas este e-mail não possui acesso interno. Solicite a liberação à gestão.");
+      } else {
+        setError("Não foi possível entrar com essas credenciais.");
+      }
     } finally {
       setPending(false);
     }

@@ -79,6 +79,12 @@ Nenhuma credencial foi cadastrada, nenhuma cobrança foi criada e nenhuma altera
 
 > A validação de ponta a ponta depende, exclusivamente, do cadastro posterior das credenciais de **Sandbox** pelo responsável na Vercel e da autorização de uma cobrança de teste controlada. A integração de produção continua inativa.
 
+## Publicação da navegação administrativa e do upload WebP
+
+Após autorização explícita, a atualização de gestão foi enviada ao repositório dedicado `Alves1986/marmitas-tb`, na branch `main`, pela revisão `4d6a8d3`. A publicação inclui o retorno direto para **Gestão administrativa** a partir da fila operacional e do registro de despesas, mantendo os atalhos existentes para fila e cardápio.
+
+O painel administrativo passou a renderizar uma seção de cada vez a partir de um menu lateral contextual. No cadastro de produto, o campo manual de URL foi substituído por seletor de foto com pré-visualização, limite de 5 MB, conversão WebP no navegador e envio para URL assinada, persistindo a referência de Storage no produto. A versão publicada foi confirmada após a Vercel servir o bundle `index-DQEdNTbu.js`, que contém os rótulos “Gestão administrativa”, “Foto do produto”, “WebP” e “5 MB”. Nenhum arquivo foi enviado, dado de catálogo foi modificado ou credencial foi adicionada nesta verificação.
+
 ## Protocolo autorizado de teste operacional
 
 Em 19 de agosto de 2026, a responsável autorizou um único fluxo em produção com **dados de homologação**, sob as seguintes condições: não acionar impressão e não realizar cobrança real. O pedido será identificado como teste nas observações, usará uma forma de pagamento de demonstração já suportada pelo sistema e servirá exclusivamente para conferir criação, consulta pública e atualização controlada de status. Nenhuma despesa financeira, alteração de cardápio ou ajuste de configuração faz parte deste protocolo.

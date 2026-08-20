@@ -203,3 +203,4 @@
 - [x] Substituir o campo de URL da foto no cadastro de produto por envio de imagem com pré-visualização, limite explícito de tamanho, conversão automática para WebP, armazenamento seguro e persistência da URL no produto.
 - [x] Reorganizar os módulos administrativos em navegação lateral responsiva, exibindo uma área de conteúdo por vez e preservando acesso a todos os módulos em desktop e celular.
 - [x] Adicionar retornos explícitos para a gestão administrativa na fila operacional e no registro de despesas, preservando também os atalhos já existentes para fila e cardápio.
+- [x] Publicar a atualização validada de navegação administrativa e upload WebP no repositório dedicado e confirmar sua propagação na Vercel, sem realizar upload de arquivo real.

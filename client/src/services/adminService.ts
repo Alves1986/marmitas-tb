@@ -1,4 +1,5 @@
 import { apiRequest } from "@/lib/api";
+import { supabase } from "@/lib/supabaseClient";
 
 type ApiRequest = <T>(path: string, init?: { method?: string; body?: unknown }) => Promise<T>;
 
@@ -103,6 +104,15 @@ export function createVercelAdminService(request: ApiRequest = vercelApi) {
   return {
     getCatalog: () => request<{ categories: unknown[]; products: unknown[]; options: unknown[] }>("/api/admin/catalog"),
     setProductAvailability: (productId: string, isActive: boolean) => request("/api/admin/catalog", { method: "PATCH", body: { productId, isActive } }),
+    async uploadProductImage(file: File): Promise<{ path: string }> {
+      if (file.type !== "image/webp") throw new Error("A foto precisa ser convertida para WebP antes do envio.");
+      const signed = await request<{ path: string; token: string }>("/api/admin/catalog", { method: "POST", body: { contentType: "image/webp" } });
+      const { error } = await supabase.storage.from("marmitas-tb-assets").uploadToSignedUrl(signed.path, signed.token, file, {
+        contentType: "image/webp",
+      });
+      if (error) throw new Error("Não foi possível enviar a foto do produto.");
+      return { path: signed.path };
+    },
     upsertCategory: (category: AdminCategoryInput) => request("/api/admin/catalog", { method: "PUT", body: { action: "upsert-category", category } }),
     upsertProduct: (product: AdminProductInput) => request("/api/admin/catalog", { method: "PUT", body: { action: "upsert-product", product } }),
     listStaff: () => request<AdminStaffMember[]>("/api/admin/staff"),

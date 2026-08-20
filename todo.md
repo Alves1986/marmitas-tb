@@ -200,6 +200,6 @@
 - [x] Orientar o responsável a cadastrar diretamente na Vercel as credenciais Asaas de Sandbox, sem compartilhar segredos no projeto ou no atendimento.
 - [x] Conectar o checkout Vercel à criação real de cobranças no Asaas Sandbox, substituindo a referência simulada por uma integração testada antes de qualquer cobrança real.
 - [x] Publicar a integração PIX Asaas Sandbox validada no repositório dedicado e confirmar a propagação em produção, sem cadastrar credenciais ou ativar cobrança real.
-- [ ] Substituir o campo de URL da foto no cadastro de produto por envio de imagem com pré-visualização, limite explícito de tamanho, conversão automática para WebP, armazenamento seguro e persistência da URL no produto.
-- [ ] Reorganizar os módulos administrativos em navegação lateral responsiva, exibindo uma área de conteúdo por vez e preservando acesso a todos os módulos em desktop e celular.
-- [ ] Adicionar retornos explícitos para a gestão administrativa na fila operacional e no registro de despesas, preservando também os atalhos já existentes para fila e cardápio.
+- [x] Substituir o campo de URL da foto no cadastro de produto por envio de imagem com pré-visualização, limite explícito de tamanho, conversão automática para WebP, armazenamento seguro e persistência da URL no produto.
+- [x] Reorganizar os módulos administrativos em navegação lateral responsiva, exibindo uma área de conteúdo por vez e preservando acesso a todos os módulos em desktop e celular.
+- [x] Adicionar retornos explícitos para a gestão administrativa na fila operacional e no registro de despesas, preservando também os atalhos já existentes para fila e cardápio.

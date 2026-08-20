@@ -1,4 +1,4 @@
-import { ArrowLeft, ClipboardList, LogIn } from "lucide-react";
+import { ArrowLeft, ClipboardList, LayoutDashboard, LogIn } from "lucide-react";
 import { useState } from "react";
 import { canAccessOperation } from "@shared/permissions";
 import { ExpenseDraftForm } from "@/components/admin/ExpenseDraftForm";
@@ -58,7 +58,10 @@ export default function OperationsExpenses() {
               <p className="text-xs font-extrabold uppercase tracking-[0.15em] text-[#68703d]">Marmitas TB · equipe</p>
               <h1 className="mt-1 font-display text-3xl font-bold">Registro de despesas da equipe</h1>
             </div>
-            <Button asChild variant="outline" className="border-[#c9b28f] text-[#481e1f] hover:bg-[#fff5df]"><a href="/operacao"><ArrowLeft aria-hidden="true" className="mr-2 size-4" />Voltar para a fila</a></Button>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button asChild variant="outline" className="border-[#c9b28f] text-[#481e1f] hover:bg-[#fff5df]"><a href="/admin"><LayoutDashboard aria-hidden="true" className="mr-2 size-4" />Gestão administrativa</a></Button>
+              <Button asChild variant="outline" className="border-[#c9b28f] text-[#481e1f] hover:bg-[#fff5df]"><a href="/operacao"><ArrowLeft aria-hidden="true" className="mr-2 size-4" />Voltar para a fila</a></Button>
+            </div>
           </div>
         </header>
         <div className="container max-w-3xl py-7">

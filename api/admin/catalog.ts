@@ -1,9 +1,11 @@
 import { z } from "zod";
 import { ApiAuthError, createSupabaseAuthGuards, type AuthenticatedProfile } from "../../server/vercel/_lib/auth.js";
 import { asVercelNodeHandler, json, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http.js";
+import { createProductImageUpload } from "../../server/vercel/_lib/productImageStorage.js";
 import { createSupabaseAdmin } from "../../server/vercel/_lib/supabaseAdmin.js";
 
 const availabilityInput = z.object({ productId: z.string().uuid(), isActive: z.boolean() });
+const imageUploadInput = z.object({ contentType: z.literal("image/webp") });
 const categoryInput = z.object({
   id: z.string().uuid().optional(),
   name: z.string().trim().min(1).max(120),
@@ -43,6 +45,7 @@ export type AdminCatalogDependencies = {
   requireAdmin(request: Request): Promise<AuthenticatedProfile>;
   getCatalog(): Promise<unknown>;
   setProductAvailability(input: { productId: string; isActive: boolean }): Promise<{ id: string; isActive: boolean }>;
+  createProductImageUpload(): Promise<{ path: string; token: string }>;
   upsertCategory(input: CategoryInput): Promise<unknown>;
   upsertProduct(input: ProductInput): Promise<unknown>;
 };
@@ -52,13 +55,18 @@ export function createAdminCatalogHandler(dependencies: AdminCatalogDependencies
     try {
       await dependencies.requireAdmin(request);
       if (request.method === "GET") return json(200, await dependencies.getCatalog());
+      if (request.method === "POST") {
+        const input = imageUploadInput.safeParse(await request.json());
+        if (!input.success) return jsonError(400, "Envie uma imagem WebP válida.");
+        return json(200, await dependencies.createProductImageUpload());
+      }
       if (request.method === "PUT") {
         const input = upsertInput.safeParse(await request.json());
         if (!input.success) return jsonError(400, "Dados de catálogo inválidos.");
         if (input.data.action === "upsert-category") return json(200, await dependencies.upsertCategory(input.data.category));
         return json(200, await dependencies.upsertProduct(input.data.product));
       }
-      if (request.method !== "PATCH") return methodNotAllowed(["GET", "PATCH", "PUT"]);
+      if (request.method !== "PATCH") return methodNotAllowed(["GET", "POST", "PATCH", "PUT"]);
       const input = availabilityInput.safeParse(await request.json());
       if (!input.success) return jsonError(400, "Dados de disponibilidade inválidos.");
       return json(200, await dependencies.setProductAvailability(input.data));
@@ -134,6 +142,7 @@ function defaultAdminCatalogHandler(request: Request): Promise<Response> {
     requireAdmin: createSupabaseAuthGuards(client).requireAdmin,
     getCatalog: getSupabaseCatalog,
     setProductAvailability: setSupabaseProductAvailability,
+    createProductImageUpload: () => createProductImageUpload(client),
     upsertCategory: upsertSupabaseCategory,
     upsertProduct: upsertSupabaseProduct,
   })(request);

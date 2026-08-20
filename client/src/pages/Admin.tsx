@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useLocation } from "wouter";
+import { BarChart3, ClipboardList, LayoutDashboard, ListChecks, ReceiptText, Settings2, ShieldCheck, UsersRound, UtensilsCrossed } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import DashboardLayout from "@/components/DashboardLayout";
 import { AdminDashboardOverview } from "@/components/admin/AdminDashboardOverview";
@@ -36,7 +37,52 @@ export const adminModuleLinks = [
   ["Configurações", "#admin-settings"],
 ] as const;
 
-function AdminFinanceDashboard() {
+export type AdminModuleKey = "overview" | "orders" | "finance" | "reviews" | "audit" | "reports" | "catalog" | "team" | "settings";
+
+const adminModules: Array<{ id: AdminModuleKey; label: string; icon: typeof LayoutDashboard }> = [
+  { id: "overview", label: "Visão geral", icon: LayoutDashboard },
+  { id: "orders", label: "Pedidos", icon: ClipboardList },
+  { id: "finance", label: "Financeiro", icon: ReceiptText },
+  { id: "reviews", label: "Revisões", icon: ListChecks },
+  { id: "audit", label: "Auditoria", icon: ShieldCheck },
+  { id: "reports", label: "Relatórios", icon: BarChart3 },
+  { id: "catalog", label: "Cardápio", icon: UtensilsCrossed },
+  { id: "team", label: "Equipe", icon: UsersRound },
+  { id: "settings", label: "Configurações", icon: Settings2 },
+];
+
+export function AdminModuleNavigation({
+  activeModule,
+  onSelectModule,
+}: {
+  activeModule: AdminModuleKey;
+  onSelectModule: (module: AdminModuleKey) => void;
+}) {
+  return (
+    <nav aria-label="Módulos administrativos" className="rounded-2xl border border-[#ead7bc] bg-[#fffaf1] p-2 shadow-sm xl:sticky xl:top-5 xl:self-start">
+      <p className="px-3 pb-2 pt-1 text-xs font-extrabold uppercase tracking-[0.14em] text-[#68703d]">Gestão</p>
+      <div className="flex gap-1 overflow-x-auto pb-1 xl:flex-col xl:overflow-visible">
+        {adminModules.map(({ id, label, icon: Icon }) => {
+          const isActive = activeModule === id;
+          return (
+            <button
+              key={id}
+              type="button"
+              aria-current={isActive ? "page" : undefined}
+              onClick={() => onSelectModule(id)}
+              className={`flex min-h-11 shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-left text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#b52a25] ${isActive ? "bg-[#f4eadb] text-[#481e1f] shadow-sm" : "text-[#6b4c42] hover:bg-[#fff3df] hover:text-[#481e1f]"}`}
+            >
+              <Icon aria-hidden="true" className="size-4 shrink-0" />
+              <span>{label}</span>
+            </button>
+          );
+        })}
+      </div>
+    </nav>
+  );
+}
+
+function AdminFinanceDashboard({ activeModule }: { activeModule: Extract<AdminModuleKey, "overview" | "orders" | "finance" | "reviews" | "audit" | "reports"> }) {
   const [summary, setSummary] = useState<AdminFinanceSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -115,26 +161,20 @@ function AdminFinanceDashboard() {
     }
   }, [loadFinance]);
 
-  return (
-    <div id="admin-overview" className="space-y-3 scroll-mt-24">
-      <AdminDashboardOverview summary={summary} loading={loading} errorMessage={errorMessage} />
-      <AdminOperationsOverview orders={orders} loading={loading} errorMessage={ordersErrorMessage} />
-      {errorMessage ? <button type="button" onClick={() => void loadFinance()} className="rounded-xl border border-[#b52a25] bg-white px-4 py-2 text-sm font-semibold text-[#8e2522] transition hover:bg-[#fff5f3] active:scale-[0.97]">Tentar novamente</button> : null}
-      <div id="admin-finance" className="scroll-mt-24">
-        <ExpenseDraftForm onSubmit={(expense) => void submitExpense(expense)} pending={expensePending} errorMessage={expenseErrorMessage} successMessage={expenseSuccessMessage} />
-      </div>
-      <div id="admin-reviews" className="scroll-mt-24">
-        <ExpenseReviewQueue expenses={reviewExpenses} onReview={reviewExpense} pendingId={reviewPendingId} errorMessage={reviewErrorMessage} />
-      </div>
-      <FinanceAuditLog auditLogs={auditLogs} loading={loading} errorMessage={auditErrorMessage} />
-      <div id="admin-reports" className="scroll-mt-24">
-        <FinanceReportActions summary={summary} />
-      </div>
-    </div>
-  );
+  if (activeModule === "overview") {
+    return <div id="admin-overview" className="space-y-3"><AdminDashboardOverview summary={summary} loading={loading} errorMessage={errorMessage} />{errorMessage ? <button type="button" onClick={() => void loadFinance()} className="rounded-xl border border-[#b52a25] bg-white px-4 py-2 text-sm font-semibold text-[#8e2522] transition hover:bg-[#fff5f3] active:scale-[0.97]">Tentar novamente</button> : null}</div>;
+  }
+  if (activeModule === "orders") {
+    return <div id="admin-orders" className="space-y-4"><AdminOperationsOverview orders={orders} loading={loading} errorMessage={ordersErrorMessage} /><a href="/operacao" className="inline-flex min-h-11 items-center rounded-xl bg-[#481e1f] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#6b2e2f]">Abrir fila operacional</a></div>;
+  }
+  if (activeModule === "finance") return <div id="admin-finance"><ExpenseDraftForm onSubmit={(expense) => void submitExpense(expense)} pending={expensePending} errorMessage={expenseErrorMessage} successMessage={expenseSuccessMessage} /></div>;
+  if (activeModule === "reviews") return <div id="admin-reviews"><ExpenseReviewQueue expenses={reviewExpenses} onReview={reviewExpense} pendingId={reviewPendingId} errorMessage={reviewErrorMessage} /></div>;
+  if (activeModule === "audit") return <div id="admin-audit"><FinanceAuditLog auditLogs={auditLogs} loading={loading} errorMessage={auditErrorMessage} /></div>;
+  return <div id="admin-reports"><FinanceReportActions summary={summary} /></div>;
 }
 
 export function AdminView({ actorRole }: { actorRole: OperationalRole }) {
+  const [activeModule, setActiveModule] = useState<AdminModuleKey>("overview");
   if (!canManageCatalog(actorRole)) {
     return (
       <section className="mx-auto max-w-lg rounded-3xl border border-[#ead7bc] bg-[#fffaf1] p-8 text-center text-[#481e1f] shadow-sm">
@@ -152,19 +192,14 @@ export function AdminView({ actorRole }: { actorRole: OperationalRole }) {
         <p className="mt-3 max-w-2xl text-sm leading-6 text-[#f3dcc7]">Atualize o cardápio, mantenha a equipe preparada e configure a operação de pedidos em um único lugar.</p>
       </header>
 
-      <nav aria-label="Módulos administrativos" className="grid grid-cols-2 gap-2 rounded-2xl border border-[#ead7bc] bg-[#fffaf1] p-3 sm:grid-cols-4">
-        {adminModuleLinks.map(([label, target]) => (
-          <a key={label} href={target} className="rounded-xl px-3 py-2 text-center text-sm font-semibold text-[#6b4c42] transition hover:bg-[#f4eadb] hover:text-[#481e1f] focus:outline-none focus:ring-2 focus:ring-[#b52a25]">
-            {label}
-          </a>
-        ))}
-      </nav>
-
-      <AdminFinanceDashboard />
-      <div id="admin-catalog" className="scroll-mt-24"><MenuManager /></div>
-      <div className="grid gap-6 xl:grid-cols-2">
-        <div id="admin-team" className="scroll-mt-24"><StaffManager /></div>
-        <div id="admin-settings" className="scroll-mt-24"><StoreSettingsForm /></div>
+      <div className="grid gap-6 xl:grid-cols-[15rem_minmax(0,1fr)]">
+        <AdminModuleNavigation activeModule={activeModule} onSelectModule={setActiveModule} />
+        <div className="min-w-0" aria-live="polite">
+          {activeModule === "catalog" ? <div id="admin-catalog"><MenuManager /></div> : null}
+          {activeModule === "team" ? <div id="admin-team"><StaffManager /></div> : null}
+          {activeModule === "settings" ? <div id="admin-settings"><StoreSettingsForm /></div> : null}
+          {(["overview", "orders", "finance", "reviews", "audit", "reports"] as const).includes(activeModule as "overview" | "orders" | "finance" | "reviews" | "audit" | "reports") ? <AdminFinanceDashboard activeModule={activeModule as Extract<AdminModuleKey, "overview" | "orders" | "finance" | "reviews" | "audit" | "reports">} /> : null}
+        </div>
       </div>
     </section>
   );

@@ -15,6 +15,7 @@ describe("/api/admin/catalog", () => {
       requireAdmin: vi.fn().mockRejectedValue(new ApiAuthError(403, "Acesso restrito à administração.")),
       getCatalog: vi.fn(),
       setProductAvailability: vi.fn(),
+      createProductImageUpload: vi.fn(),
       upsertCategory: vi.fn(),
       upsertProduct: vi.fn(),
     });
@@ -27,7 +28,7 @@ describe("/api/admin/catalog", () => {
   it("lista o catálogo interno e permite alterar apenas a disponibilidade de produto", async () => {
     const getCatalog = vi.fn().mockResolvedValue({ categories: [], products: [{ id: "product-uuid", isActive: true }] });
     const setProductAvailability = vi.fn().mockResolvedValue({ id: "product-uuid", isActive: false });
-    const handler = createAdminCatalogHandler({ requireAdmin: vi.fn().mockResolvedValue(admin), getCatalog, setProductAvailability, upsertCategory: vi.fn(), upsertProduct: vi.fn() });
+    const handler = createAdminCatalogHandler({ requireAdmin: vi.fn().mockResolvedValue(admin), getCatalog, setProductAvailability, createProductImageUpload: vi.fn(), upsertCategory: vi.fn(), upsertProduct: vi.fn() });
 
     const list = await handler(new Request("https://marmitas-tb.vercel.app/api/admin/catalog"));
     const update = await handler(
@@ -50,6 +51,7 @@ describe("/api/admin/catalog", () => {
       requireAdmin: vi.fn().mockResolvedValue(admin),
       getCatalog: vi.fn(),
       setProductAvailability: vi.fn(),
+      createProductImageUpload: vi.fn(),
       upsertCategory,
       upsertProduct,
     });
@@ -85,5 +87,46 @@ describe("/api/admin/catalog", () => {
     expect(product.status).toBe(200);
     expect(upsertCategory).toHaveBeenCalledWith(expect.objectContaining({ slug: "pratos-especiais" }));
     expect(upsertProduct).toHaveBeenCalledWith(expect.objectContaining({ name: "Marmita especial", options: [expect.objectContaining({ label: "Feijão" })] }));
+  });
+
+  it("emite um destino de upload assinado somente para foto WebP solicitada por administrador", async () => {
+    const createProductImageUpload = vi.fn().mockResolvedValue({ path: "catalog/products/123.webp", token: "signed-token" });
+    const handler = createAdminCatalogHandler({
+      requireAdmin: vi.fn().mockResolvedValue(admin),
+      getCatalog: vi.fn(),
+      setProductAvailability: vi.fn(),
+      upsertCategory: vi.fn(),
+      upsertProduct: vi.fn(),
+      createProductImageUpload,
+    } as never);
+
+    const response = await handler(new Request("https://marmitas-tb.vercel.app/api/admin/catalog", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ contentType: "image/webp" }),
+    }));
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({ path: "catalog/products/123.webp", token: "signed-token" });
+    expect(createProductImageUpload).toHaveBeenCalledTimes(1);
+  });
+
+  it("recusa solicitar upload de produto para tipo diferente de WebP", async () => {
+    const handler = createAdminCatalogHandler({
+      requireAdmin: vi.fn().mockResolvedValue(admin),
+      getCatalog: vi.fn(),
+      setProductAvailability: vi.fn(),
+      upsertCategory: vi.fn(),
+      upsertProduct: vi.fn(),
+      createProductImageUpload: vi.fn(),
+    });
+
+    const response = await handler(new Request("https://marmitas-tb.vercel.app/api/admin/catalog", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ contentType: "image/jpeg" }),
+    }));
+
+    expect(response.status).toBe(400);
   });
 });

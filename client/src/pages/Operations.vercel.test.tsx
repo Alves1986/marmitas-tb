@@ -42,6 +42,12 @@ describe("Operations no runtime Vercel", () => {
     expect(screen.getByText("Lançamentos seguem como rascunho até revisão administrativa.")).toBeTruthy();
   });
 
+  it("oferece à equipe um retorno explícito para a gestão administrativa", async () => {
+    render(<Operations />);
+
+    expect((await screen.findByRole("link", { name: "Gestão administrativa" })).getAttribute("href")).toBe("/admin");
+  });
+
   it("mantém o pedido pendente e mostra o erro quando o reconhecimento falha", async () => {
     mocks.acknowledgeAlert.mockRejectedValueOnce(new Error("Serviço indisponível"));
     render(<Operations />);

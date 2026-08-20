@@ -1,6 +1,16 @@
 import { describe, expect, it, vi } from "vitest";
 import { createVercelAdminService } from "./adminService";
 
+const storage = vi.hoisted(() => {
+  const uploadToSignedUrl = vi.fn();
+  const from = vi.fn(() => ({ uploadToSignedUrl }));
+  return { from, uploadToSignedUrl };
+});
+
+vi.mock("@/lib/supabaseClient", () => ({
+  supabase: { storage: { from: storage.from } },
+}));
+
 describe("VercelAdminService", () => {
   it("consulta e atualiza o catálogo administrativo com UUIDs Supabase", async () => {
     const api = vi.fn().mockResolvedValue({ categories: [], products: [], options: [] });
@@ -88,5 +98,26 @@ describe("VercelAdminService", () => {
     await expect(auditService.listFinanceAudit()).resolves.toEqual({ auditLogs: [{ id: "audit-1", action: "expense.approved" }] });
 
     expect(api).toHaveBeenCalledWith("/api/admin/finance?view=audit");
+  });
+
+  it("solicita upload assinado e envia somente o WebP preparado para o Storage", async () => {
+    const api = vi.fn().mockResolvedValue({ path: "catalog/products/marmita.webp", token: "signed-token" });
+    const service = createVercelAdminService(api);
+    const file = new File(["imagem-webp"], "marmita.webp", { type: "image/webp" });
+
+    expect("uploadProductImage" in service).toBe(true);
+
+    storage.uploadToSignedUrl.mockResolvedValue({ error: null });
+    const imageService = service as typeof service & { uploadProductImage(file: File): Promise<{ path: string }> };
+    await expect(imageService.uploadProductImage(file)).resolves.toEqual({ path: "catalog/products/marmita.webp" });
+
+    expect(api).toHaveBeenCalledWith("/api/admin/catalog", { method: "POST", body: { contentType: "image/webp" } });
+    expect(storage.from).toHaveBeenCalledWith("marmitas-tb-assets");
+    expect(storage.uploadToSignedUrl).toHaveBeenCalledWith(
+      "catalog/products/marmita.webp",
+      "signed-token",
+      file,
+      { contentType: "image/webp" },
+    );
   });
 });

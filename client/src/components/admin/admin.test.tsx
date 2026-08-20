@@ -1,8 +1,8 @@
 // @vitest-environment happy-dom
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { AdminView } from "@/pages/Admin";
-import { CategoryManagerList, formatPriceForEditor, parsePriceFromEditor, ProductImagePreview } from "./MenuManager";
+import { AdminModuleNavigation, AdminView } from "@/pages/Admin";
+import { CategoryManagerList, formatPriceForEditor, parsePriceFromEditor, ProductImagePreview, ProductImageUploadField } from "./MenuManager";
 import { StaffManagerView } from "./StaffManager";
 import { StoreSettingsFormView } from "./StoreSettingsForm";
 import { dashboardMenuItems, MobileSessionActions } from "@/components/DashboardLayout";
@@ -40,6 +40,16 @@ describe("AdminView", () => {
     expect(links).toContainEqual(["Pedidos", "/operacao"]);
     expect(links).toContainEqual(["Revisões", "#admin-reviews"]);
     expect(links).toContainEqual(["Relatórios", "#admin-reports"]);
+  });
+
+  it("organiza os módulos no menu lateral e seleciona somente o módulo solicitado", () => {
+    const onSelectModule = vi.fn();
+    render(<AdminModuleNavigation activeModule="overview" onSelectModule={onSelectModule} />);
+
+    expect(screen.getByRole("navigation", { name: /módulos administrativos/i })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Visão geral" }).getAttribute("aria-current")).toBe("page");
+    fireEvent.click(screen.getByRole("button", { name: "Cardápio" }));
+    expect(onSelectModule).toHaveBeenCalledWith("catalog");
   });
 
   it("apresenta uma visão geral com receitas, despesas e caixa sem valores simulados", async () => {
@@ -150,6 +160,24 @@ describe("AdminView", () => {
     render(<ProductImagePreview productName="Marmita especial" imageUrl="/manus-storage/marmita-especial.jpg" />);
     const image = screen.getByRole("img", { name: /prévia da foto de marmita especial/i });
     expect(image.getAttribute("src")).toBe("/manus-storage/marmita-especial.jpg");
+  });
+
+  it("oferece envio de foto até 5 MB, converte para WebP e atualiza o caminho do produto", async () => {
+    const onImagePathChange = vi.fn();
+    const prepareImage = vi.fn().mockResolvedValue(new File(["webp"], "marmita.webp", { type: "image/webp" }));
+    const uploadImage = vi.fn().mockResolvedValue({ path: "catalog/products/marmita.webp" });
+    render(<ProductImageUploadField productName="Marmita" imagePath="" onImagePathChange={onImagePathChange} prepareImage={prepareImage} uploadImage={uploadImage} />);
+
+    const input = screen.getByLabelText(/foto do produto/i);
+    expect(input.getAttribute("type")).toBe("file");
+    expect(input.getAttribute("accept")).toBe("image/jpeg,image/png,image/webp");
+    expect(screen.getByText(/jpe?g, png ou webp.*5 mb/i)).toBeTruthy();
+
+    fireEvent.change(input, { target: { files: [new File(["foto"], "marmita.jpg", { type: "image/jpeg" })] } });
+
+    await waitFor(() => expect(prepareImage).toHaveBeenCalledTimes(1));
+    expect(uploadImage).toHaveBeenCalledWith(expect.objectContaining({ type: "image/webp" }));
+    expect(onImagePathChange).toHaveBeenCalledWith("catalog/products/marmita.webp");
   });
 
   it.each([

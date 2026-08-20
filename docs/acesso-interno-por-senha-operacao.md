@@ -20,6 +20,16 @@ Se o convite expirar ou o colaborador não o encontrar, use **Reenviar convite**
 
 ## Configurações externas obrigatórias antes da publicação
 
+Em **20/08/2026**, o painel autenticado do projeto `hwkgplnzvcaobjozfmqx` foi acessado em `Authentication → Sign In / Providers`. As áreas `URL Configuration` e `Emails` também estão disponíveis no mesmo módulo de autenticação e serão usadas somente para os ajustes descritos abaixo.
+
+Na verificação inicial, **Allow new users to sign up** estava ativado; o provedor **Email** e a confirmação de e-mail já estavam habilitados. Apenas a permissão de cadastro público será desativada, sem modificar usuários existentes.
+
+Após a alteração autorizada, a opção **Allow new users to sign up** ficou desativada e a tela voltou ao estado sem alterações pendentes, confirmando o salvamento. O provedor **Email** e **Confirm email** foram mantidos habilitados.
+
+Na verificação de **URL Configuration**, o `Site URL` já está definido como `https://marmitastb.vercel.app`. A lista permite `https://marmitastb.vercel.app/**`, que já cobre explicitamente a rota `/definir-senha`, e também permite os aliases de implantação `https://marmitas-*-andersonalves.vercel.app/**`. Portanto, nenhuma alteração adicional de URL foi necessária.
+
+Em **Emails → SMTP Settings**, o SMTP personalizado está desativado. A habilitação exige host, porta, usuário, senha/chave e remetente verificado de um provedor transacional; como essas credenciais não foram fornecidas, nenhuma tentativa de ativação foi feita e a configuração atual foi preservada.
+
 Estas configurações não são alteradas automaticamente pelo código e devem ser concluídas antes de liberar o novo bundle em produção.
 
 | Local | Configuração | Valor ou ação necessária | Motivo |

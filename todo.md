@@ -206,4 +206,5 @@
 - [x] Publicar a atualização validada de navegação administrativa e upload WebP no repositório dedicado e confirmar sua propagação na Vercel, sem realizar upload de arquivo real.
 - [x] Avaliar e definir a substituição do acesso por link por e-mail e senha, com cadastro de equipe estritamente restrito a gestores autorizados e sem autoatendimento público.
 - [x] Migrar a aplicação de acesso interno para e-mail e senha, com criação, desativação e convite de membros apenas por gestores administradores, sem fluxo de auto cadastro na interface e sem magic link de equipe.
-- [ ] Desativar no Supabase Auth a permissão de novos cadastros pelo provedor de e-mail e concluir as URLs de redirecionamento e SMTP antes de ativar a migração em produção.
+- [x] Desativar no Supabase Auth a permissão de novos cadastros pelo provedor de e-mail e conferir a cobertura das URLs de redirecionamento da definição de senha.
+- [ ] Configurar SMTP transacional no Supabase com credenciais de um provedor e remetente verificado antes de testar convites e recuperação de senha em produção.

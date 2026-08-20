@@ -204,3 +204,5 @@
 - [x] Reorganizar os módulos administrativos em navegação lateral responsiva, exibindo uma área de conteúdo por vez e preservando acesso a todos os módulos em desktop e celular.
 - [x] Adicionar retornos explícitos para a gestão administrativa na fila operacional e no registro de despesas, preservando também os atalhos já existentes para fila e cardápio.
 - [x] Publicar a atualização validada de navegação administrativa e upload WebP no repositório dedicado e confirmar sua propagação na Vercel, sem realizar upload de arquivo real.
+- [x] Avaliar e definir a substituição do acesso por link por e-mail e senha, com cadastro de equipe estritamente restrito a gestores autorizados e sem autoatendimento público.
+- [ ] Migrar o acesso interno para e-mail e senha, permitindo criação, desativação e convite de membros apenas por gestores administradores e sem auto cadastro público.

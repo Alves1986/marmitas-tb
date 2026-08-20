@@ -1,0 +1,27 @@
+flowchart LR
+  Cliente[Cliente\nVitrine e acompanhamento]
+  Equipe[Equipe\nOperação e gestão]
+  PWA[PWA React + Vite]
+  Vercel[Vercel\nHospedagem e funções HTTP]
+  PublicAPI[APIs públicas\ncardápio e pedidos]
+  AdminAPI[APIs internas\nadministração e operação]
+  Supabase[Supabase\nAuth, Postgres e Storage]
+  Asaas[Asaas Sandbox\nPIX de teste]
+  SMTP[SMTP transacional\npendente de domínio]
+
+  Cliente --> PWA
+  Equipe --> PWA
+  PWA --> Vercel
+  Vercel --> PublicAPI
+  Vercel --> AdminAPI
+  PublicAPI --> Supabase
+  AdminAPI --> Supabase
+  PublicAPI -. PIX de teste .-> Asaas
+  Supabase -. convite e recuperação .-> SMTP
+
+  classDef public fill:#fff6e8,stroke:#b66932,color:#481e1f
+  classDef internal fill:#edf0d5,stroke:#68703d,color:#33410f
+  classDef service fill:#f6e6e6,stroke:#a82926,color:#481e1f
+  class Cliente,Equipe,PWA public
+  class Vercel,PublicAPI,AdminAPI internal
+  class Supabase,Asaas,SMTP service

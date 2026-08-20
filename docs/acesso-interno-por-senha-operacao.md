@@ -61,6 +61,8 @@ Em 20/08/2026, a conta Resend vinculada a `cassia.andinho@gmail.com` foi encontr
 
 Em 20/08/2026, a consulta pública do Registro.br confirmou que `marmitastb.com.br` está disponível. O preço exibido é **R$ 40,00 por um ano**, com alternativas de dois anos por R$ 76,00 e cinco anos por R$ 184,00. O nome não foi reservado, registrado ou cobrado. O registro exigirá uma conta do titular, dados cadastrais e confirmação de pagamento no próprio Registro.br. [4]
 
+Por decisão do responsável em 20/08/2026, nenhum domínio será registrado nesta fase. Assim, o SMTP personalizado continuará deliberadamente desativado e os testes de convite e recuperação dependentes de e-mail ficam pendentes. Quando a Marmitas TB definir um domínio institucional, o responsável deverá fornecer acesso ao DNS; então o domínio será incluído no Resend, seus registros DNS serão validados e somente depois as credenciais SMTP serão cadastradas no Supabase.
+
 ## Ativação inicial do administrador existente
 
 Após a publicação autorizada e a configuração do Supabase, a conta administrativa já existente deve abrir `/operacao`, selecionar **Esqueci minha senha**, informar o próprio e-mail e concluir a definição em `/definir-senha`. A tela confirma a solicitação de modo neutro, sem revelar se um e-mail possui ou não conta cadastrada.

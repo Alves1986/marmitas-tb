@@ -212,3 +212,4 @@
 - [ ] Retomar a compra ou vinculação de um domínio institucional e a verificação DNS do remetente somente após definição expressa do domínio pela Marmitas TB.
 - [x] Produzir um manual operacional ilustrado com imagens reais do sistema para os perfis de administração, operação e cliente.
 - [x] Produzir documentação técnica de arquitetura, integrações, rotinas de manutenção, segurança, publicação e diagnóstico futuro.
+- [x] Enviar ao repositório dedicado `Alves1986/marmitas-tb` o commit com a documentação operacional e técnica, sem alterar a pendência de SMTP e domínio.

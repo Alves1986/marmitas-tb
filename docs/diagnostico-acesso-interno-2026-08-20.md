@@ -42,6 +42,6 @@ Foi criado primeiro um teste que falhava quando uma conta autenticada possuía u
 
 ## Retomada e publicação
 
-O papel administrativo já foi corrigido no Supabase. O responsável deve entrar novamente em `/acesso` usando o mesmo e-mail e a mesma senha; ao autenticar, o destino esperado é `/admin`.
+O papel administrativo já foi corrigido no Supabase. A confirmação visual posterior demonstrou um novo evento de login válido e a rota `/admin` exibiu a sessão autenticada, o e-mail da conta e todos os módulos administrativos. Portanto, o redirecionamento esperado após a autenticação foi comprovado sem alterar dados operacionais.
 
-O aprimoramento de mensagem está validado no ambiente local e aguarda a decisão de publicação do próximo commit na branch `main`, pois esse envio pode iniciar uma implantação na Vercel. A confirmação visual da sessão autenticada deve ser registrada após o novo login do responsável.
+O aprimoramento de mensagem está validado no ambiente local e aguarda a decisão de publicação do próximo commit na branch `main`, pois esse envio pode iniciar uma implantação na Vercel.

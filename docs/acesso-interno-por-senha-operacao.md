@@ -59,6 +59,8 @@ O plano gratuito informado pelo Resend prevê até 3.000 mensagens por mês e 10
 
 Em 20/08/2026, a conta Resend vinculada a `cassia.andinho@gmail.com` foi encontrada autenticada, mas a área **Domains** não possui nenhum domínio cadastrado ou verificado. Portanto, ainda não há remetente próprio que possa ser utilizado com segurança no Supabase; a próxima etapa depende de um domínio que a Marmitas TB controle e de acesso ao DNS correspondente.
 
+Em 20/08/2026, a consulta pública do Registro.br confirmou que `marmitastb.com.br` está disponível. O preço exibido é **R$ 40,00 por um ano**, com alternativas de dois anos por R$ 76,00 e cinco anos por R$ 184,00. O nome não foi reservado, registrado ou cobrado. O registro exigirá uma conta do titular, dados cadastrais e confirmação de pagamento no próprio Registro.br. [4]
+
 ## Ativação inicial do administrador existente
 
 Após a publicação autorizada e a configuração do Supabase, a conta administrativa já existente deve abrir `/operacao`, selecionar **Esqueci minha senha**, informar o próprio e-mail e concluir a definição em `/definir-senha`. A tela confirma a solicitação de modo neutro, sem revelar se um e-mail possui ou não conta cadastrada.
@@ -91,3 +93,5 @@ O código local foi validado com testes automatizados, checagem de tipos e build
 [2] [Resend — Send emails using Supabase with SMTP](https://resend.com/docs/send-with-supabase-smtp)
 
 [3] [Resend — What is Resend Pricing](https://resend.com/docs/knowledge-base/what-is-resend-pricing)
+
+[4] [Registro.br — Registro de domínios .br](https://registro.br/)

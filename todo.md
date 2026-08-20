@@ -209,3 +209,5 @@
 - [x] Desativar no Supabase Auth a permissão de novos cadastros pelo provedor de e-mail e conferir a cobertura das URLs de redirecionamento da definição de senha.
 - [ ] Configurar SMTP transacional no Supabase com credenciais de um provedor e remetente verificado antes de testar convites e recuperação de senha em produção.
 - [ ] Selecionar um provedor de SMTP transacional compatível com o volume inicial, criar ou vincular a conta necessária e validar o remetente antes de inserir credenciais no Supabase.
+- [ ] Produzir um manual operacional ilustrado com imagens reais do sistema para os perfis de administração, operação e cliente.
+- [ ] Produzir documentação técnica de arquitetura, integrações, rotinas de manutenção, segurança, publicação e diagnóstico futuro.

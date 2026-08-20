@@ -42,6 +42,17 @@ export type AdminStaffMember = {
   created_at: string;
 };
 
+export type AdminStaffInviteInput = {
+  email: string;
+  displayName: string;
+  role: Extract<SupabaseStaffRole, "staff" | "admin">;
+};
+
+export type AdminStaffInvitation = {
+  id: string;
+  invitation_status: "pending";
+};
+
 export type AdminStoreSettings = {
   storeName: string;
   deliveryFeeInCents: number;
@@ -117,6 +128,8 @@ export function createVercelAdminService(request: ApiRequest = vercelApi) {
     upsertProduct: (product: AdminProductInput) => request("/api/admin/catalog", { method: "PUT", body: { action: "upsert-product", product } }),
     listStaff: () => request<AdminStaffMember[]>("/api/admin/staff"),
     setStaffRole: (userId: string, role: SupabaseStaffRole) => request("/api/admin/staff", { method: "PATCH", body: { userId, role } }),
+    createStaffMember: (member: AdminStaffInviteInput) => request<AdminStaffInvitation>("/api/admin/staff", { method: "POST", body: { action: "create", ...member } }),
+    inviteStaffMember: (userId: string) => request<AdminStaffInvitation>("/api/admin/staff", { method: "POST", body: { action: "invite", userId } }),
     getSettings: () => request<AdminStoreSettings>("/api/admin/settings"),
     updateSettings: (settings: AdminStoreSettings) => request("/api/admin/settings", { method: "PATCH", body: settings }),
     getFinance: (period: { from: string; to: string }) => request<AdminFinanceSummary>(`/api/admin/finance?from=${encodeURIComponent(period.from)}&to=${encodeURIComponent(period.to)}`),

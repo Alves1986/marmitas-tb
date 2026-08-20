@@ -1,32 +1,64 @@
-import { requestTeamOtp } from "@/lib/supabaseAuth";
+import { loadSessionUser, requestPasswordReset, signInWithPassword, type SessionLookupClient } from "@/lib/supabaseAuth";
 import { supabase } from "@/lib/supabaseClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, MailCheck, ShieldCheck } from "lucide-react";
+import { ArrowLeft, LockKeyhole } from "lucide-react";
 import { FormEvent, useState } from "react";
+import { useLocation } from "wouter";
 
 export default function StaffAccess() {
+  const [, setLocation] = useLocation();
   const [email, setEmail] = useState("");
-  const [linkRequested, setLinkRequested] = useState(false);
+  const [password, setPassword] = useState("");
   const [pending, setPending] = useState(false);
+  const [recoveryPending, setRecoveryPending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  async function sendCode(event: FormEvent<HTMLFormElement>) {
+  async function signIn(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setPending(true);
     setError(null);
+    setMessage(null);
+
+    if (password.length < 12) {
+      setError("A senha precisa ter pelo menos 12 caracteres.");
+      return;
+    }
+
+    setPending(true);
 
     try {
-      await requestTeamOtp(supabase, email);
-      setEmail(email.trim().toLowerCase());
-      setLinkRequested(true);
-      setMessage("Enviamos um link de acesso para o seu e-mail autorizado.");
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Não foi possível enviar o link agora.");
+      await signInWithPassword(supabase, email, password);
+      const user = await loadSessionUser(supabase as unknown as SessionLookupClient);
+      if (user?.role === "admin") {
+        setLocation("/admin");
+        return;
+      }
+      if (user?.role === "staff") {
+        setLocation("/operacao");
+        return;
+      }
+      throw new Error("Acesso interno não autorizado");
+    } catch {
+      setError("Não foi possível entrar com essas credenciais.");
     } finally {
       setPending(false);
+    }
+  }
+
+  async function recoverPassword() {
+    setError(null);
+    setMessage(null);
+    setRecoveryPending(true);
+
+    try {
+      await requestPasswordReset(supabase, email);
+      setMessage("Se houver uma conta interna vinculada a este e-mail, enviaremos as instruções para definir uma nova senha.");
+    } catch {
+      setError("Não foi possível enviar as instruções de recuperação agora. Tente novamente mais tarde.");
+    } finally {
+      setRecoveryPending(false);
     }
   }
 
@@ -42,26 +74,33 @@ export default function StaffAccess() {
           </a>
         </div>
         <div className="mt-7 flex size-12 items-center justify-center rounded-2xl bg-[#f7ead7] text-[#a82926]">
-          {linkRequested ? <ShieldCheck aria-hidden="true" className="size-6" /> : <MailCheck aria-hidden="true" className="size-6" />}
+          <LockKeyhole aria-hidden="true" className="size-6" />
         </div>
         <p className="mt-5 text-xs font-extrabold uppercase tracking-[0.15em] text-[#68703d]">Marmitas TB · equipe</p>
-        <h1 className="mt-2 font-display text-3xl font-bold">{linkRequested ? "Confira seu e-mail" : "Acesse com seu e-mail"}</h1>
+        <h1 className="mt-2 font-display text-3xl font-bold">Acesse sua área interna</h1>
         <p className="mt-3 text-sm leading-6 text-[#765f50]">
-          {linkRequested
-            ? `Abra o e-mail e toque no link para entrar na operação. O link foi enviado para ${email}. Se não aparecer, verifique a caixa de spam ou reenvie o link.`
-            : "Somente e-mails previamente autorizados podem receber um link de acesso."}
+          Use seu e-mail corporativo e sua senha individual. O acesso é liberado somente para membros convidados pela gestão.
         </p>
 
         {message && <p className="mt-5 rounded-xl bg-[#edf1df] px-4 py-3 text-sm text-[#4e5729]" role="status">{message}</p>}
         {error && <p className="mt-5 rounded-xl bg-[#fff0ee] px-4 py-3 text-sm text-[#a82926]" role="alert">{error}</p>}
 
-        <form className="mt-6 space-y-4" onSubmit={sendCode}>
+        <form className="mt-6 space-y-4" onSubmit={signIn}>
           <div className="space-y-2">
             <Label htmlFor="staff-email">E-mail autorizado</Label>
             <Input id="staff-email" type="email" autoComplete="email" required value={email} onChange={(event) => setEmail(event.target.value)} placeholder="equipe@empresa.com" />
           </div>
-          <Button className="w-full bg-[#a82926] text-white hover:bg-[#7e1f1d]" type="submit" disabled={pending}>
-            {pending ? "Enviando link..." : linkRequested ? "Reenviar link de acesso" : "Enviar link de acesso"}
+          <div className="space-y-2">
+            <Label htmlFor="staff-password">Senha</Label>
+            <Input id="staff-password" type="password" autoComplete="current-password" required value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Sua senha individual" />
+          </div>
+          <div className="flex justify-end">
+            <button type="button" onClick={recoverPassword} disabled={pending || recoveryPending} className="text-sm font-semibold text-[#a82926] underline-offset-4 hover:underline disabled:cursor-not-allowed disabled:opacity-60">
+              {recoveryPending ? "Enviando instruções..." : "Esqueci minha senha"}
+            </button>
+          </div>
+          <Button className="w-full bg-[#a82926] text-white hover:bg-[#7e1f1d]" type="submit" disabled={pending || recoveryPending}>
+            {pending ? "Entrando..." : "Entrar na operação"}
           </Button>
         </form>
       </section>

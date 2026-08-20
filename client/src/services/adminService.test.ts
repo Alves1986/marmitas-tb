@@ -57,6 +57,25 @@ describe("VercelAdminService", () => {
     expect(api).toHaveBeenNthCalledWith(4, "/api/admin/settings", { method: "PATCH", body: settings });
   });
 
+  it("cria membros internos e reenvia convites pelo endpoint protegido de equipe", async () => {
+    const api = vi.fn()
+      .mockResolvedValueOnce({ id: "f37a4e26-ae35-4f9d-824e-e4c348e5b7e3", invitation_status: "pending" })
+      .mockResolvedValueOnce({ id: "f37a4e26-ae35-4f9d-824e-e4c348e5b7e3", invitation_status: "pending" });
+    const service = createVercelAdminService(api);
+
+    await service.createStaffMember({ email: "cozinha@marmitastb.com.br", displayName: "Equipe Cozinha", role: "staff" });
+    await service.inviteStaffMember("f37a4e26-ae35-4f9d-824e-e4c348e5b7e3");
+
+    expect(api).toHaveBeenNthCalledWith(1, "/api/admin/staff", {
+      method: "POST",
+      body: { action: "create", email: "cozinha@marmitastb.com.br", displayName: "Equipe Cozinha", role: "staff" },
+    });
+    expect(api).toHaveBeenNthCalledWith(2, "/api/admin/staff", {
+      method: "POST",
+      body: { action: "invite", userId: "f37a4e26-ae35-4f9d-824e-e4c348e5b7e3" },
+    });
+  });
+
   it("consulta o resumo financeiro pelo período selecionado", async () => {
     const api = vi.fn().mockResolvedValue({ revenueInCents: 4500, expenseInCents: 1200, netCashInCents: 3300 });
     const service = createVercelAdminService(api);

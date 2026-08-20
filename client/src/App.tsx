@@ -10,6 +10,7 @@ import Admin from "./pages/Admin";
 import Home from "./pages/Home";
 import Operations from "./pages/Operations";
 import OperationsExpenses from "./pages/OperationsExpenses";
+import SetPassword from "./pages/SetPassword";
 import StaffAccess from "./pages/StaffAccess";
 import TrackOrder from "./pages/TrackOrder";
 
@@ -20,6 +21,7 @@ function Router() {
       <Route path={"/"} component={Home} />
       <Route path={"/acompanhar"} component={TrackOrder} />
       <Route path={"/acesso"} component={StaffAccess} />
+      <Route path={"/definir-senha"} component={SetPassword} />
       <Route path={"/operacao"} component={Operations} />
       <Route path={"/operacao/despesas"} component={OperationsExpenses} />
       <Route path={"/admin"} component={Admin} />

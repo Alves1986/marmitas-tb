@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 vi.mock("./pages/Home", () => ({ default: () => <div>Cardápio</div> }));
 vi.mock("./pages/TrackOrder", () => ({ default: () => <div>Acompanhar pedido</div> }));
 vi.mock("./pages/StaffAccess", () => ({ default: () => <div>Acesso da equipe</div> }));
+vi.mock("./pages/SetPassword", () => ({ default: () => <div>Definir senha</div> }));
 vi.mock("./pages/Operations", () => ({
   default: () => <div>Fila operacional</div>,
   OperationsAccessGate: ({ children }: { children: React.ReactNode }) => <>{children}</>,
@@ -29,5 +30,13 @@ describe("rota de despesas operacionais", () => {
     render(<App />);
 
     expect(screen.getByText("Registro de despesas da equipe")).toBeTruthy();
+  });
+
+  it("expõe a rota de definição de senha usada por convites e recuperação", () => {
+    window.history.replaceState({}, "", "/definir-senha");
+
+    render(<App />);
+
+    expect(screen.getByText("Definir senha")).toBeTruthy();
   });
 });

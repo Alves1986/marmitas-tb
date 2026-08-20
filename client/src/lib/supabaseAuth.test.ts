@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { loadSessionUser, requestTeamOtp, toSessionUser } from "./supabaseAuth";
+import * as supabaseAuth from "./supabaseAuth";
+import { loadSessionUser, toSessionUser } from "./supabaseAuth";
 
 describe("toSessionUser", () => {
   it("preserva o papel operacional de um perfil Supabase", () => {
@@ -77,28 +78,58 @@ describe("loadSessionUser", () => {
   });
 });
 
-describe("requestTeamOtp", () => {
-  it("normaliza o e-mail e impede o cadastro público", async () => {
+describe("política de acesso interno", () => {
+  it("não expõe mais a solicitação de magic link como fluxo de entrada da equipe", () => {
+    expect("requestTeamOtp" in supabaseAuth).toBe(false);
+  });
+});
+
+describe("signInWithPassword", () => {
+  it("normaliza o e-mail antes de autenticar a equipe por senha", async () => {
     const requests: unknown[] = [];
     const client = {
       auth: {
-        signInWithOtp: async (request: unknown) => {
+        signInWithPassword: async (request: unknown) => {
           requests.push(request);
           return { error: null };
         },
       },
     };
+    const signInWithPassword = (supabaseAuth as typeof supabaseAuth & {
+      signInWithPassword?: (client: typeof client, email: string, password: string) => Promise<void>;
+    }).signInWithPassword;
 
-    await expect(requestTeamOtp(client, "  equipe@marmitastb.com.br ")).resolves.toBeUndefined();
+    expect(signInWithPassword).toBeTypeOf("function");
+    await expect(signInWithPassword!(client, "  equipe@marmitastb.com.br ", "senha-segura-123")).resolves.toBeUndefined();
     expect(requests).toEqual([
-      {
-        email: "equipe@marmitastb.com.br",
-        options: { shouldCreateUser: false },
-      },
+      { email: "equipe@marmitastb.com.br", password: "senha-segura-123" },
     ]);
   });
+});
 
-  it("direciona o link de acesso para a operação sem permitir cadastro público", async () => {
+describe("setNewPassword", () => {
+  it("envia somente a nova senha ao Supabase após um convite ou link de recuperação válido", async () => {
+    const requests: unknown[] = [];
+    const client = {
+      auth: {
+        updateUser: async (request: unknown) => {
+          requests.push(request);
+          return { error: null };
+        },
+      },
+    };
+    const setNewPassword = (supabaseAuth as typeof supabaseAuth & {
+      setNewPassword?: (client: typeof client, password: string) => Promise<void>;
+    }).setNewPassword;
+
+    expect(setNewPassword).toBeTypeOf("function");
+    await expect(setNewPassword!(client, "senha-nova-segura-123")).resolves.toBeUndefined();
+    expect(requests).toEqual([{ password: "senha-nova-segura-123" }]);
+  });
+});
+
+describe("requestPasswordReset", () => {
+  it("normaliza o e-mail e aponta a recuperação para a rota de definição de senha", async () => {
     const requests: unknown[] = [];
     const previousWindow = globalThis.window;
     Object.defineProperty(globalThis, "window", {
@@ -109,38 +140,27 @@ describe("requestTeamOtp", () => {
     try {
       const client = {
         auth: {
-          signInWithOtp: async (request: unknown) => {
-            requests.push(request);
+          resetPasswordForEmail: async (email: string, options: unknown) => {
+            requests.push({ email, options });
             return { error: null };
           },
         },
       };
+      const requestPasswordReset = (supabaseAuth as typeof supabaseAuth & {
+        requestPasswordReset?: (client: typeof client, email: string) => Promise<void>;
+      }).requestPasswordReset;
 
-      await requestTeamOtp(client, "cassia.andinho@gmail.com");
+      expect(requestPasswordReset).toBeTypeOf("function");
+      await expect(requestPasswordReset!(client, "  equipe@marmitastb.com.br ")).resolves.toBeUndefined();
     } finally {
       Object.defineProperty(globalThis, "window", { configurable: true, value: previousWindow });
     }
 
     expect(requests).toEqual([
       {
-        email: "cassia.andinho@gmail.com",
-        options: {
-          shouldCreateUser: false,
-          emailRedirectTo: "https://marmitastb.vercel.app/operacao",
-        },
+        email: "equipe@marmitastb.com.br",
+        options: { redirectTo: "https://marmitastb.vercel.app/definir-senha" },
       },
     ]);
-  });
-
-  it("encerra com erro controlado quando o pedido de link não responde", async () => {
-    const client = {
-      auth: {
-        signInWithOtp: () => new Promise<never>(() => undefined),
-      },
-    };
-
-    await expect(
-      requestTeamOtp(client, "cassia.andinho@gmail.com", { timeoutMs: 5 }),
-    ).rejects.toThrow("tempo limite");
   });
 });

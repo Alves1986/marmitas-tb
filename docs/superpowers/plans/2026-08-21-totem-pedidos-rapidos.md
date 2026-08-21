@@ -34,6 +34,8 @@ Nessa sessão, a seleção de uma marmita abriu `Bebida` em `3/7` e a seleção 
 
 Ao tocar em `Não quero sobremesa`, o totem abriu `Revisão` em `5/7` e exibiu somente a marmita e a bebida selecionadas, com total de R$ 23,00. O campo de nome permaneceu opcional e o avanço para pagamento continuou disponível.
 
+Na revisão de navegação, todas as etapas posteriores ao início passaram a exibir o botão visual `Voltar`, com rótulo acessível que informa o destino, como `Voltar para marmitas`. As escolhas já feitas permanecem no pedido após o retorno. A etapa de pagamento agora mostra somente PIX e cartão demonstrativos, sem botão genérico que permita pular a confirmação simulada.
+
 ---
 
 ## Estrutura de arquivos

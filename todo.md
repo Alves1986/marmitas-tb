@@ -231,3 +231,5 @@
 - [x] Corrigir o avanço automático após escolha de bebida e sobremesa no totem, preservando a possibilidade de pular adicionais e cobrindo as regressões.
 - [x] Revisar e validar as transições de nome, pagamento e confirmação para que todas as etapas restantes do totem tenham avanço claro e acessível.
 - [x] Tornar a etapa de sobremesa opcional com ação explícita de pular, mantendo o avanço automático quando uma sobremesa for selecionada e cobrindo os dois caminhos em teste.
+- [x] Adicionar ação de voltar em todas as etapas navegáveis do totem, preservando itens, nome e método de pagamento já selecionados, com testes de regressão.
+- [x] Impedir o avanço genérico da etapa de pagamento sem que PIX ou cartão demonstrativo seja escolhido, preservando a confirmação apenas após aprovação simulada.

@@ -23,6 +23,28 @@ describe("Totem", () => {
     expect(screen.getByRole("heading", { name: /quer uma bebida/i })).toBeTruthy();
   });
 
+  it("volta com destino claro e preserva a marmita já escolhida", () => {
+    render(<Totem />);
+
+    fireEvent.click(screen.getAllByRole("button")[0]);
+    fireEvent.click(screen.getAllByRole("button")[0]);
+    expect(screen.getByRole("heading", { name: /quer uma bebida/i })).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: /voltar para marmitas/i }));
+    expect(screen.getByRole("heading", { name: /escolha sua marmita/i })).toBeTruthy();
+    expect(screen.getByText("No pedido")).toBeTruthy();
+  });
+
+  it("exibe uma ação de voltar identificável em cada etapa navegável", () => {
+    render(<Totem />);
+
+    fireEvent.click(screen.getAllByRole("button")[0]);
+    expect(screen.getByRole("button", { name: /voltar para opções/i })).toBeTruthy();
+
+    fireEvent.click(screen.getAllByRole("button")[0]);
+    expect(screen.getByRole("button", { name: /voltar para marmitas/i })).toBeTruthy();
+  });
+
   it("segue das bebidas para sobremesa e da sobremesa para a revisão ao selecionar adicionais", () => {
     render(<Totem />);
 
@@ -68,6 +90,20 @@ describe("Totem", () => {
     expect(screen.getByRole("heading", { name: /sua senha é/i })).toBeTruthy();
     expect(screen.getByText(/anderson/i)).toBeTruthy();
     vi.useRealTimers();
+  });
+
+  it("não permite confirmar sem escolher PIX ou cartão de demonstração", () => {
+    render(<Totem />);
+
+    fireEvent.click(screen.getAllByRole("button")[0]);
+    fireEvent.click(screen.getAllByRole("button")[0]);
+    fireEvent.click(screen.getAllByRole("button")[0]);
+    fireEvent.click(screen.getAllByRole("button")[0]);
+    fireEvent.click(screen.getByRole("button", { name: /ir para pagamento/i }));
+
+    expect(screen.getByRole("heading", { name: /como deseja pagar/i })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /escolha uma forma/i })).toBeNull();
+    expect(screen.queryByRole("heading", { name: /sua senha é/i })).toBeNull();
   });
 
   it("reinicia a janela de inatividade após interação e retorna ao início depois de 90 segundos", () => {

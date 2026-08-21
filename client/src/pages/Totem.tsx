@@ -23,6 +23,7 @@ export default function Totem() {
 
   const total = state.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const index = STEPS.indexOf(state.step);
+  const previousStep = index > 0 ? STEPS[index - 1] : null;
   const reset = () => { setState(expireTotemSession(state)); setCategoryId(null); setPayment(null); setProcessing(false); };
 
   useEffect(() => {
@@ -86,11 +87,11 @@ export default function Totem() {
         {state.step === "review" && <ReviewStep items={state.items} total={total} name={state.displayName} onName={(displayName) => setState((current) => ({ ...current, displayName }))} />}
         {state.step === "payment" && <PaymentStep total={total} processing={processing} onPay={approve} />}
         {state.step === "receipt" && receipt && <ReceiptStep receipt={receipt} items={state.items} onPrint={() => window.print()} onFinish={reset} />}
-        {state.step !== "receipt" && <nav className="mt-auto flex gap-3 pt-6">
-          {index > 0 && <button type="button" onClick={() => move(STEPS[index - 1])} className="grid size-14 shrink-0 place-items-center rounded-2xl border border-[#d7bea0] bg-white" aria-label="Voltar"><ArrowLeft className="size-5" /></button>}
-          <button type="button" disabled={state.step === "categories" || (state.step === "products" && state.items.length === 0)} onClick={() => move(STEPS[index + 1])} className="flex min-h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-[#481e1f] px-5 text-base font-extrabold text-white shadow-[0_10px_22px_rgba(72,30,31,.18)] transition active:scale-[.98] disabled:cursor-not-allowed disabled:opacity-40">
-            {state.step === "payment" ? "Escolha uma forma" : state.step === "review" ? "Ir para pagamento" : state.step === "desserts" ? "Não quero sobremesa" : "Continuar"}<ChevronRight className="size-5" />
-          </button>
+        {state.step !== "receipt" && state.step !== "categories" && <nav className="mt-auto flex gap-3 pt-6">
+          {previousStep && <button type="button" onClick={() => move(previousStep)} className="flex min-h-14 shrink-0 items-center justify-center gap-2 rounded-2xl border border-[#d7bea0] bg-white px-4 text-base font-extrabold" aria-label={`Voltar para ${STEP_LABELS[previousStep].toLowerCase()}`}><ArrowLeft className="size-5" /> Voltar</button>}
+          {state.step !== "payment" && <button type="button" disabled={state.step === "products" && state.items.length === 0} onClick={() => move(STEPS[index + 1])} className="flex min-h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-[#481e1f] px-5 text-base font-extrabold text-white shadow-[0_10px_22px_rgba(72,30,31,.18)] transition active:scale-[.98] disabled:cursor-not-allowed disabled:opacity-40">
+            {state.step === "review" ? "Ir para pagamento" : state.step === "desserts" ? "Não quero sobremesa" : "Continuar"}<ChevronRight className="size-5" />
+          </button>}
         </nav>}
       </section>
     </main>

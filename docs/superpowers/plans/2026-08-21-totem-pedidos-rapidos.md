@@ -28,6 +28,12 @@ O toque em `Suflair com chocolate` abriu `Revisão` em `5/7`, exibindo os três 
 
 No percurso final, selecionar `Cartão` iniciou a aprovação demonstrativa e abriu `Retirada` em `7/7`. A confirmação exibiu a senha `MTB-001`, os itens do pedido, o aviso “Cartão demonstrativo · Sem cobrança real”, além dos controles de imprimir recibo e iniciar novo pedido. Não houve escrita no Supabase nem cobrança externa em toda a revisão.
 
+Na validação da opção de sobremesa, uma nova sessão abriu `Marmitas` em `2/7` após selecionar `Destaques`, preservando logo, progresso e a instrução de avanço por toque. O percurso seguirá por bebida e sobremesa para confirmar o novo atalho explícito de pular.
+
+Nessa sessão, a seleção de uma marmita abriu `Bebida` em `3/7` e a seleção de uma bebida abriu `Sobremesa` em `4/7`. A tela de sobremesa exibiu o título “E uma sobremesa?”, o item disponível e a ação destacada `Não quero sobremesa` no rodapé, sem exigir a inclusão de doce.
+
+Ao tocar em `Não quero sobremesa`, o totem abriu `Revisão` em `5/7` e exibiu somente a marmita e a bebida selecionadas, com total de R$ 23,00. O campo de nome permaneceu opcional e o avanço para pagamento continuou disponível.
+
 ---
 
 ## Estrutura de arquivos

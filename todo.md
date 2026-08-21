@@ -230,3 +230,4 @@
 - [x] Corrigir o avanço da etapa de marmitas no totem após a inclusão de item, preservando ajuste de quantidade e cobrindo a regressão em teste.
 - [x] Corrigir o avanço automático após escolha de bebida e sobremesa no totem, preservando a possibilidade de pular adicionais e cobrindo as regressões.
 - [x] Revisar e validar as transições de nome, pagamento e confirmação para que todas as etapas restantes do totem tenham avanço claro e acessível.
+- [x] Tornar a etapa de sobremesa opcional com ação explícita de pular, mantendo o avanço automático quando uma sobremesa for selecionada e cobrindo os dois caminhos em teste.

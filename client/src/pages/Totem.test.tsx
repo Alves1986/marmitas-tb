@@ -37,6 +37,18 @@ describe("Totem", () => {
     expect(screen.getByRole("heading", { name: /confira seu pedido/i })).toBeTruthy();
   });
 
+  it("permite pular a sobremesa e seguir diretamente para a revisão", () => {
+    render(<Totem />);
+
+    fireEvent.click(screen.getAllByRole("button")[0]);
+    fireEvent.click(screen.getAllByRole("button")[0]);
+    fireEvent.click(screen.getAllByRole("button")[0]);
+    expect(screen.getByRole("heading", { name: /uma sobremesa/i })).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: /não quero sobremesa/i }));
+    expect(screen.getByRole("heading", { name: /confira seu pedido/i })).toBeTruthy();
+  });
+
   it("leva da revisão ao pagamento e confirma o recibo após escolher cartão", () => {
     vi.useFakeTimers();
     render(<Totem />);

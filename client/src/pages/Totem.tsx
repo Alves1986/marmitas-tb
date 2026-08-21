@@ -89,7 +89,7 @@ export default function Totem() {
         {state.step !== "receipt" && <nav className="mt-auto flex gap-3 pt-6">
           {index > 0 && <button type="button" onClick={() => move(STEPS[index - 1])} className="grid size-14 shrink-0 place-items-center rounded-2xl border border-[#d7bea0] bg-white" aria-label="Voltar"><ArrowLeft className="size-5" /></button>}
           <button type="button" disabled={state.step === "categories" || (state.step === "products" && state.items.length === 0)} onClick={() => move(STEPS[index + 1])} className="flex min-h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-[#481e1f] px-5 text-base font-extrabold text-white shadow-[0_10px_22px_rgba(72,30,31,.18)] transition active:scale-[.98] disabled:cursor-not-allowed disabled:opacity-40">
-            {state.step === "payment" ? "Escolha uma forma" : state.step === "review" ? "Ir para pagamento" : state.step === "desserts" ? "Revisar pedido" : "Continuar"}<ChevronRight className="size-5" />
+            {state.step === "payment" ? "Escolha uma forma" : state.step === "review" ? "Ir para pagamento" : state.step === "desserts" ? "Não quero sobremesa" : "Continuar"}<ChevronRight className="size-5" />
           </button>
         </nav>}
       </section>

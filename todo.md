@@ -237,3 +237,8 @@
 - [x] Cobrir em regressão a presença e o acionamento dos controles diretamente no fluxo de sobremesa e retorno do totem.
 - [x] Reiniciar automaticamente a sequência local de tags de retirada do totem a cada novo dia, usando a data local do dispositivo.
 - [x] Cobrir em regressão a sequência no mesmo dia e a reinicialização da tag no dia seguinte.
+- [x] Confirmar e tornar explícito o retorno automático à tela inicial após 90 segundos sem interação no totem.
+- [x] Criar uma confirmação de pedido mais atrativa, com mensagem de agradecimento e animação acessível de sucesso.
+- [x] Cobrir em regressão o retorno por inatividade e a nova confirmação de sucesso do totem.
+- [x] Adicionar uma ação manual de encerrar atendimento que limpe o estado local e retorne o totem à tela inicial em qualquer etapa aplicável.
+- [ ] Salvar versão validada do totem e orientar a publicação manual em produção pelo responsável.

@@ -40,6 +40,8 @@ Após a revisão do responsável, identificou-se que os controles corretos estav
 
 Por decisão do responsável, a senha de retirada demonstrativa passou a usar uma sequência diária local. A cada confirmação, o totem armazena a data local do dispositivo no formato `AAAA-MM-DD` junto da sequência; se a data armazenada for diferente da data local atual, a próxima confirmação reinicia em `MTB-001`. Assim, no mesmo dia a contagem avança normalmente, e no primeiro pedido do dia seguinte ela retorna a `001`, sem Supabase, cobrança ou persistência de pedidos reais.
 
+Na evolução de encerramento, a tela de retirada recebeu um indicador de sucesso com animação curta condicionada à preferência de movimento do dispositivo, a mensagem “Obrigado!” e o aviso de que o almoço está sendo preparado. A senha de retirada continua visualmente prioritária. A tela inicial agora explica que o atendimento é reiniciado após 90 segundos sem interação; além do temporizador, a retirada oferece `Encerrar atendimento` para limpar o estado local e retornar imediatamente às opções. Validação em 21/08/2026: 273 testes aprovados, 2 pulados, TypeScript sem erros e `git diff --check` concluído; a visualização vertical da tela inicial confirmou a legibilidade da orientação de inatividade.
+
 ---
 
 ## Estrutura de arquivos

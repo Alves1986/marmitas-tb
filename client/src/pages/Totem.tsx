@@ -104,7 +104,14 @@ export default function Totem() {
 }
 
 function CategoryStep({ onChoose }: { onChoose: (id: string) => void }) {
-  return <><h1 className="mt-2 font-display text-4xl leading-tight">Escolha uma opção</h1><p className="mt-2 text-base text-[#765f50]">Comece pelo que você quer comer hoje.</p><div className="mt-7 grid gap-3">{categories.filter((category) => !/bebida|sobremesa/i.test(category.label)).map((category) => <button key={category.id} type="button" onClick={() => onChoose(category.id)} className="flex min-h-20 items-center justify-between rounded-3xl border border-[#ead9c1] bg-white px-5 text-left shadow-sm transition active:scale-[.99]"><span><strong className="block text-lg">{category.label}</strong><span className="mt-1 block text-sm text-[#806859]">{category.description}</span></span><ChevronRight className="size-6 text-[#a82926]" /></button>)}</div></>;
+  return <>
+    <h1 className="mt-2 font-display text-4xl leading-tight">Escolha uma opção</h1>
+    <p className="mt-2 text-base text-[#765f50]">Comece pelo que você quer comer hoje.</p>
+    <p className="mt-4 text-sm font-semibold text-[#68703d]">Para sua privacidade, o atendimento reinicia após 90 segundos sem interação.</p>
+    <div className="mt-7 grid gap-3">
+      {categories.filter((category) => !/bebida|sobremesa/i.test(category.label)).map((category) => <button key={category.id} type="button" onClick={() => onChoose(category.id)} className="flex min-h-20 items-center justify-between rounded-3xl border border-[#ead9c1] bg-white px-5 text-left shadow-sm transition active:scale-[.99]"><span><strong className="block text-lg">{category.label}</strong><span className="mt-1 block text-sm text-[#806859]">{category.description}</span></span><ChevronRight className="size-6 text-[#a82926]" /></button>)}
+    </div>
+  </>;
 }
 
 function ProductStep({ title, products: choices, items, onAdd, onChoose, onUpdate, optional = false, onSkip }: { title: string; products: Product[]; items: TotemItem[]; onAdd: (product: Product) => void; onChoose?: (product: Product) => void; onUpdate: (id: string, delta: number) => void; optional?: boolean; onSkip?: () => void }) {
@@ -115,4 +122,18 @@ function ReviewStep({ items, total, name, onName }: { items: TotemItem[]; total:
 
 function PaymentStep({ total, processing, onPay }: { total: number; processing: boolean; onPay: (method: TotemPaymentMethod) => void }) { return <><h1 className="mt-2 font-display text-4xl leading-tight">Como deseja pagar?</h1><p className="mt-2 text-base text-[#765f50]">Demonstração segura: nenhuma cobrança será realizada.</p><div className="mt-7 grid gap-4"><button type="button" disabled={processing} onClick={() => onPay("pix")} className="min-h-28 rounded-3xl bg-[#68703d] px-6 text-left text-white shadow-lg transition active:scale-[.99]"><QrCode className="size-8" /><strong className="mt-2 block text-xl">PIX</strong><span className="text-sm opacity-90">Mostrar QR de demonstração · {formatCurrency(total)}</span></button><button type="button" disabled={processing} onClick={() => onPay("card")} className="min-h-28 rounded-3xl bg-[#481e1f] px-6 text-left text-white shadow-lg transition active:scale-[.99]"><CreditCard className="size-8" /><strong className="mt-2 block text-xl">Cartão</strong><span className="text-sm opacity-90">Aprovação simulada · {formatCurrency(total)}</span></button></div>{processing && <p className="mt-6 rounded-2xl bg-[#fff1d7] p-4 text-center font-bold text-[#765f50]">Processando pagamento de demonstração…</p>}</> }
 
-function ReceiptStep({ receipt, items, onPrint, onFinish }: { receipt: ReturnType<typeof createTotemReceipt>; items: TotemItem[]; onPrint: () => void; onFinish: () => void }) { return <div id="totem-receipt" className="text-center"><CheckCircle2 className="mx-auto size-16 text-[#68703d]" /><p className="mt-5 text-xs font-extrabold uppercase tracking-[.16em] text-[#68703d]">Pedido confirmado</p><h1 className="mt-2 font-display text-4xl">Sua senha é</h1><p className="mt-4 rounded-3xl bg-[#481e1f] px-5 py-6 font-mono text-3xl font-black text-white">{receipt.tag}</p><p className="mt-5 text-base text-[#765f50]">Mostre esta senha ao retirar seu pedido no balcão.</p><div className="mt-6 rounded-3xl bg-white p-5 text-left shadow-sm">{items.map((item) => <p key={item.id} className="flex justify-between py-1 text-sm"><span>{item.quantity}× {item.name}</span><span>{formatCurrency(item.price * item.quantity)}</span></p>)}<p className="mt-3 border-t border-[#ead9c1] pt-3 text-sm font-bold">{receipt.paymentLabel} · Sem cobrança real</p></div><button type="button" onClick={onPrint} className="mt-6 flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#481e1f] bg-white text-base font-extrabold"><Printer className="size-5" /> Imprimir recibo</button><button type="button" onClick={onFinish} className="mt-3 flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#a82926] text-base font-extrabold text-white">Novo pedido <ShoppingBag className="size-5" /></button></div> }
+function ReceiptStep({ receipt, items, onPrint, onFinish }: { receipt: ReturnType<typeof createTotemReceipt>; items: TotemItem[]; onPrint: () => void; onFinish: () => void }) {
+  return <div id="totem-receipt" className="text-center">
+    <div data-testid="totem-success-indicator" className="totem-success-indicator mx-auto grid size-16 place-items-center rounded-full bg-[#e9efd4] text-[#68703d]" aria-hidden="true"><CheckCircle2 className="size-10" /></div>
+    <p className="mt-5 text-xs font-extrabold uppercase tracking-[.16em] text-[#68703d]">Pedido confirmado</p>
+    <h1 className="mt-2 font-display text-4xl">Obrigado!</h1>
+    <p className="mt-3 text-base text-[#765f50]">Seu almoço está sendo preparado com carinho.</p>
+    <h2 className="mt-6 font-display text-3xl">Sua senha é</h2>
+    <p className="mt-4 rounded-3xl bg-[#481e1f] px-5 py-6 font-mono text-3xl font-black text-white">{receipt.tag}</p>
+    <p className="mt-5 text-base text-[#765f50]">Mostre esta senha ao retirar seu pedido no balcão.</p>
+    <div className="mt-6 rounded-3xl bg-white p-5 text-left shadow-sm">{items.map((item) => <p key={item.id} className="flex justify-between py-1 text-sm"><span>{item.quantity}× {item.name}</span><span>{formatCurrency(item.price * item.quantity)}</span></p>)}<p className="mt-3 border-t border-[#ead9c1] pt-3 text-sm font-bold">{receipt.paymentLabel} · Sem cobrança real</p></div>
+    <button type="button" onClick={onPrint} className="mt-6 flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#481e1f] bg-white text-base font-extrabold"><Printer className="size-5" /> Imprimir recibo</button>
+    <button type="button" onClick={onFinish} className="mt-3 flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#a82926] text-base font-extrabold text-white">Novo pedido <ShoppingBag className="size-5" /></button>
+    <button type="button" onClick={onFinish} className="mt-3 flex min-h-12 w-full items-center justify-center rounded-2xl border border-[#d7bea0] bg-white text-sm font-extrabold text-[#765f50]">Encerrar atendimento</button>
+  </div>;
+}

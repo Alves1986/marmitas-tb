@@ -11,6 +11,7 @@ describe("Totem", () => {
 
     expect(screen.getByRole("img", { name: /Marmitas TB/i })).toBeTruthy();
     expect(screen.getByRole("heading", { name: /escolha uma opção/i })).toBeTruthy();
+    expect(screen.getByText(/90 segundos sem interação/i)).toBeTruthy();
     expect(screen.getAllByRole("button").length).toBeGreaterThan(2);
   });
 
@@ -110,7 +111,28 @@ describe("Totem", () => {
     fireEvent.click(screen.getByRole("button", { name: /cartão/i }));
     act(() => { vi.advanceTimersByTime(1_200); });
     expect(screen.getByRole("heading", { name: /sua senha é/i })).toBeTruthy();
+    expect(screen.getByText(/obrigado/i)).toBeTruthy();
+    expect(screen.getByText(/seu almoço está sendo preparado com carinho/i)).toBeTruthy();
+    expect(screen.getByTestId("totem-success-indicator")).toBeTruthy();
     expect(screen.getByText(/anderson/i)).toBeTruthy();
+    vi.useRealTimers();
+  });
+
+  it("permite encerrar manualmente o atendimento na tela de retirada", () => {
+    vi.useFakeTimers();
+    render(<Totem />);
+
+    fireEvent.click(screen.getAllByRole("button")[0]);
+    fireEvent.click(screen.getAllByRole("button")[0]);
+    fireEvent.click(screen.getAllByRole("button")[0]);
+    fireEvent.click(screen.getAllByRole("button")[0]);
+    fireEvent.click(screen.getByRole("button", { name: /ir para pagamento/i }));
+    fireEvent.click(screen.getByRole("button", { name: /cartão/i }));
+    act(() => { vi.advanceTimersByTime(1_200); });
+
+    fireEvent.click(screen.getByRole("button", { name: /encerrar atendimento/i }));
+    expect(screen.getByRole("heading", { name: /escolha uma opção/i })).toBeTruthy();
+    expect(screen.queryByText(/sua senha é/i)).toBeNull();
     vi.useRealTimers();
   });
 

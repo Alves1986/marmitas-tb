@@ -14,6 +14,15 @@ describe("Totem", () => {
     expect(screen.getAllByRole("button").length).toBeGreaterThan(2);
   });
 
+  it("adiciona a marmita escolhida e segue diretamente para as bebidas", () => {
+    render(<Totem />);
+
+    fireEvent.click(screen.getAllByRole("button")[0]);
+    fireEvent.click(screen.getAllByRole("button")[0]);
+
+    expect(screen.getByRole("heading", { name: /quer uma bebida/i })).toBeTruthy();
+  });
+
   it("reinicia a janela de inatividade após interação e retorna ao início depois de 90 segundos", () => {
     vi.useFakeTimers();
     render(<Totem />);

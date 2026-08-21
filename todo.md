@@ -227,3 +227,4 @@
 - [x] Validar o fluxo completo do totem em orientação vertical, incluindo retorno por inatividade, acessibilidade por toque e preparação para modo quiosque.
 - [x] Aplicar logo e identidade visual Marmitas TB de forma consistente em todas as telas e estados do totem.
 - [x] Corrigir ou substituir o visualizador de maquetes do totem para que a revisão visual fique disponível ao responsável.
+- [x] Corrigir o avanço da etapa de marmitas no totem após a inclusão de item, preservando ajuste de quantidade e cobrindo a regressão em teste.

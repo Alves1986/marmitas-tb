@@ -10,6 +10,18 @@
 
 ---
 
+## Aditivo de escopo executado — 21 de agosto de 2026
+
+Após a aprovação deste plano, o responsável determinou que a primeira versão do totem fosse **inteiramente demonstrativa e local**. Portanto, as tarefas deste documento que preveem migração, endpoint, persistência de pedido, controles administrativos em banco ou escrita no Supabase não foram executadas e permanecem como referência para uma etapa futura autorizada.
+
+Na reprodução em navegador, tocar uma marmita adicionou corretamente o item e habilitou o botão global `Continuar`, mas não deixou explícita a passagem para bebidas. O ajuste em curso preserva os controles de quantidade e introduz uma ação direta de avanço após a inclusão, para que a jornada não dependa de o cliente localizar outro botão no rodapé.
+
+Na validação visual posterior, a etapa de marmitas passou a apresentar a instrução explícita “Toque em uma marmita para adicionar e seguir para bebidas.”, com a marca e o progresso visíveis em orientação vertical. A confirmação do salto para a etapa de bebidas será registrada após o toque em uma marmita.
+
+O toque em “Carne de panela com purê de batata” adicionou o item e abriu imediatamente a etapa `Bebida`, com o título “Quer uma bebida?” e o progresso `3/7`. A correção foi coberta por regressão automatizada e confirmada em navegador.
+
+---
+
 ## Estrutura de arquivos
 
 | Arquivo | Responsabilidade |

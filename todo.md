@@ -235,3 +235,5 @@
 - [x] Impedir o avanço genérico da etapa de pagamento sem que PIX ou cartão demonstrativo seja escolhido, preservando a confirmação apenas após aprovação simulada.
 - [x] Exibir os controles de retorno e a decisão de pular sobremesa junto ao conteúdo visível da etapa correspondente no totem vertical.
 - [x] Cobrir em regressão a presença e o acionamento dos controles diretamente no fluxo de sobremesa e retorno do totem.
+- [x] Reiniciar automaticamente a sequência local de tags de retirada do totem a cada novo dia, usando a data local do dispositivo.
+- [x] Cobrir em regressão a sequência no mesmo dia e a reinicialização da tag no dia seguinte.

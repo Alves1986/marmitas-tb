@@ -4,7 +4,7 @@ import type { Product } from "@shared/order";
 import { brandAsset } from "@/data/assets";
 import { categories, products } from "@/data/catalog";
 import { formatCurrency } from "@/lib/order";
-import { createInitialTotemState, createTotemReceipt, expireTotemSession, type TotemItem, type TotemPaymentMethod, type TotemStep } from "@/lib/totem";
+import { createInitialTotemState, createTotemReceipt, expireTotemSession, incrementTotemDailySequence, readTotemDailySequence, TOTEM_DAILY_SEQUENCE_STORAGE_KEY, type TotemItem, type TotemPaymentMethod, type TotemStep } from "@/lib/totem";
 
 const STEPS: TotemStep[] = ["categories", "products", "drinks", "desserts", "review", "payment", "receipt"];
 const STEP_LABELS: Record<TotemStep, string> = {
@@ -18,7 +18,7 @@ export default function Totem() {
   const [state, setState] = useState(createInitialTotemState);
   const [categoryId, setCategoryId] = useState<string | null>(null);
   const [payment, setPayment] = useState<TotemPaymentMethod | null>(null);
-  const [sequence, setSequence] = useState(() => Number(sessionStorage.getItem("marmitas-tb-totem-sequence") ?? "0"));
+  const [sequence, setSequence] = useState(() => readTotemDailySequence(sessionStorage.getItem(TOTEM_DAILY_SEQUENCE_STORAGE_KEY)).sequence);
   const [processing, setProcessing] = useState(false);
 
   const total = state.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -64,7 +64,12 @@ export default function Totem() {
   function approve(method: TotemPaymentMethod) {
     setPayment(method); setProcessing(true);
     window.setTimeout(() => {
-      const next = sequence + 1; setSequence(next); sessionStorage.setItem("marmitas-tb-totem-sequence", String(next)); setProcessing(false); move("receipt");
+      const dailySequence = readTotemDailySequence(sessionStorage.getItem(TOTEM_DAILY_SEQUENCE_STORAGE_KEY));
+      const next = incrementTotemDailySequence(dailySequence);
+      setSequence(next.sequence);
+      sessionStorage.setItem(TOTEM_DAILY_SEQUENCE_STORAGE_KEY, JSON.stringify(next));
+      setProcessing(false);
+      move("receipt");
     }, 1200);
   }
   const receipt = state.step === "receipt" && payment ? createTotemReceipt({ sequence, displayName: state.displayName, paymentMethod: payment, items: state.items }) : null;

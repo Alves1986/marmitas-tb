@@ -38,6 +38,8 @@ Na revisão de navegação, todas as etapas posteriores ao início passaram a ex
 
 Após a revisão do responsável, identificou-se que os controles corretos estavam no DOM, porém concentrados no rodapé após uma lista potencialmente longa de produtos. A correção moveu a alternativa `Não quero sobremesa` para um painel destacado imediatamente abaixo do título de sobremesas e transformou a barra de ações em rodapé fixável no viewport vertical. O retorno agora permanece acessível enquanto o cliente percorre a lista; a ação de pular sobremesa fica visível antes das opções de doce. Duas regressões cobrem esses pontos de interação.
 
+Por decisão do responsável, a senha de retirada demonstrativa passou a usar uma sequência diária local. A cada confirmação, o totem armazena a data local do dispositivo no formato `AAAA-MM-DD` junto da sequência; se a data armazenada for diferente da data local atual, a próxima confirmação reinicia em `MTB-001`. Assim, no mesmo dia a contagem avança normalmente, e no primeiro pedido do dia seguinte ela retorna a `001`, sem Supabase, cobrança ou persistência de pedidos reais.
+
 ---
 
 ## Estrutura de arquivos

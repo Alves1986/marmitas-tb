@@ -219,10 +219,11 @@
 - [x] Promover o perfil atual autorizado de cliente para administrador no Supabase, preservando a senha existente e verificando o papel resultante.
 - [x] Diferenciar, na tela de acesso, credencial inválida de conta autenticada sem papel interno, com teste de regressão.
 - [x] Confirmar, no navegador do responsável, o login da conta administrativa corrigida com a mesma senha e o redirecionamento para `/admin`.
-- [ ] Definir e documentar a experiência do totem vertical de pedidos rápidos para retirada presencial, incluindo categorias, adicionais, nome opcional e senha de retirada.
-- [ ] Implementar um modo de totem responsivo para tablet ou monitor touch, reutilizando o catálogo e o pedido da Marmitas TB sem expor rotas administrativas.
-- [ ] Implementar pagamentos de demonstração por cartão e PIX no totem, com confirmação automática padrão, controles de cenário restritos à equipe e nenhuma cobrança real.
-- [ ] Gerar e imprimir recibo de retirada com senha no formato `MTB-001` e nome opcional após a confirmação demonstrativa do pagamento.
+- [x] Definir e documentar a experiência do totem vertical de pedidos rápidos para retirada presencial, incluindo categorias, adicionais, nome opcional e senha de retirada.
+- [x] Implementar um modo de totem responsivo para tablet ou monitor touch, reutilizando o catálogo e o pedido da Marmitas TB sem expor rotas administrativas.
+- [x] Implementar pagamentos de demonstração por cartão e PIX no totem, com confirmação automática padrão, controles de cenário restritos à equipe e nenhuma cobrança real.
+- [x] Manter a demonstração inicial do totem em estado local, sem criar pedidos, cobranças, eventos ou qualquer escrita no Supabase.
+- [x] Gerar e imprimir recibo de retirada com senha no formato `MTB-001` e nome opcional após a confirmação demonstrativa do pagamento.
 - [ ] Validar o fluxo completo do totem em orientação vertical, incluindo retorno por inatividade, acessibilidade por toque e preparação para modo quiosque.
-- [ ] Aplicar logo e identidade visual Marmitas TB de forma consistente em todas as telas e estados do totem.
+- [x] Aplicar logo e identidade visual Marmitas TB de forma consistente em todas as telas e estados do totem.
 - [x] Corrigir ou substituir o visualizador de maquetes do totem para que a revisão visual fique disponível ao responsável.

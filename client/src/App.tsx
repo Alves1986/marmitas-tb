@@ -13,6 +13,7 @@ import OperationsExpenses from "./pages/OperationsExpenses";
 import SetPassword from "./pages/SetPassword";
 import StaffAccess from "./pages/StaffAccess";
 import TrackOrder from "./pages/TrackOrder";
+import Totem from "./pages/Totem";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -20,6 +21,7 @@ function Router() {
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/acompanhar"} component={TrackOrder} />
+      <Route path={"/totem"} component={Totem} />
       <Route path={"/acesso"} component={StaffAccess} />
       <Route path={"/definir-senha"} component={SetPassword} />
       <Route path={"/operacao"} component={Operations} />
@@ -39,7 +41,7 @@ function Router() {
 
 function App() {
   const [location] = useLocation();
-  const isPublicRoute = location === "/" || location === "/acompanhar";
+  const isPublicRoute = location === "/" || location === "/acompanhar" || location === "/totem";
 
   return (
     <ErrorBoundary>

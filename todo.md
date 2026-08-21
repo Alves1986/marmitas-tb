@@ -248,3 +248,4 @@
 - [x] Salvar a documentação atualizada em checkpoint antes de qualquer envio ao GitHub.
 - [x] Verificar a implantação Vercel acionada pelo envio da branch principal e restaurar a rota pública `/totem` caso o 404 persista após a propagação.
 - [x] Corrigir a atualização do service worker para impedir que clientes mantenham bundle anterior sem a rota `/totem` após uma publicação.
+- [ ] Enviar a versão validada atual da Marmitas TB para a branch `main` do repositório dedicado `Alves1986/marmitas-tb` e confirmar a sincronização.

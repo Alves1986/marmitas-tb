@@ -13,7 +13,12 @@ import "./index.css";
 const queryClient = new QueryClient();
 
 if (import.meta.env.PROD) {
-  registerSW({ immediate: true });
+  registerSW({
+    immediate: true,
+    onRegisteredSW(_scriptUrl, registration) {
+      void registration?.update().catch(() => undefined);
+    },
+  });
 }
 
 const redirectToLoginIfUnauthorized = (error: unknown) => {

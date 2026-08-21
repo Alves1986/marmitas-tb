@@ -1,0 +1,15 @@
+# Verificação pós-envio — 21/08/2026
+
+O commit `09aaa6f` foi enviado com sucesso para a branch `main` do repositório dedicado `Alves1986/marmitas-tb`. O remoto verificado aponta exclusivamente para esse repositório.
+
+Na checagem pública inicial, realizada logo após o envio, a rota `https://marmitastb.vercel.app/totem` respondeu com a tela da aplicação para recurso não encontrado (`404`). A verificação foi repetida após aguardar a propagação inicial e apresentou o mesmo resultado. Esse registro não conclui a causa: a implantação pode ainda estar em processamento ou exigir inspeção no painel da Vercel.
+
+Uma inspeção HTTP posterior mostrou que tanto `/` quanto `/totem` já respondiam `HTTP 200` a partir do mesmo `index.html`, com `last-modified` em `21/08/2026 21:13:13 GMT` e bundle `/assets/index-DZ3B7wMD.js`. Portanto, o fallback SPA está ativo e o domínio já entrega uma versão recém-gerada; a tela `404` é renderizada pelo próprio cliente. A investigação segue comparando esse bundle com as rotas da branch enviada para determinar por que a rota `/totem` não está presente na versão servida.
+
+A causa foi confirmada no navegador: o service worker `sw.js` permanecia no controle da página e carregava o bundle anterior `/assets/index-cZUr1alj.js`, que não contém o componente `Totem`. O HTML atual referencia `/assets/index-DZ3B7wMD.js`, que contém a rota `/totem`; os dois arquivos ainda respondem `200`, o que permite ao cache antigo continuar a apresentar a aplicação anterior. Assim, a implantação e o fallback estão corretos, mas a atualização automática do service worker não substituiu imediatamente o bundle cacheado em um cliente já instalado.
+
+O `sw.js` atualmente servido pré-cacheia o bundle novo e não referencia o bundle antigo. Ao solicitar uma atualização explícita do registro do service worker no navegador afetado, a página foi recarregada durante a própria operação, comportamento compatível com a substituição do controlador antigo. A etapa seguinte é validar a rota após essa recarga e ajustar o cliente para avisar ou recarregar de forma previsível quando existir uma atualização disponível.
+
+Após a recarga, `https://marmitastb.vercel.app/totem` carregou a tela “Escolha uma opção”, com as categorias do pedido rápido e o aviso de reinício após 90 segundos, confirmando a restauração da rota no navegador inicialmente afetado. Para reduzir a recorrência em publicações futuras, o cliente passou a executar `registration.update()` logo após o registro da PWA; a chamada é tolerante a falhas e conserva o fluxo de atualização automática fornecido pelo registrador. Essa proteção está validada localmente por duas regressões específicas, pela suíte completa (`275` testes aprovados e `2` pulados), pela checagem TypeScript, pelo build PWA e por `git diff --check`. Ela depende de um novo envio da branch principal para alcançar a produção.
+
+O histórico de execuções do GitHub Actions não pôde ser consultado pelo token disponível, pois a API respondeu `403 Resource not accessible by integration`. Nenhuma nova publicação, mudança no Supabase, alteração de credencial ou configuração de domínio foi executada durante essa verificação.

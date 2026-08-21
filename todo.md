@@ -246,3 +246,5 @@
 - [x] Elaborar um tutorial completo de uso do sistema, cobrindo cliente, operação, administração e totem.
 - [x] Gerar e revisar um PDF ilustrado do tutorial com as funções atualmente disponíveis.
 - [x] Salvar a documentação atualizada em checkpoint antes de qualquer envio ao GitHub.
+- [x] Verificar a implantação Vercel acionada pelo envio da branch principal e restaurar a rota pública `/totem` caso o 404 persista após a propagação.
+- [ ] Corrigir a atualização do service worker para impedir que clientes mantenham bundle anterior sem a rota `/totem` após uma publicação.

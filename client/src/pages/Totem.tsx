@@ -26,11 +26,14 @@ export default function Totem() {
   const reset = () => { setState(expireTotemSession(state)); setCategoryId(null); setPayment(null); setProcessing(false); };
 
   useEffect(() => {
-    const timeout = window.setTimeout(reset, 90_000);
-    const wake = () => window.clearTimeout(timeout);
-    window.addEventListener("pointerdown", wake, { once: true });
-    return () => { window.clearTimeout(timeout); window.removeEventListener("pointerdown", wake); };
-  }, [state.step, state.items.length, state.displayName]);
+    let timeout: number;
+    const expire = () => { setState(createInitialTotemState()); setCategoryId(null); setPayment(null); setProcessing(false); };
+    const restart = () => { window.clearTimeout(timeout); timeout = window.setTimeout(expire, 90_000); };
+    restart();
+    window.addEventListener("pointerdown", restart);
+    window.addEventListener("keydown", restart);
+    return () => { window.clearTimeout(timeout); window.removeEventListener("pointerdown", restart); window.removeEventListener("keydown", restart); };
+  }, []);
 
   function move(step: TotemStep) { setState((current) => ({ ...current, step })); }
   function add(product: Product) {

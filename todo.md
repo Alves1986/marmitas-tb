@@ -224,6 +224,6 @@
 - [x] Implementar pagamentos de demonstração por cartão e PIX no totem, com confirmação automática padrão, controles de cenário restritos à equipe e nenhuma cobrança real.
 - [x] Manter a demonstração inicial do totem em estado local, sem criar pedidos, cobranças, eventos ou qualquer escrita no Supabase.
 - [x] Gerar e imprimir recibo de retirada com senha no formato `MTB-001` e nome opcional após a confirmação demonstrativa do pagamento.
-- [ ] Validar o fluxo completo do totem em orientação vertical, incluindo retorno por inatividade, acessibilidade por toque e preparação para modo quiosque.
+- [x] Validar o fluxo completo do totem em orientação vertical, incluindo retorno por inatividade, acessibilidade por toque e preparação para modo quiosque.
 - [x] Aplicar logo e identidade visual Marmitas TB de forma consistente em todas as telas e estados do totem.
 - [x] Corrigir ou substituir o visualizador de maquetes do totem para que a revisão visual fique disponível ao responsável.

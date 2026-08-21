@@ -14,6 +14,8 @@ Este diretório concentra os materiais necessários para operar, manter e evolui
 | [Homologação controlada em produção](./operacao/homologacao-controlada-2026-08-20.md) | Gestão e suporte técnico | Pedido de teste, transição operacional auditada, sem cobrança ou nova impressão |
 | [Homologação Asaas](./operacao/asaas-homologacao.md) | Financeiro e desenvolvimento | PIX Sandbox, variáveis e webhook |
 | [Homologação Supabase e Vercel](./operacao/supabase-vercel-homologacao.md) | Desenvolvimento | Estado da migração e critérios de ambiente |
+| [Guia de contexto CLAUDE](../CLAUDE.md) | Desenvolvimento e suporte técnico | Arquitetura atual, rotas, regras de segurança, validações e limites de integração |
+| [Tutorial completo de uso em PDF](/manus-storage/tutorial-completo-marmitas-tb_4b6a5ae5.pdf) | Clientes, equipe e gestores | Manual ilustrado consolidado de atendimento, operação, administração e totem; entregue como artefato de treinamento antes do próximo envio ao GitHub |
 
 > A configuração de SMTP próprio permanece pendente porque o domínio institucional da Marmitas TB ainda não foi definido. Nenhuma compra ou registro de domínio foi realizado. Consulte o guia de acesso por senha antes de retomar essa etapa.
 

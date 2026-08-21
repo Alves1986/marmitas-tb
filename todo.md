@@ -241,4 +241,8 @@
 - [x] Criar uma confirmação de pedido mais atrativa, com mensagem de agradecimento e animação acessível de sucesso.
 - [x] Cobrir em regressão o retorno por inatividade e a nova confirmação de sucesso do totem.
 - [x] Adicionar uma ação manual de encerrar atendimento que limpe o estado local e retorne o totem à tela inicial em qualquer etapa aplicável.
-- [ ] Salvar versão validada do totem e orientar a publicação manual em produção pelo responsável.
+- [x] Salvar versão validada do totem e orientar a publicação manual em produção pelo responsável.
+- [x] Atualizar o CLAUDE.md com arquitetura, rotas, fluxos, limites e regras atuais da Marmitas TB.
+- [x] Elaborar um tutorial completo de uso do sistema, cobrindo cliente, operação, administração e totem.
+- [x] Gerar e revisar um PDF ilustrado do tutorial com as funções atualmente disponíveis.
+- [ ] Salvar a documentação atualizada em checkpoint antes de qualquer envio ao GitHub.

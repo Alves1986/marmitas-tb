@@ -228,3 +228,5 @@
 - [x] Aplicar logo e identidade visual Marmitas TB de forma consistente em todas as telas e estados do totem.
 - [x] Corrigir ou substituir o visualizador de maquetes do totem para que a revisão visual fique disponível ao responsável.
 - [x] Corrigir o avanço da etapa de marmitas no totem após a inclusão de item, preservando ajuste de quantidade e cobrindo a regressão em teste.
+- [x] Corrigir o avanço automático após escolha de bebida e sobremesa no totem, preservando a possibilidade de pular adicionais e cobrindo as regressões.
+- [x] Revisar e validar as transições de nome, pagamento e confirmação para que todas as etapas restantes do totem tenham avanço claro e acessível.

@@ -23,6 +23,41 @@ describe("Totem", () => {
     expect(screen.getByRole("heading", { name: /quer uma bebida/i })).toBeTruthy();
   });
 
+  it("segue das bebidas para sobremesa e da sobremesa para a revisão ao selecionar adicionais", () => {
+    render(<Totem />);
+
+    fireEvent.click(screen.getAllByRole("button")[0]);
+    fireEvent.click(screen.getAllByRole("button")[0]);
+    expect(screen.getByRole("heading", { name: /quer uma bebida/i })).toBeTruthy();
+
+    fireEvent.click(screen.getAllByRole("button")[0]);
+    expect(screen.getByRole("heading", { name: /uma sobremesa/i })).toBeTruthy();
+
+    fireEvent.click(screen.getAllByRole("button")[0]);
+    expect(screen.getByRole("heading", { name: /confira seu pedido/i })).toBeTruthy();
+  });
+
+  it("leva da revisão ao pagamento e confirma o recibo após escolher cartão", () => {
+    vi.useFakeTimers();
+    render(<Totem />);
+
+    fireEvent.click(screen.getAllByRole("button")[0]);
+    fireEvent.click(screen.getAllByRole("button")[0]);
+    fireEvent.click(screen.getAllByRole("button")[0]);
+    fireEvent.click(screen.getAllByRole("button")[0]);
+    expect(screen.getByRole("heading", { name: /confira seu pedido/i })).toBeTruthy();
+
+    fireEvent.change(screen.getByPlaceholderText(/anderson/i), { target: { value: "Anderson" } });
+    fireEvent.click(screen.getByRole("button", { name: /ir para pagamento/i }));
+    expect(screen.getByRole("heading", { name: /como deseja pagar/i })).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: /cartão/i }));
+    act(() => { vi.advanceTimersByTime(1_200); });
+    expect(screen.getByRole("heading", { name: /sua senha é/i })).toBeTruthy();
+    expect(screen.getByText(/anderson/i)).toBeTruthy();
+    vi.useRealTimers();
+  });
+
   it("reinicia a janela de inatividade após interação e retorna ao início depois de 90 segundos", () => {
     vi.useFakeTimers();
     render(<Totem />);

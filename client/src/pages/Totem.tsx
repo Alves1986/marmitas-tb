@@ -49,6 +49,14 @@ export default function Totem() {
     add(product);
     move("drinks");
   }
+  function chooseDrink(product: Product) {
+    add(product);
+    move("desserts");
+  }
+  function chooseDessert(product: Product) {
+    add(product);
+    move("review");
+  }
   function update(id: string, delta: number) {
     setState((current) => ({ ...current, items: current.items.map((item) => item.id === id ? { ...item, quantity: Math.max(0, item.quantity + delta) } : item).filter((item) => item.quantity > 0) }));
   }
@@ -73,8 +81,8 @@ export default function Totem() {
         <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#a82926]">{STEP_LABELS[state.step]}</p>
         {state.step === "categories" && <CategoryStep onChoose={(id) => { setCategoryId(id); move("products"); }} />}
         {state.step === "products" && <ProductStep title="Escolha sua marmita" products={products.filter((product) => product.categoryId === categoryId)} items={state.items} onAdd={add} onChoose={chooseMarmita} onUpdate={update} />}
-        {state.step === "drinks" && <ProductStep title="Quer uma bebida?" products={products.filter(isDrink)} items={state.items} onAdd={add} onUpdate={update} optional />}
-        {state.step === "desserts" && <ProductStep title="E uma sobremesa?" products={products.filter(isDessert)} items={state.items} onAdd={add} onUpdate={update} optional />}
+        {state.step === "drinks" && <ProductStep title="Quer uma bebida?" products={products.filter(isDrink)} items={state.items} onAdd={add} onChoose={chooseDrink} onUpdate={update} optional />}
+        {state.step === "desserts" && <ProductStep title="E uma sobremesa?" products={products.filter(isDessert)} items={state.items} onAdd={add} onChoose={chooseDessert} onUpdate={update} optional />}
         {state.step === "review" && <ReviewStep items={state.items} total={total} name={state.displayName} onName={(displayName) => setState((current) => ({ ...current, displayName }))} />}
         {state.step === "payment" && <PaymentStep total={total} processing={processing} onPay={approve} />}
         {state.step === "receipt" && receipt && <ReceiptStep receipt={receipt} items={state.items} onPrint={() => window.print()} onFinish={reset} />}

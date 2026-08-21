@@ -20,6 +20,14 @@ Na validação visual posterior, a etapa de marmitas passou a apresentar a instr
 
 O toque em “Carne de panela com purê de batata” adicionou o item e abriu imediatamente a etapa `Bebida`, com o título “Quer uma bebida?” e o progresso `3/7`. A correção foi coberta por regressão automatizada e confirmada em navegador.
 
+Na revisão integral posterior, a rota `/totem` abriu em `Opções` com marca e progresso `1/7`; a escolha de `Destaques` abriu `Marmitas` com a instrução explícita de que um toque adiciona e segue para bebidas. A sequência de adicionais está em validação controlada na mesma sessão, sem escrita externa.
+
+Na mesma sessão, o toque em uma marmita abriu `Bebida` em `3/7`, e o toque em `Coca-Cola 200 ml` abriu imediatamente `Sobremesa` em `4/7`. Ambas as telas preservaram a marca, o progresso, o caminho explícito de escolha e a alternativa de pular pelo botão de rodapé.
+
+O toque em `Suflair com chocolate` abriu `Revisão` em `5/7`, exibindo os três itens e o total de R$ 36,00. O campo de nome permaneceu opcional: avançar sem preenchê-lo abriu `Pagamento` em `6/7`, com as opções PIX e Cartão de demonstração visíveis e o aviso de que nenhuma cobrança será realizada.
+
+No percurso final, selecionar `Cartão` iniciou a aprovação demonstrativa e abriu `Retirada` em `7/7`. A confirmação exibiu a senha `MTB-001`, os itens do pedido, o aviso “Cartão demonstrativo · Sem cobrança real”, além dos controles de imprimir recibo e iniciar novo pedido. Não houve escrita no Supabase nem cobrança externa em toda a revisão.
+
 ---
 
 ## Estrutura de arquivos

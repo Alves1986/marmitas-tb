@@ -36,6 +36,8 @@ Ao tocar em `Não quero sobremesa`, o totem abriu `Revisão` em `5/7` e exibiu s
 
 Na revisão de navegação, todas as etapas posteriores ao início passaram a exibir o botão visual `Voltar`, com rótulo acessível que informa o destino, como `Voltar para marmitas`. As escolhas já feitas permanecem no pedido após o retorno. A etapa de pagamento agora mostra somente PIX e cartão demonstrativos, sem botão genérico que permita pular a confirmação simulada.
 
+Após a revisão do responsável, identificou-se que os controles corretos estavam no DOM, porém concentrados no rodapé após uma lista potencialmente longa de produtos. A correção moveu a alternativa `Não quero sobremesa` para um painel destacado imediatamente abaixo do título de sobremesas e transformou a barra de ações em rodapé fixável no viewport vertical. O retorno agora permanece acessível enquanto o cliente percorre a lista; a ação de pular sobremesa fica visível antes das opções de doce. Duas regressões cobrem esses pontos de interação.
+
 ---
 
 ## Estrutura de arquivos

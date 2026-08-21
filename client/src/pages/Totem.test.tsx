@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import Totem from "./Totem";
 
@@ -45,6 +45,16 @@ describe("Totem", () => {
     expect(screen.getByRole("button", { name: /voltar para marmitas/i })).toBeTruthy();
   });
 
+  it("mantém o retorno em uma barra de ação persistente durante a escolha de bebida", () => {
+    render(<Totem />);
+
+    fireEvent.click(screen.getAllByRole("button")[0]);
+    fireEvent.click(screen.getAllByRole("button")[0]);
+
+    const actions = screen.getByTestId("totem-step-actions");
+    expect(within(actions).getByRole("button", { name: /voltar para marmitas/i })).toBeTruthy();
+  });
+
   it("segue das bebidas para sobremesa e da sobremesa para a revisão ao selecionar adicionais", () => {
     render(<Totem />);
 
@@ -68,6 +78,18 @@ describe("Totem", () => {
     expect(screen.getByRole("heading", { name: /uma sobremesa/i })).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: /não quero sobremesa/i }));
+    expect(screen.getByRole("heading", { name: /confira seu pedido/i })).toBeTruthy();
+  });
+
+  it("oferece a recusa explícita no conteúdo da escolha de sobremesa", () => {
+    render(<Totem />);
+
+    fireEvent.click(screen.getAllByRole("button")[0]);
+    fireEvent.click(screen.getAllByRole("button")[0]);
+    fireEvent.click(screen.getAllByRole("button")[0]);
+
+    const dessertChoice = screen.getByTestId("totem-dessert-choice");
+    fireEvent.click(within(dessertChoice).getByRole("button", { name: /não quero sobremesa/i }));
     expect(screen.getByRole("heading", { name: /confira seu pedido/i })).toBeTruthy();
   });
 

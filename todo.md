@@ -233,3 +233,5 @@
 - [x] Tornar a etapa de sobremesa opcional com ação explícita de pular, mantendo o avanço automático quando uma sobremesa for selecionada e cobrindo os dois caminhos em teste.
 - [x] Adicionar ação de voltar em todas as etapas navegáveis do totem, preservando itens, nome e método de pagamento já selecionados, com testes de regressão.
 - [x] Impedir o avanço genérico da etapa de pagamento sem que PIX ou cartão demonstrativo seja escolhido, preservando a confirmação apenas após aprovação simulada.
+- [x] Exibir os controles de retorno e a decisão de pular sobremesa junto ao conteúdo visível da etapa correspondente no totem vertical.
+- [x] Cobrir em regressão a presença e o acionamento dos controles diretamente no fluxo de sobremesa e retorno do totem.

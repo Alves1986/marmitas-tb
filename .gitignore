@@ -113,6 +113,7 @@ temp/
 
 # Webdev artifacts (checkpoint zips, migrations, etc.)
 .webdev/
+.superpowers/
 
 # Snapshots locais com dados operacionais e pessoais do legado
 migration-artifacts/

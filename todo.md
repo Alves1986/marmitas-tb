@@ -245,4 +245,4 @@
 - [x] Atualizar o CLAUDE.md com arquitetura, rotas, fluxos, limites e regras atuais da Marmitas TB.
 - [x] Elaborar um tutorial completo de uso do sistema, cobrindo cliente, operação, administração e totem.
 - [x] Gerar e revisar um PDF ilustrado do tutorial com as funções atualmente disponíveis.
-- [ ] Salvar a documentação atualizada em checkpoint antes de qualquer envio ao GitHub.
+- [x] Salvar a documentação atualizada em checkpoint antes de qualquer envio ao GitHub.

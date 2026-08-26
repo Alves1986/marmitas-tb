@@ -18,9 +18,9 @@ describe("/api/operations/print-jobs", () => {
     });
     const response = await handler(new Request("https://marmitas-tb.vercel.app/api/operations/print-jobs", {
       method: "POST",
-      body: JSON.stringify({ orderId: "d78a4b3c-86be-4909-8ef2-0c0b2f4fa6ed" }),
+      body: JSON.stringify({ orderId: "d78a4b3c-86be-4909-8ef2-0c0b2f4fa6ed", reason: "Via anterior ilegível" }),
     }));
     expect(response.status).toBe(201);
-    expect(requeue).toHaveBeenCalledWith({ orderId: "d78a4b3c-86be-4909-8ef2-0c0b2f4fa6ed", actorUserId: "3c6237a9-5b6f-4871-8da3-06f027bc4f15" });
+    expect(requeue).toHaveBeenCalledWith({ orderId: "d78a4b3c-86be-4909-8ef2-0c0b2f4fa6ed", actorUserId: "3c6237a9-5b6f-4871-8da3-06f027bc4f15", reason: "Via anterior ilegível" });
   });
 });

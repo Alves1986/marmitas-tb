@@ -53,10 +53,10 @@ export function createVercelOperationsService(api: OperationsApi = vercelApi) {
     listPrintJobs() {
       return api<VercelPrintJob[]>("/api/operations/printJobs");
     },
-    requeuePrint(orderId: string) {
+    requeuePrint(orderId: string, reason: string) {
       return api<VercelPrintJob>("/api/operations/printJobs", {
         method: "POST",
-        body: { orderId },
+        body: { orderId, reason },
       });
     },
     markPrintJob(printJobId: string, status: "printed" | "failed", printerName?: string) {

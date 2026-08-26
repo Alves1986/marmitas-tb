@@ -12,6 +12,7 @@ const itemInput = z.object({
 
 export const createOrderInput = z
   .object({
+    idempotencyKey: z.string().uuid(),
     customer: z.object({
       name: z.string().trim().min(2).max(160),
       phone: z.string().transform(normalizePhoneForLookup).refine((value) => value.length >= 8, "Informe um telefone válido."),
@@ -30,6 +31,24 @@ export const createOrderInput = z
 
 export type CreatePublicOrderInput = z.infer<typeof createOrderInput> & {
   customerPhoneLookup: string;
+  sourceChannel: "OWN_APP";
+};
+
+const createKioskOrderInput = z.object({
+  idempotencyKey: z.string().uuid(),
+  displayName: z.string().trim().max(40).optional(),
+  paymentMethod: z.enum(["pix", "card"]),
+  items: z.array(itemInput).min(1).max(30),
+});
+
+export type CreateKioskOrderInput = z.infer<typeof createKioskOrderInput> & {
+  sourceChannel: "KIOSK";
+};
+
+export type KioskOrderConfirmation = {
+  orderNumber: string;
+  estimatedTime: string;
+  submittedAt: string;
 };
 
 export type PublicOrderConfirmation = {
@@ -61,6 +80,10 @@ export type PublicOrderRepository = {
   createOrder(input: CreatePublicOrderInput): Promise<PublicOrderConfirmation>;
   findTracking(input: z.infer<typeof trackingInput>): Promise<PublicTrackingOrder | null>;
   findLatestTrackingByPhone(phone: string): Promise<PublicTrackingOrder | null>;
+};
+
+export type KioskOrderRepository = {
+  createOrder(input: CreateKioskOrderInput): Promise<KioskOrderConfirmation>;
 };
 
 export function createPublicOrdersHandler(repository: PublicOrderRepository) {
@@ -96,8 +119,24 @@ export function createPublicOrdersHandler(repository: PublicOrderRepository) {
       const confirmation = await repository.createOrder({
         ...input.data,
         customerPhoneLookup: input.data.customer.phone,
+        sourceChannel: "OWN_APP",
       });
       return json(201, confirmation);
+    } catch (error) {
+      return jsonError(500, error);
+    }
+  };
+}
+
+export function createKioskOrdersHandler(repository: KioskOrderRepository) {
+  return async function kioskOrdersHandler(request: Request): Promise<Response> {
+    if (request.method !== "POST") return methodNotAllowed(["POST"]);
+
+    try {
+      const input = createKioskOrderInput.safeParse(await request.json());
+      if (!input.success) return jsonError(400, "Dados do pedido do totem inválidos.");
+
+      return json(201, await repository.createOrder({ ...input.data, sourceChannel: "KIOSK" }));
     } catch (error) {
       return jsonError(500, error);
     }

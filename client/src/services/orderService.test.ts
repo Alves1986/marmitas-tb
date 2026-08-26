@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { createLocalOrderService, createVercelOrderService } from "./orderService";
+import * as orderService from "./orderService";
+
+const { createLocalOrderService, createVercelOrderService } = orderService;
 
 describe("local order service", () => {
   it("confirms a delivery order through the standard payload contract", async () => {
@@ -117,5 +119,59 @@ describe("Vercel order service", () => {
     const service = createVercelOrderService({ request });
     const confirmation = await service.submit({ id: "local-order-3", createdAt: "2026-08-18T18:00:00.000Z", deliveryMode: "delivery", customer: { name: "Ana", phone: "42999991234", address: "Rua 1", neighborhood: "Centro", reference: "Portão", paymentMethod: "card", changeFor: "" }, items: [{ id: "1", productId: "19c4f23b-1e6d-4ca1-8e62-c44876fc65f2", name: "Marmita", unitPrice: 20, quantity: 1, selections: [], note: "" }], summary: { subtotal: 20, savings: 0, deliveryFee: 5, total: 25 } });
     expect(confirmation.orderNumber).toBe("TB-20260818-A1B2C3");
+  });
+
+  it("preserva a mesma chave idempotente quando o mesmo pedido é reenviado", async () => {
+    const submittedBodies: unknown[] = [];
+    const service = createVercelOrderService({
+      createIdempotencyKey: () => "b2a5f4d8-9a4d-4d66-b1a9-9aa5f93c9241",
+      request: async (_path, options) => {
+        submittedBodies.push(options.body);
+        return { orderNumber: "TB-20260826-CORE", estimatedTime: "35 a 45 min", submittedAt: "2026-08-26T23:15:00.000Z" };
+      },
+    });
+    const payload = { id: "local-order-4", createdAt: "2026-08-26T23:15:00.000Z", deliveryMode: "pickup", customer: { name: "Ana", phone: "42999991234", address: "", neighborhood: "", reference: "", paymentMethod: "pix", changeFor: "" }, items: [{ id: "1", productId: "19c4f23b-1e6d-4ca1-8e62-c44876fc65f2", name: "Marmita", unitPrice: 20, quantity: 1, selections: [], note: "" }], summary: { subtotal: 20, savings: 0, deliveryFee: 0, total: 20 } } as const;
+
+    await service.submit(payload);
+    await service.submit(payload);
+
+    expect(submittedBodies).toEqual([
+      expect.objectContaining({ idempotencyKey: "b2a5f4d8-9a4d-4d66-b1a9-9aa5f93c9241" }),
+      expect.objectContaining({ idempotencyKey: "b2a5f4d8-9a4d-4d66-b1a9-9aa5f93c9241" }),
+    ]);
+  });
+});
+
+describe("KIOSK order service", () => {
+  it("envia apenas o contrato KIOSK com IDs persistidos e preserva a chave em novo envio", async () => {
+    const createKioskOrderService = Reflect.get(orderService, "createKioskOrderService") as undefined | ((options: {
+      request: (path: string, options: { method: "POST"; body: unknown }) => Promise<unknown>;
+      createIdempotencyKey: () => string;
+    }) => { submit(payload: unknown): Promise<unknown> });
+    expect(createKioskOrderService).toBeTypeOf("function");
+    if (!createKioskOrderService) return;
+
+    const requests: Array<{ path: string; body: unknown }> = [];
+    const service = createKioskOrderService({
+      createIdempotencyKey: () => "b2a5f4d8-9a4d-4d66-b1a9-9aa5f93c9241",
+      request: async (path, options) => {
+        requests.push({ path, body: options.body });
+        return { orderNumber: "TB-20260826-KIOSK", estimatedTime: "15 a 25 min", submittedAt: "2026-08-26T23:35:00.000Z" };
+      },
+    });
+    const payload = {
+      id: "totem-session-1",
+      displayName: "Anderson",
+      paymentMethod: "card",
+      items: [{ productId: "19c4f23b-1e6d-4ca1-8e62-c44876fc65f2", quantity: 1, optionIds: ["56ee2e8e-649b-4aa1-9c1f-f8efa3e547d7"], note: "" }],
+    };
+
+    await service.submit(payload);
+    await service.submit(payload);
+
+    expect(requests).toEqual([
+      { path: "/api/public/kiosk-orders", body: expect.objectContaining({ idempotencyKey: "b2a5f4d8-9a4d-4d66-b1a9-9aa5f93c9241", paymentMethod: "card", items: payload.items }) },
+      { path: "/api/public/kiosk-orders", body: expect.objectContaining({ idempotencyKey: "b2a5f4d8-9a4d-4d66-b1a9-9aa5f93c9241" }) },
+    ]);
   });
 });

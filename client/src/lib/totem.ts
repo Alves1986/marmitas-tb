@@ -13,6 +13,7 @@ export type TotemItem = {
   name: string;
   price: number;
   quantity: number;
+  optionIds: string[];
 };
 
 export type TotemState = {

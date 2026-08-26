@@ -248,3 +248,13 @@
 - [x] Salvar a documentação atualizada em checkpoint antes de qualquer envio ao GitHub.
 - [x] Verificar a implantação Vercel acionada pelo envio da branch principal e restaurar a rota pública `/totem` caso o 404 persista após a propagação.
 - [x] Corrigir a atualização do service worker para impedir que clientes mantenham bundle anterior sem a rota `/totem` após uma publicação.
+- [x] Mapear o blueprint enviado para a arquitetura atual, distinguindo o que já existe do que exige novo contrato, integração ou infraestrutura.
+- [x] Definir e especificar o primeiro incremento do núcleo unificado de pedidos, com canal de origem, idempotência e auditoria.
+- [x] Planejar os módulos futuros de PDV, iFood, impressão local, estoque e dashboard sem ativar integrações externas não autorizadas.
+- [x] Projetar o primeiro incremento do núcleo unificado: canais de origem, status operacionais, idempotência, auditoria e adaptação progressiva do site e totem.
+- [x] Modelar uma fila de impressão única e auditável, compartilhada pelos canais aplicativo próprio, totem, futuro PDV e futura integração iFood.
+- [x] Restaurar a visualização colaborativa do núcleo unificado para validação do desenho operacional.
+- [x] Definir e testar prioridade máxima para trabalhos de impressão do balcão, preservando ordem e rastreabilidade dos demais canais.
+- [x] Aplicar a migração compatível autorizada do núcleo unificado no Supabase, preservando pedidos existentes e preenchendo-os como OWN_APP.
+- [x] Conectar o totem ao catálogo persistido e criar pedidos KIOSK no mesmo núcleo, sem habilitar cobrança real.
+- [x] Ordenar a fila Vercel por prioridade e criação, atribuir prioridade máxima ao balcão e exigir motivo auditável em reimpressões.

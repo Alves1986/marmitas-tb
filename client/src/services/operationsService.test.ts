@@ -18,11 +18,11 @@ describe("VercelOperationsService", () => {
     const service = createVercelOperationsService(api);
 
     await service.listPrintJobs();
-    await service.requeuePrint("5acb1c7d-1630-4b06-9f1e-9496bb3be555");
+    await service.requeuePrint("5acb1c7d-1630-4b06-9f1e-9496bb3be555", "Via da cozinha ficou ilegível.");
     await service.markPrintJob("090811f6-0535-483d-b2f3-a764d839aaa1", "printed", "Posto cozinha");
 
     expect(api).toHaveBeenNthCalledWith(1, "/api/operations/printJobs");
-    expect(api).toHaveBeenNthCalledWith(2, "/api/operations/printJobs", { method: "POST", body: { orderId: "5acb1c7d-1630-4b06-9f1e-9496bb3be555" } });
+    expect(api).toHaveBeenNthCalledWith(2, "/api/operations/printJobs", { method: "POST", body: { orderId: "5acb1c7d-1630-4b06-9f1e-9496bb3be555", reason: "Via da cozinha ficou ilegível." } });
     expect(api).toHaveBeenNthCalledWith(3, "/api/operations/printJobs", { method: "PATCH", body: { printJobId: "090811f6-0535-483d-b2f3-a764d839aaa1", status: "printed", printerName: "Posto cozinha" } });
   });
 });

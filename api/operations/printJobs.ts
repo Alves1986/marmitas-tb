@@ -3,7 +3,10 @@ import { ApiAuthError, createSupabaseAuthGuards, type AuthenticatedProfile } fro
 import { asVercelNodeHandler, json, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http.js";
 import { createSupabaseAdmin } from "../../server/vercel/_lib/supabaseAdmin.js";
 
-const requeueInput = z.object({ orderId: z.string().uuid() });
+const requeueInput = z.object({
+  orderId: z.string().uuid(),
+  reason: z.string().trim().min(3).max(500),
+});
 const markInput = z.object({
   printJobId: z.string().uuid(),
   status: z.enum(["printed", "failed"]),
@@ -13,7 +16,7 @@ const markInput = z.object({
 export type PrintJobsDependencies = {
   requireOperator(request: Request): Promise<AuthenticatedProfile>;
   list(): Promise<unknown[]>;
-  requeue(input: { orderId: string; actorUserId: string }): Promise<unknown>;
+  requeue(input: { orderId: string; actorUserId: string; reason: string }): Promise<unknown>;
   mark(input: z.infer<typeof markInput>): Promise<unknown>;
 };
 
@@ -47,28 +50,41 @@ export function createPrintJobsHandler(dependencies: PrintJobsDependencies) {
 async function listPrintJobs() {
   const client = createSupabaseAdmin();
   const { data, error } = await client.from("print_jobs")
-    .select("id, order_id, status, attempts, printer_name, printed_at, created_at, orders(code)")
+    .select("id, order_id, station_code, document_type, priority, status, attempts, printer_name, printed_at, created_at, orders(code, source_channel)")
     .eq("status", "queued")
+    .order("priority", { ascending: false })
     .order("created_at", { ascending: true });
   if (error) throw new Error("Não foi possível carregar a fila de impressão.");
   return data ?? [];
 }
 
-async function requeuePrintJob(input: { orderId: string; actorUserId: string }) {
-  const client = createSupabaseAdmin();
-  const { data: job, error: jobError } = await client.from("print_jobs")
-    .insert({ order_id: input.orderId, status: "queued" })
-    .select("id, order_id, status, created_at")
-    .single();
-  if (jobError) throw new Error("Não foi possível solicitar a reimpressão.");
-  const { error: eventError } = await client.from("order_events").insert({
-    order_id: input.orderId,
-    actor_user_id: input.actorUserId,
-    event_type: "print_queued",
-    message: "Reimpressão de comanda solicitada pela equipe.",
+type RequeuePrintRpcClient = {
+  rpc: (name: "requeue_print_job", parameters: Record<string, unknown>) => PromiseLike<{
+    data: Array<{ print_job_id: string; print_job_status: "queued" | "printed" | "failed"; print_job_priority: number; print_job_created_at: string }> | null;
+    error: { message: string } | null;
+  }>;
+};
+
+export async function requeueSupabasePrintJob(client: RequeuePrintRpcClient, input: { orderId: string; actorUserId: string; reason: string }) {
+  const { data, error } = await client.rpc("requeue_print_job", {
+    p_order_id: input.orderId,
+    p_actor_user_id: input.actorUserId,
+    p_reason: input.reason,
+    p_station_code: "COZINHA",
   });
-  if (eventError) throw new Error("Não foi possível registrar a auditoria da reimpressão.");
-  return job;
+  if (error || !data?.[0]) throw new Error(`Não foi possível solicitar a reimpressão: ${error?.message ?? "sem confirmação"}`);
+
+  const job = data[0];
+  return {
+    id: job.print_job_id,
+    status: job.print_job_status,
+    priority: job.print_job_priority,
+    created_at: job.print_job_created_at,
+  };
+}
+
+async function requeuePrintJob(input: { orderId: string; actorUserId: string; reason: string }) {
+  return requeueSupabasePrintJob(createSupabaseAdmin(), input);
 }
 
 async function markPrintJob(input: z.infer<typeof markInput>) {

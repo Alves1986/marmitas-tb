@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { createPublicOrdersHandler } from "../../../api/public/orders";
 
 const validRequest = {
+  idempotencyKey: "b2a5f4d8-9a4d-4d66-b1a9-9aa5f93c9241",
   customer: {
     name: "Ana da Silva",
     phone: "(42) 99999-1234",

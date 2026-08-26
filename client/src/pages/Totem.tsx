@@ -1,34 +1,141 @@
 import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, CheckCircle2, ChevronRight, CreditCard, Minus, Plus, Printer, QrCode, ShoppingBag, UtensilsCrossed } from "lucide-react";
-import type { Product } from "@shared/order";
+import type { Product, ProductOptionGroup } from "@shared/order";
 import { brandAsset } from "@/data/assets";
 import { categories, products } from "@/data/catalog";
 import { formatCurrency } from "@/lib/order";
 import { createInitialTotemState, createTotemReceipt, expireTotemSession, incrementTotemDailySequence, readTotemDailySequence, TOTEM_DAILY_SEQUENCE_STORAGE_KEY, type TotemItem, type TotemPaymentMethod, type TotemStep } from "@/lib/totem";
+import { createKioskOrderService, type KioskOrderConfirmation, type KioskOrderPayload } from "@/services/orderService";
 
 const STEPS: TotemStep[] = ["categories", "products", "drinks", "desserts", "review", "payment", "receipt"];
 const STEP_LABELS: Record<TotemStep, string> = {
   categories: "Opções", products: "Marmitas", drinks: "Bebida", desserts: "Sobremesa", review: "Revisão", payment: "Pagamento", receipt: "Retirada",
 };
 
+type PublicMenuForTotem = {
+  categories: Array<{ id: string; name: string; slug: string; sortOrder: number }>;
+  products: Array<{
+    id: string;
+    categoryId: string;
+    name: string;
+    description: string | null;
+    imagePath: string | null;
+    priceInCents: number;
+    originalPriceInCents: number | null;
+    requiresConfiguration: boolean;
+    options: Array<{ id: string; groupName: string; label: string; priceDeltaInCents: number; isRequired: boolean; sortOrder: number }>;
+  }>;
+};
+
+type PublicMenuOptionForTotem = PublicMenuForTotem["products"][number]["options"][number];
+type TotemProduct = Product & { defaultOptionIds: string[] };
+
+export type TotemCatalog = {
+  categories: Array<{ id: string; label: string; description: string }>;
+  products: TotemProduct[];
+};
+
+export function mapPublicMenuToTotemCatalog(menu: PublicMenuForTotem): TotemCatalog {
+  const categoryNames = new Map(menu.categories.map((category) => [category.id, category.name]));
+  const categories = menu.categories.map((category) => ({
+    id: category.id,
+    label: category.name,
+    description: category.slug === "destaques" ? "As escolhas do dia" : "Selecione uma opção",
+  }));
+
+  return {
+    categories,
+    products: menu.products.map((product) => {
+      const optionsByGroup = new Map<string, PublicMenuOptionForTotem[]>();
+      for (const option of product.options) {
+        const group = optionsByGroup.get(option.groupName) ?? [];
+        group.push(option);
+        optionsByGroup.set(option.groupName, group);
+      }
+      const defaultOptions = Array.from(optionsByGroup.values())
+        .map((group) => group.sort((left, right) => left.sortOrder - right.sortOrder).find((option) => option.isRequired))
+        .filter((option): option is PublicMenuOptionForTotem => Boolean(option));
+      const optionGroups: ProductOptionGroup[] = Array.from(optionsByGroup.entries()).map(([groupName, group]) => ({
+        id: groupName,
+        label: groupName,
+        required: group.some((option) => option.isRequired),
+        options: group.map((option) => ({ id: option.id, label: option.label, priceAdjustment: option.priceDeltaInCents / 100 })),
+      }));
+
+      return {
+        id: product.id,
+        categoryId: product.categoryId,
+        categoryLabel: categoryNames.get(product.categoryId) ?? "Cardápio",
+        name: product.name,
+        description: product.description ?? "",
+        imageUrl: product.imagePath ?? brandAsset("logo-marmitastb.jpg"),
+        price: (product.priceInCents + defaultOptions.reduce((total, option) => total + option.priceDeltaInCents, 0)) / 100,
+        originalPrice: product.originalPriceInCents ? product.originalPriceInCents / 100 : undefined,
+        accent: "red",
+        options: optionGroups,
+        defaultOptionIds: defaultOptions.map((option) => option.id),
+      };
+    }),
+  };
+}
+
+const fallbackCatalog: TotemCatalog = {
+  categories: categories.map((category) => ({ id: category.id, label: category.label, description: category.description })),
+  products: products.map((product) => ({ ...product, defaultOptionIds: [] })),
+};
+
+async function submitKioskRequest(path: string, options: { method: "POST"; body: unknown }): Promise<KioskOrderConfirmation> {
+  const response = await fetch(path, {
+    method: options.method,
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(options.body),
+  });
+  const data = await response.json().catch(() => null) as KioskOrderConfirmation | { error?: string } | null;
+  if (!response.ok || !data || !("orderNumber" in data)) {
+    throw new Error(data && "error" in data && data.error ? data.error : "Não foi possível registrar o pedido do totem.");
+  }
+  return data;
+}
+
+const kioskOrderService = createKioskOrderService({ request: submitKioskRequest });
+
+type TotemProps = {
+  params?: unknown;
+  initialCatalog?: TotemCatalog;
+  submitOrder?: (payload: KioskOrderPayload) => Promise<KioskOrderConfirmation>;
+};
+
 function isDrink(product: Product) { return /bebida|suco|refrigerante/i.test(product.categoryLabel); }
 function isDessert(product: Product) { return /sobremesa|doce/i.test(product.categoryLabel); }
 
-export default function Totem() {
+export default function Totem({ initialCatalog, submitOrder = kioskOrderService.submit }: TotemProps) {
   const [state, setState] = useState(createInitialTotemState);
   const [categoryId, setCategoryId] = useState<string | null>(null);
   const [payment, setPayment] = useState<TotemPaymentMethod | null>(null);
   const [sequence, setSequence] = useState(() => readTotemDailySequence(sessionStorage.getItem(TOTEM_DAILY_SEQUENCE_STORAGE_KEY)).sequence);
   const [processing, setProcessing] = useState(false);
+  const [catalog, setCatalog] = useState<TotemCatalog>(initialCatalog ?? fallbackCatalog);
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
+  const [orderSessionId, setOrderSessionId] = useState(() => crypto.randomUUID());
 
   const total = state.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const index = STEPS.indexOf(state.step);
   const previousStep = index > 0 ? STEPS[index - 1] : null;
-  const reset = () => { setState(expireTotemSession(state)); setCategoryId(null); setPayment(null); setProcessing(false); };
+  const reset = () => { setState(expireTotemSession(state)); setCategoryId(null); setPayment(null); setProcessing(false); setSubmissionError(null); setOrderSessionId(crypto.randomUUID()); };
+
+  useEffect(() => {
+    if (initialCatalog) return;
+    let active = true;
+    void fetch("/api/public/menu")
+      .then((response) => response.ok ? response.json() as Promise<PublicMenuForTotem> : Promise.reject(new Error("cardápio indisponível")))
+      .then((menu) => { if (active) setCatalog(mapPublicMenuToTotemCatalog(menu)); })
+      .catch(() => { /* A interface preserva o catálogo de contingência; o servidor rejeita qualquer item desatualizado. */ });
+    return () => { active = false; };
+  }, [initialCatalog]);
 
   useEffect(() => {
     let timeout: number;
-    const expire = () => { setState(createInitialTotemState()); setCategoryId(null); setPayment(null); setProcessing(false); };
+    const expire = () => { setState(createInitialTotemState()); setCategoryId(null); setPayment(null); setProcessing(false); setSubmissionError(null); setOrderSessionId(crypto.randomUUID()); };
     const restart = () => { window.clearTimeout(timeout); timeout = window.setTimeout(expire, 90_000); };
     restart();
     window.addEventListener("pointerdown", restart);
@@ -37,40 +144,51 @@ export default function Totem() {
   }, []);
 
   function move(step: TotemStep) { setState((current) => ({ ...current, step })); }
-  function add(product: Product) {
+  function add(product: TotemProduct) {
     setState((current) => {
       const existing = current.items.find((item) => item.id === product.id);
       const items = existing
         ? current.items.map((item) => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item)
-        : [...current.items, { id: product.id, name: product.name, price: product.price, quantity: 1 }];
+        : [...current.items, { id: product.id, name: product.name, price: product.price, quantity: 1, optionIds: product.defaultOptionIds }];
       return { ...current, items };
     });
   }
-  function chooseMarmita(product: Product) {
+  function chooseMarmita(product: TotemProduct) {
     add(product);
     move("drinks");
   }
-  function chooseDrink(product: Product) {
+  function chooseDrink(product: TotemProduct) {
     add(product);
     move("desserts");
   }
-  function chooseDessert(product: Product) {
+  function chooseDessert(product: TotemProduct) {
     add(product);
     move("review");
   }
   function update(id: string, delta: number) {
     setState((current) => ({ ...current, items: current.items.map((item) => item.id === id ? { ...item, quantity: Math.max(0, item.quantity + delta) } : item).filter((item) => item.quantity > 0) }));
   }
-  function approve(method: TotemPaymentMethod) {
-    setPayment(method); setProcessing(true);
-    window.setTimeout(() => {
+  async function approve(method: TotemPaymentMethod) {
+    setPayment(method); setProcessing(true); setSubmissionError(null);
+    try {
+      await submitOrder({
+        id: orderSessionId,
+        displayName: state.displayName || undefined,
+        paymentMethod: method,
+        items: state.items.map((item) => ({ productId: item.id, quantity: item.quantity, optionIds: item.optionIds, note: "" })),
+      });
+      window.setTimeout(() => {
       const dailySequence = readTotemDailySequence(sessionStorage.getItem(TOTEM_DAILY_SEQUENCE_STORAGE_KEY));
       const next = incrementTotemDailySequence(dailySequence);
       setSequence(next.sequence);
       sessionStorage.setItem(TOTEM_DAILY_SEQUENCE_STORAGE_KEY, JSON.stringify(next));
       setProcessing(false);
       move("receipt");
-    }, 1200);
+      }, 1200);
+    } catch (error) {
+      setProcessing(false);
+      setSubmissionError(error instanceof Error ? error.message : "Não foi possível registrar o pedido do totem.");
+    }
   }
   const receipt = state.step === "receipt" && payment ? createTotemReceipt({ sequence, displayName: state.displayName, paymentMethod: payment, items: state.items }) : null;
 
@@ -85,12 +203,12 @@ export default function Totem() {
       <section className="mx-auto flex min-h-[calc(100dvh-81px)] max-w-xl flex-col px-5 pb-7 pt-6">
         <div className="mb-5 h-1.5 overflow-hidden rounded-full bg-[#ead9c1]"><div className="h-full rounded-full bg-[#a82926] transition-all duration-300" style={{ width: `${((index + 1) / STEPS.length) * 100}%` }} /></div>
         <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#a82926]">{STEP_LABELS[state.step]}</p>
-        {state.step === "categories" && <CategoryStep onChoose={(id) => { setCategoryId(id); move("products"); }} />}
-        {state.step === "products" && <ProductStep title="Escolha sua marmita" products={products.filter((product) => product.categoryId === categoryId)} items={state.items} onAdd={add} onChoose={chooseMarmita} onUpdate={update} />}
-        {state.step === "drinks" && <ProductStep title="Quer uma bebida?" products={products.filter(isDrink)} items={state.items} onAdd={add} onChoose={chooseDrink} onUpdate={update} optional />}
-        {state.step === "desserts" && <ProductStep title="E uma sobremesa?" products={products.filter(isDessert)} items={state.items} onAdd={add} onChoose={chooseDessert} onUpdate={update} optional onSkip={() => move("review")} />}
+        {state.step === "categories" && <CategoryStep categories={catalog.categories} onChoose={(id) => { setCategoryId(id); move("products"); }} />}
+        {state.step === "products" && <ProductStep title="Escolha sua marmita" products={catalog.products.filter((product) => product.categoryId === categoryId)} items={state.items} onAdd={add} onChoose={chooseMarmita} onUpdate={update} />}
+        {state.step === "drinks" && <ProductStep title="Quer uma bebida?" products={catalog.products.filter(isDrink)} items={state.items} onAdd={add} onChoose={chooseDrink} onUpdate={update} optional />}
+        {state.step === "desserts" && <ProductStep title="E uma sobremesa?" products={catalog.products.filter(isDessert)} items={state.items} onAdd={add} onChoose={chooseDessert} onUpdate={update} optional onSkip={() => move("review")} />}
         {state.step === "review" && <ReviewStep items={state.items} total={total} name={state.displayName} onName={(displayName) => setState((current) => ({ ...current, displayName }))} />}
-        {state.step === "payment" && <PaymentStep total={total} processing={processing} onPay={approve} />}
+        {state.step === "payment" && <PaymentStep total={total} processing={processing} error={submissionError} onPay={approve} />}
         {state.step === "receipt" && receipt && <ReceiptStep receipt={receipt} items={state.items} onPrint={() => window.print()} onFinish={reset} />}
         {state.step !== "receipt" && state.step !== "categories" && <nav data-testid="totem-step-actions" className="sticky bottom-0 z-10 -mx-5 mt-auto flex gap-3 border-t border-[#ead9c1] bg-[#fff7ea]/95 px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 backdrop-blur">
           {previousStep && <button type="button" onClick={() => move(previousStep)} className="flex min-h-14 shrink-0 items-center justify-center gap-2 rounded-2xl border border-[#d7bea0] bg-white px-4 text-base font-extrabold" aria-label={`Voltar para ${STEP_LABELS[previousStep].toLowerCase()}`}><ArrowLeft className="size-5" /> Voltar</button>}
@@ -103,24 +221,24 @@ export default function Totem() {
   );
 }
 
-function CategoryStep({ onChoose }: { onChoose: (id: string) => void }) {
+function CategoryStep({ categories: choices, onChoose }: { categories: TotemCatalog["categories"]; onChoose: (id: string) => void }) {
   return <>
     <h1 className="mt-2 font-display text-4xl leading-tight">Escolha uma opção</h1>
     <p className="mt-2 text-base text-[#765f50]">Comece pelo que você quer comer hoje.</p>
     <p className="mt-4 text-sm font-semibold text-[#68703d]">Para sua privacidade, o atendimento reinicia após 90 segundos sem interação.</p>
     <div className="mt-7 grid gap-3">
-      {categories.filter((category) => !/bebida|sobremesa/i.test(category.label)).map((category) => <button key={category.id} type="button" onClick={() => onChoose(category.id)} className="flex min-h-20 items-center justify-between rounded-3xl border border-[#ead9c1] bg-white px-5 text-left shadow-sm transition active:scale-[.99]"><span><strong className="block text-lg">{category.label}</strong><span className="mt-1 block text-sm text-[#806859]">{category.description}</span></span><ChevronRight className="size-6 text-[#a82926]" /></button>)}
+      {choices.filter((category) => !/bebida|sobremesa/i.test(category.label)).map((category) => <button key={category.id} type="button" onClick={() => onChoose(category.id)} className="flex min-h-20 items-center justify-between rounded-3xl border border-[#ead9c1] bg-white px-5 text-left shadow-sm transition active:scale-[.99]"><span><strong className="block text-lg">{category.label}</strong><span className="mt-1 block text-sm text-[#806859]">{category.description}</span></span><ChevronRight className="size-6 text-[#a82926]" /></button>)}
     </div>
   </>;
 }
 
-function ProductStep({ title, products: choices, items, onAdd, onChoose, onUpdate, optional = false, onSkip }: { title: string; products: Product[]; items: TotemItem[]; onAdd: (product: Product) => void; onChoose?: (product: Product) => void; onUpdate: (id: string, delta: number) => void; optional?: boolean; onSkip?: () => void }) {
+function ProductStep({ title, products: choices, items, onAdd, onChoose, onUpdate, optional = false, onSkip }: { title: string; products: TotemProduct[]; items: TotemItem[]; onAdd: (product: TotemProduct) => void; onChoose?: (product: TotemProduct) => void; onUpdate: (id: string, delta: number) => void; optional?: boolean; onSkip?: () => void }) {
   return <><h1 className="mt-2 font-display text-4xl leading-tight">{title}</h1><p className="mt-2 text-base text-[#765f50]">{optional ? "Você pode pular esta etapa se quiser." : "Toque em uma marmita para adicionar e seguir para bebidas."}</p>{onSkip && <div data-testid="totem-dessert-choice" className="mt-5 rounded-3xl border border-[#e7d4b9] bg-[#fffaf1] p-4 shadow-sm"><p className="text-sm font-bold text-[#765f50]">Quer adicionar uma sobremesa?</p><button type="button" onClick={onSkip} className="mt-3 flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#481e1f] bg-white px-5 text-base font-extrabold text-[#481e1f] transition active:scale-[.98]">Não quero sobremesa <ChevronRight className="size-5" /></button></div>}<div className="mt-6 grid gap-4">{choices.map((product) => { const item = items.find((current) => current.id === product.id); return <article key={product.id} className="overflow-hidden rounded-3xl border border-[#ead9c1] bg-white shadow-sm"><button type="button" onClick={() => onChoose ? onChoose(product) : onAdd(product)} className="flex w-full items-center gap-4 p-4 text-left"><img src={product.imageUrl} alt="" className="size-20 rounded-2xl object-cover" /><span className="min-w-0 flex-1"><strong className="block text-lg leading-tight">{product.name}</strong><span className="mt-1 line-clamp-2 block text-sm text-[#806859]">{product.description}</span><b className="mt-2 block text-base text-[#a82926]">{formatCurrency(product.price)}</b></span><Plus className="size-6 shrink-0 text-[#a82926]" /></button>{item && <div className="flex items-center justify-between border-t border-[#f0e3d0] bg-[#fffaf1] px-4 py-3"><span className="text-sm font-bold">No pedido</span><span className="flex items-center gap-3"><button type="button" onClick={() => onUpdate(product.id, -1)} className="grid size-11 place-items-center rounded-xl border border-[#d9bea0]" aria-label={`Remover ${product.name}`}><Minus className="size-4" /></button><b>{item.quantity}</b><button type="button" onClick={() => onAdd(product)} className="grid size-11 place-items-center rounded-xl bg-[#481e1f] text-white" aria-label={`Adicionar ${product.name}`}><Plus className="size-4" /></button></span></div>}</article>; })}</div></>;
 }
 
 function ReviewStep({ items, total, name, onName }: { items: TotemItem[]; total: number; name: string; onName: (value: string) => void }) { return <><h1 className="mt-2 font-display text-4xl leading-tight">Confira seu pedido</h1><div className="mt-6 space-y-3 rounded-3xl bg-white p-5 shadow-sm">{items.map((item) => <div key={item.id} className="flex justify-between gap-3 text-sm"><span>{item.quantity}× {item.name}</span><b>{formatCurrency(item.price * item.quantity)}</b></div>)}<div className="border-t border-[#ead9c1] pt-4 text-xl font-black">Total <span className="float-right text-[#a82926]">{formatCurrency(total)}</span></div></div><label className="mt-6 block"><span className="text-base font-bold">Seu nome é opcional</span><span className="mt-1 block text-sm text-[#806859]">Ele aparecerá junto da senha quando o pedido ficar pronto.</span><input value={name} onChange={(event) => onName(event.target.value)} maxLength={40} placeholder="Ex.: Anderson" className="mt-3 min-h-14 w-full rounded-2xl border border-[#d7bea0] bg-white px-4 text-lg outline-none focus:border-[#a82926] focus:ring-4 focus:ring-[#a82926]/10" /></label></> }
 
-function PaymentStep({ total, processing, onPay }: { total: number; processing: boolean; onPay: (method: TotemPaymentMethod) => void }) { return <><h1 className="mt-2 font-display text-4xl leading-tight">Como deseja pagar?</h1><p className="mt-2 text-base text-[#765f50]">Demonstração segura: nenhuma cobrança será realizada.</p><div className="mt-7 grid gap-4"><button type="button" disabled={processing} onClick={() => onPay("pix")} className="min-h-28 rounded-3xl bg-[#68703d] px-6 text-left text-white shadow-lg transition active:scale-[.99]"><QrCode className="size-8" /><strong className="mt-2 block text-xl">PIX</strong><span className="text-sm opacity-90">Mostrar QR de demonstração · {formatCurrency(total)}</span></button><button type="button" disabled={processing} onClick={() => onPay("card")} className="min-h-28 rounded-3xl bg-[#481e1f] px-6 text-left text-white shadow-lg transition active:scale-[.99]"><CreditCard className="size-8" /><strong className="mt-2 block text-xl">Cartão</strong><span className="text-sm opacity-90">Aprovação simulada · {formatCurrency(total)}</span></button></div>{processing && <p className="mt-6 rounded-2xl bg-[#fff1d7] p-4 text-center font-bold text-[#765f50]">Processando pagamento de demonstração…</p>}</> }
+function PaymentStep({ total, processing, error, onPay }: { total: number; processing: boolean; error: string | null; onPay: (method: TotemPaymentMethod) => void | Promise<void> }) { return <><h1 className="mt-2 font-display text-4xl leading-tight">Como deseja pagar?</h1><p className="mt-2 text-base text-[#765f50]">Demonstração segura: nenhuma cobrança será realizada.</p><div className="mt-7 grid gap-4"><button type="button" disabled={processing} onClick={() => { void onPay("pix"); }} className="min-h-28 rounded-3xl bg-[#68703d] px-6 text-left text-white shadow-lg transition active:scale-[.99]"><QrCode className="size-8" /><strong className="mt-2 block text-xl">PIX</strong><span className="text-sm opacity-90">Mostrar QR de demonstração · {formatCurrency(total)}</span></button><button type="button" disabled={processing} onClick={() => { void onPay("card"); }} className="min-h-28 rounded-3xl bg-[#481e1f] px-6 text-left text-white shadow-lg transition active:scale-[.99]"><CreditCard className="size-8" /><strong className="mt-2 block text-xl">Cartão</strong><span className="text-sm opacity-90">Aprovação simulada · {formatCurrency(total)}</span></button></div>{processing && <p className="mt-6 rounded-2xl bg-[#fff1d7] p-4 text-center font-bold text-[#765f50]">Registrando pedido de demonstração…</p>}{error && <p role="alert" className="mt-5 rounded-2xl border border-[#a82926]/30 bg-[#fff0ee] p-4 text-center text-sm font-bold text-[#8c2522]">{error}</p>}</> }
 
 function ReceiptStep({ receipt, items, onPrint, onFinish }: { receipt: ReturnType<typeof createTotemReceipt>; items: TotemItem[]; onPrint: () => void; onFinish: () => void }) {
   return <div id="totem-receipt" className="text-center">

@@ -41,6 +41,7 @@ import { OrderQueue } from "./OrderQueue";
 afterEach(() => {
   cleanup();
   vi.clearAllMocks();
+  vi.unstubAllGlobals();
 });
 
 describe("OrderQueue no runtime Vercel", () => {
@@ -61,6 +62,7 @@ describe("OrderQueue no runtime Vercel", () => {
   });
 
   it("informa ao operador quando a reimpressão manual não abre no navegador", async () => {
+    vi.stubGlobal("prompt", vi.fn(() => "Via anterior ilegível"));
     const service = await import("@/services/operationsService");
     vi.mocked(service.vercelOperationsService.listPrintJobs).mockResolvedValueOnce([]);
     vi.mocked(service.vercelOperationsService.requeuePrint).mockResolvedValueOnce({

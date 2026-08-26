@@ -200,6 +200,11 @@ export function OrderQueue({ onOrdersChange }: OrderQueueProps) {
       queuePrint.mutate(getManualPrintRequest(Number(orderId)));
       return;
     }
+    const reason = window.prompt("Informe o motivo da reimpressão para registro operacional:", "Via anterior ilegível");
+    if (!reason?.trim()) {
+      setPrintFeedback((current) => ({ ...current, [String(orderId)]: "A reimpressão foi cancelada: informe o motivo para registrá-la." }));
+      return;
+    }
     setPendingPrintOrderId(orderId);
     let printStatus: "printed" | "failed" = "printed";
     try {
@@ -214,7 +219,7 @@ export function OrderQueue({ onOrdersChange }: OrderQueueProps) {
     }
 
     try {
-      const job = await vercelOperationsService.requeuePrint(String(orderId));
+      const job = await vercelOperationsService.requeuePrint(String(orderId), reason.trim());
       printedJobIds.current.add(job.id);
       await vercelOperationsService.markPrintJob(job.id, printStatus, "Navegador do posto");
       await refreshVercelQueue();

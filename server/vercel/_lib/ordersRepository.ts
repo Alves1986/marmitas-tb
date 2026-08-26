@@ -1,7 +1,8 @@
 import { createTemporaryOrderCode } from "./orders.js";
 import { createSupabaseAdmin } from "./supabaseAdmin.js";
 import { createAsaasSandboxPixPayment } from "./asaasSandboxPayments.js";
-import type { CreatePublicOrderInput, PublicOrderConfirmation, PublicTrackingOrder } from "../../../api/public/orders";
+import { persistUnifiedOrder, type UnifiedOrderItem, type UnifiedOrderPayload } from "./unifiedOrders.js";
+import type { CreateKioskOrderInput, CreatePublicOrderInput, KioskOrderConfirmation, PublicOrderConfirmation, PublicTrackingOrder } from "../../../api/public/orders";
 
 type ProductRecord = { id: string; name: string; price_in_cents: number };
 type OptionRecord = {
@@ -12,6 +13,79 @@ type OptionRecord = {
   price_delta_in_cents: number;
   is_required: boolean;
 };
+
+type BuildOwnAppUnifiedOrderInput = {
+  code: string;
+  sourceChannel: "OWN_APP";
+  idempotencyKey: string;
+  customer: CreatePublicOrderInput["customer"];
+  customerPhoneLookup: string;
+  fulfillmentMethod: CreatePublicOrderInput["fulfillmentMethod"];
+  paymentMethod: CreatePublicOrderInput["paymentMethod"];
+  orderItems: UnifiedOrderItem[];
+};
+
+type BuildKioskUnifiedOrderInput = {
+  code: string;
+  idempotencyKey: string;
+  displayName?: string;
+  paymentMethod: "pix" | "card";
+  orderItems: UnifiedOrderItem[];
+};
+
+export function buildOwnAppUnifiedOrderPayload(input: BuildOwnAppUnifiedOrderInput): UnifiedOrderPayload {
+  const subtotalInCents = input.orderItems.reduce((total, item) => total + item.unitPriceInCents * item.quantity, 0);
+  const deliveryFeeInCents = input.fulfillmentMethod === "delivery" ? 500 : 0;
+
+  return {
+    code: input.code,
+    sourceChannel: input.sourceChannel,
+    idempotencyKey: input.idempotencyKey,
+    customer: {
+      name: input.customer.name,
+      phone: input.customer.phone,
+      phoneLookup: input.customerPhoneLookup,
+      address: input.fulfillmentMethod === "delivery" ? input.customer.address : undefined,
+      notes: input.customer.notes,
+    },
+    fulfillmentMethod: input.fulfillmentMethod,
+    subtotalInCents,
+    deliveryFeeInCents,
+    totalInCents: subtotalInCents + deliveryFeeInCents,
+    status: "aguardando_pagamento",
+    paymentMethod: input.paymentMethod,
+    paymentProvider: "asaas_test",
+    paymentStatus: "pending",
+    paymentReference: `test_${input.code}`,
+    items: input.orderItems,
+  };
+}
+
+export function buildKioskUnifiedOrderPayload(input: BuildKioskUnifiedOrderInput): UnifiedOrderPayload {
+  const subtotalInCents = input.orderItems.reduce((total, item) => total + item.unitPriceInCents * item.quantity, 0);
+
+  return {
+    code: input.code,
+    sourceChannel: "KIOSK",
+    idempotencyKey: input.idempotencyKey,
+    customer: {
+      name: input.displayName || "Cliente do totem",
+      phone: "TOTEM",
+      phoneLookup: "TOTEM",
+      notes: "Pagamento demonstrativo aprovado no totem.",
+    },
+    fulfillmentMethod: "pickup",
+    subtotalInCents,
+    deliveryFeeInCents: 0,
+    totalInCents: subtotalInCents,
+    status: "confirmado",
+    paymentMethod: input.paymentMethod === "card" ? "credit_card" : "pix",
+    paymentProvider: "asaas_test",
+    paymentStatus: "confirmed",
+    paymentReference: `kiosk_demo_${input.code}`,
+    items: input.orderItems,
+  };
+}
 
 function unique<T>(values: readonly T[]): T[] {
   return values.filter((value, index) => values.indexOf(value) === index);
@@ -71,55 +145,24 @@ export async function createSupabaseOrder(input: CreatePublicOrderInput): Promis
     };
   });
 
-  const subtotalInCents = orderItems.reduce((total, item) => total + item.unitPriceInCents * item.quantity, 0);
-  const deliveryFeeInCents = input.fulfillmentMethod === "delivery" ? 500 : 0;
   const now = new Date();
   const code = createTemporaryOrderCode(now, crypto.randomUUID());
-  const { data: order, error: orderError } = await client
-    .from("orders")
-    .insert({
-      code,
-      customer_name: input.customer.name,
-      customer_phone: input.customer.phone,
-      customer_phone_lookup: input.customerPhoneLookup,
-      fulfillment_method: input.fulfillmentMethod,
-      delivery_address: input.fulfillmentMethod === "delivery" ? input.customer.address : null,
-      customer_notes: input.customer.notes || null,
-      subtotal_in_cents: subtotalInCents,
-      delivery_fee_in_cents: deliveryFeeInCents,
-      total_in_cents: subtotalInCents + deliveryFeeInCents,
-      status: "aguardando_pagamento",
-      payment_method: input.paymentMethod,
-      payment_provider: "asaas_test",
-      payment_status: "pending",
-      payment_reference: `test_${code}_${now.getTime()}`,
-    })
-    .select("id, code, created_at")
-    .single();
-  if (orderError || !order) throw new Error("Não foi possível registrar o pedido.");
-
-  const { error: itemsError } = await client.from("order_items").insert(
-    orderItems.map((item) => ({
-      order_id: order.id,
-      product_id: item.productId,
-      product_name: item.productName,
-      unit_price_in_cents: item.unitPriceInCents,
-      quantity: item.quantity,
-      configuration: item.configuration,
-      notes: item.note || null,
-    })),
-  );
-  if (itemsError) throw new Error("Não foi possível registrar os itens do pedido.");
-
-  const { error: eventError } = await client.from("order_events").insert({
-    order_id: order.id,
-    event_type: "created",
-    to_status: "aguardando_pagamento",
-    message: "Pedido recebido.",
+  const unifiedPayload = buildOwnAppUnifiedOrderPayload({
+    code,
+    sourceChannel: input.sourceChannel,
+    idempotencyKey: input.idempotencyKey,
+    customer: input.customer,
+    customerPhoneLookup: input.customerPhoneLookup,
+    fulfillmentMethod: input.fulfillmentMethod,
+    paymentMethod: input.paymentMethod,
+    orderItems,
   });
-  if (eventError) throw new Error("Não foi possível registrar o histórico do pedido.");
+  const persisted = await persistUnifiedOrder(client, unifiedPayload);
+  const order = { id: persisted.id, code: persisted.code, created_at: persisted.createdAt };
+  const subtotalInCents = unifiedPayload.subtotalInCents;
+  const deliveryFeeInCents = unifiedPayload.deliveryFeeInCents;
 
-  let paymentReference = `test_${code}_${now.getTime()}`;
+  let paymentReference = unifiedPayload.paymentReference ?? `test_${code}`;
   let paymentUrl: string | undefined;
   if (input.paymentMethod === "pix") {
     const sandboxPayment = await createAsaasSandboxPixPayment({
@@ -160,6 +203,76 @@ export async function createSupabaseOrder(input: CreatePublicOrderInput): Promis
     paymentUrl,
     paymentStatus: "pending",
     isTestPayment: true,
+  };
+}
+
+export async function createSupabaseKioskOrder(input: CreateKioskOrderInput): Promise<KioskOrderConfirmation> {
+  const client = createSupabaseAdmin();
+  const productIds = unique(input.items.map((item) => item.productId));
+  const { data: productData, error: productError } = await client
+    .from("products")
+    .select("id, name, price_in_cents")
+    .in("id", productIds)
+    .eq("is_active", true);
+  if (productError) throw new Error("Não foi possível validar os produtos do totem.");
+
+  const products = (productData ?? []) as ProductRecord[];
+  const productsById = new Map(products.map((product) => [product.id, product]));
+  if (productsById.size !== productIds.length) throw new Error("Um dos produtos do totem não está disponível.");
+
+  const { data: optionData, error: optionError } = await client
+    .from("product_options")
+    .select("id, product_id, group_name, label, price_delta_in_cents, is_required")
+    .in("product_id", productIds)
+    .eq("is_active", true);
+  if (optionError) throw new Error("Não foi possível validar as opções do totem.");
+
+  const options = (optionData ?? []) as OptionRecord[];
+  const optionsById = new Map(options.map((option) => [option.id, option]));
+  const orderItems: UnifiedOrderItem[] = input.items.map((item) => {
+    const product = productsById.get(item.productId)!;
+    const selectedOptions = item.optionIds.map((optionId) => optionsById.get(optionId));
+    if (selectedOptions.some((option) => !option || option.product_id !== product.id)) {
+      throw new Error("Configuração de produto inválida no totem.");
+    }
+
+    const selectedGroupNames = new Set(selectedOptions.map((option) => option!.group_name));
+    const requiredGroupNames = unique(
+      options.filter((option) => option.product_id === product.id && option.is_required).map((option) => option.group_name),
+    );
+    if (requiredGroupNames.some((groupName) => !selectedGroupNames.has(groupName))) {
+      throw new Error("Selecione as opções obrigatórias do produto no totem.");
+    }
+
+    const optionTotal = selectedOptions.reduce((total, option) => total + option!.price_delta_in_cents, 0);
+    return {
+      productId: product.id,
+      productName: product.name,
+      unitPriceInCents: product.price_in_cents + optionTotal,
+      quantity: item.quantity,
+      configuration: selectedOptions.map((option) => ({
+        id: option!.id,
+        groupName: option!.group_name,
+        label: option!.label,
+        priceDeltaInCents: option!.price_delta_in_cents,
+      })),
+      note: item.note,
+    };
+  });
+
+  const code = createTemporaryOrderCode(new Date(), crypto.randomUUID());
+  const persisted = await persistUnifiedOrder(client, buildKioskUnifiedOrderPayload({
+    code,
+    idempotencyKey: input.idempotencyKey,
+    displayName: input.displayName,
+    paymentMethod: input.paymentMethod,
+    orderItems,
+  }));
+
+  return {
+    orderNumber: persisted.code,
+    estimatedTime: "15 a 25 min",
+    submittedAt: persisted.createdAt,
   };
 }
 

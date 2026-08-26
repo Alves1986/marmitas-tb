@@ -31,6 +31,7 @@ export function createLocalOrderService(options: LocalOrderServiceOptions = {}):
 type VercelOrderServiceOptions = {
   request: (path: string, options: { method: "POST"; body: unknown }) => Promise<OrderConfirmation>;
   loadMenu?: () => Promise<PublicMenu>;
+  createIdempotencyKey?: () => string;
 };
 
 export type PublicMenu = {
@@ -67,13 +68,19 @@ async function resolveItemsForPublicOrder(items: CartItem[], loadMenu?: () => Pr
 }
 
 export function createVercelOrderService(options: VercelOrderServiceOptions): OrderService {
+  const createIdempotencyKey = options.createIdempotencyKey ?? (() => crypto.randomUUID());
+  const idempotencyKeys = new Map<string, string>();
+
   return {
     async submit(payload) {
       const items = await resolveItemsForPublicOrder(payload.items, options.loadMenu);
       const paymentMethod = payload.customer.paymentMethod === "card" ? "credit_card" : payload.customer.paymentMethod === "food_voucher" ? "voucher" : payload.customer.paymentMethod;
+      const idempotencyKey = idempotencyKeys.get(payload.id) ?? createIdempotencyKey();
+      idempotencyKeys.set(payload.id, idempotencyKey);
       return options.request("/api/public/orders", {
         method: "POST",
         body: {
+          idempotencyKey,
           customer: {
             name: payload.customer.name,
             phone: payload.customer.phone,
@@ -83,6 +90,46 @@ export function createVercelOrderService(options: VercelOrderServiceOptions): Or
           fulfillmentMethod: payload.deliveryMode,
           paymentMethod,
           items: items.map((item) => ({ productId: item.productId, quantity: item.quantity, optionIds: item.selections.map((selection) => selection.optionId), note: item.note })),
+        },
+      });
+    },
+  };
+}
+
+export type KioskOrderPayload = {
+  id: string;
+  displayName?: string;
+  paymentMethod: "pix" | "card";
+  items: Array<{ productId: string; quantity: number; optionIds: string[]; note: string }>;
+};
+
+export type KioskOrderConfirmation = {
+  orderNumber: string;
+  estimatedTime: string;
+  submittedAt: string;
+};
+
+type KioskOrderServiceOptions = {
+  request: (path: string, options: { method: "POST"; body: unknown }) => Promise<KioskOrderConfirmation>;
+  createIdempotencyKey?: () => string;
+};
+
+export function createKioskOrderService(options: KioskOrderServiceOptions) {
+  const createIdempotencyKey = options.createIdempotencyKey ?? (() => crypto.randomUUID());
+  const idempotencyKeys = new Map<string, string>();
+
+  return {
+    async submit(payload: KioskOrderPayload): Promise<KioskOrderConfirmation> {
+      const idempotencyKey = idempotencyKeys.get(payload.id) ?? createIdempotencyKey();
+      idempotencyKeys.set(payload.id, idempotencyKey);
+
+      return options.request("/api/public/kiosk-orders", {
+        method: "POST",
+        body: {
+          idempotencyKey,
+          displayName: payload.displayName || undefined,
+          paymentMethod: payload.paymentMethod,
+          items: payload.items,
         },
       });
     },

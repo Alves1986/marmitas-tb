@@ -279,3 +279,13 @@
 - [x] Preparar o plano técnico testável da tela de cozinha aprovada antes de alterar o código.
 - [x] Executar continuamente o plano aprovado da tela de cozinha, com TDD e checkpoint por marco estável.
 - [x] Ampliar o contrato operacional de leitura com origem do pedido e senha COUNTER para a projeção de cozinha.
+- [x] Levantar e aprovar o núcleo inicial de estoque por movimentações, sem compras automáticas, QR Code ou integração externa.
+- [x] Definir o contrato de movimentos manuais de estoque: entrada, consumo interno, perda e ajuste, com motivo, ator e histórico auditável.
+- [x] Definir os dados mínimos de insumos e saldo operacional, sem baixa automática vinculada a pedidos nesta etapa.
+- [x] Definir autorização server-side: staff/admin para entrada e consumo; somente admin para perda e ajuste, sempre com motivo e auditoria.
+- [x] Definir cadastro mínimo de insumo com nome, unidade (kg, g, L, mL ou unidade) e estoque mínimo; formar saldo apenas por movimentações registradas.
+- [ ] Documentar e implementar a rota interna /operacao/estoque com lista de saldo, histórico e formulário de movimentações auditáveis.
+- [x] Executar o incremento de estoque em branch local isolada, sem push GitHub ou publicação Vercel.
+- [ ] Aplicar futuramente a migração arquivada do núcleo de estoque e conectar a rota ao Supabase, somente após nova autorização explícita e sem dados de teste não autorizados.
+- [x] Consolidar os recursos operacionais em um dispatcher dinâmico, preservando pedidos, alertas e impressão e mantendo a cota Vercel abaixo de 12 funções.
+- [x] Preparar a rota /operacao/estoque, os contratos e as regressões locais com estado explícito de ativação pendente e sem acesso ao Supabase.

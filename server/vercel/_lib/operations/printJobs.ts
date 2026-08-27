@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { ApiAuthError, createSupabaseAuthGuards, type AuthenticatedProfile } from "../../server/vercel/_lib/auth.js";
-import { asVercelNodeHandler, json, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http.js";
-import { createSupabaseAdmin } from "../../server/vercel/_lib/supabaseAdmin.js";
+import { ApiAuthError, createSupabaseAuthGuards, type AuthenticatedProfile } from "../auth.js";
+import { json, jsonError, methodNotAllowed } from "../http.js";
+import { createSupabaseAdmin } from "../supabaseAdmin.js";
 
 const requeueInput = z.object({
   orderId: z.string().uuid(),
@@ -47,7 +47,7 @@ export function createPrintJobsHandler(dependencies: PrintJobsDependencies) {
   };
 }
 
-async function listPrintJobs() {
+export async function listPrintJobs() {
   const client = createSupabaseAdmin();
   const { data, error } = await client.from("print_jobs")
     .select("id, order_id, station_code, document_type, priority, status, attempts, printer_name, printed_at, created_at, orders(code, source_channel)")
@@ -83,11 +83,11 @@ export async function requeueSupabasePrintJob(client: RequeuePrintRpcClient, inp
   };
 }
 
-async function requeuePrintJob(input: { orderId: string; actorUserId: string; reason: string }) {
+export async function requeuePrintJob(input: { orderId: string; actorUserId: string; reason: string }) {
   return requeueSupabasePrintJob(createSupabaseAdmin(), input);
 }
 
-async function markPrintJob(input: z.infer<typeof markInput>) {
+export async function markPrintJob(input: z.infer<typeof markInput>) {
   const client = createSupabaseAdmin();
   const { data, error } = await client.from("print_jobs")
     .update({
@@ -103,10 +103,8 @@ async function markPrintJob(input: z.infer<typeof markInput>) {
   return data;
 }
 
-function defaultPrintJobsHandler(request: Request): Promise<Response> {
+export function createDefaultPrintJobsHandler() {
   const client = createSupabaseAdmin();
   const guards = createSupabaseAuthGuards(client);
-  return createPrintJobsHandler({ requireOperator: guards.requireStaff, list: listPrintJobs, requeue: requeuePrintJob, mark: markPrintJob })(request);
+  return createPrintJobsHandler({ requireOperator: guards.requireStaff, list: listPrintJobs, requeue: requeuePrintJob, mark: markPrintJob });
 }
-
-export default asVercelNodeHandler(defaultPrintJobsHandler);

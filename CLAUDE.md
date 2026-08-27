@@ -4,7 +4,7 @@
 **Repositório autorizado:** `Alves1986/marmitas-tb` (privado)  
 **Produção:** <https://marmitastb.vercel.app>  
 **Idioma e moeda:** português brasileiro e real brasileiro (R$).  
-**Última atualização:** 21 de agosto de 2026.
+**Última atualização:** 27 de agosto de 2026.
 
 > Este arquivo é o ponto de partida para qualquer manutenção. Ele preserva decisões operacionais, limites de segurança e o fluxo de validação do projeto. Não registre senhas, tokens, chaves, dados pessoais de clientes ou credenciais de terceiros neste repositório.
 
@@ -20,6 +20,7 @@ A Marmitas TB é uma aplicação de delivery própria para Telêmaco Borba/PR. E
 | Acesso interno | `/acesso` | Equipe autorizada | E-mail e senha individuais |
 | Definição de senha | `/definir-senha` | Membro convidado | Convite e recuperação, condicionados a SMTP |
 | Operação | `/operacao` | `staff` e `admin` | Fila, status, alertas e impressão/reimpressão |
+| Estoque | `/operacao/estoque` | `staff` e `admin` | Interface preparada; persistência e lançamentos aguardam autorização de ativação no Supabase |
 | Despesas operacionais | `/operacao/despesas` | Perfil autorizado | Registro operacional de despesas |
 | Administração | `/admin` | `admin` | Financeiro, cardápio, equipe e configurações |
 
@@ -35,11 +36,13 @@ A Marmitas TB é uma aplicação de delivery própria para Telêmaco Borba/PR. E
 | Pagamentos | Asaas Sandbox | webhook e helpers de pagamento | Não ativar cobrança real sem autorização e homologação |
 | Implantação | GitHub privado e Vercel | `vercel.json`, repositório dedicado | Não enviar ao repositório `Alves1986/ministral` |
 
-O Plano Hobby da Vercel admite no máximo **12 funções serverless** por implantação. A arquitetura atual usa 10 funções, portanto não fragmente contratos existentes sem avaliar esse limite.[2]
+O Plano Hobby da Vercel admite no máximo **12 funções serverless** por implantação. A arquitetura atual usa 10 funções: os recursos de pedidos, alertas, impressão e estoque são roteados pelo dispatcher `api/operations/[resource].ts`. Não fragmente contratos existentes sem avaliar esse limite.[2]
 
 ## 3. Autorização e segurança
 
 Os perfis de acesso são `customer`, `staff` e `admin`. O cliente não acessa rotas internas; `staff` trabalha na fila; e `admin` também gerencia cardápio, equipe, configurações e finanças. A proteção precisa existir tanto na interface quanto nas funções de servidor.[2]
+
+No núcleo de estoque preparado, `staff` e `admin` poderão consultar a posição, registrar entrada e consumo interno quando a persistência for autorizada. Somente `admin` poderá cadastrar/inativar insumos e registrar perdas ou ajustes; estes exigirão motivo e auditoria. O saldo será sempre derivado de movimentações, nunca editado diretamente nem reduzido por pedidos nesta etapa.
 
 | Prática obrigatória | Regra |
 |---|---|
@@ -123,7 +126,7 @@ Se o preview falhar, investigue `.manus-logs/` pelo terminal. Para incidentes pu
 
 ## 8. Limites e pendências deliberadas
 
-O Asaas continua em Sandbox, sem cobranças reais. O SMTP transacional permanece desativado até a definição de um domínio institucional. Esses limites são decisões intencionais de segurança e operação; não tente contorná-los por código, dados fictícios ou configuração improvisada.[1] [2]
+O Asaas continua em Sandbox, sem cobranças reais. O SMTP transacional permanece desativado até a definição de um domínio institucional. A migração local `20260827120000_inventory_core.sql` também permanece **arquivada e não aplicada** por decisão do responsável; a rota `/operacao/estoque` não deve consultar ou escrever tabelas de estoque até nova autorização explícita. Esses limites são decisões intencionais de segurança e operação; não tente contorná-los por código, dados fictícios ou configuração improvisada.[1] [2]
 
 ## 9. Documentos de referência
 
@@ -135,6 +138,8 @@ O Asaas continua em Sandbox, sem cobranças reais. O SMTP transacional permanece
 | `docs/acesso-interno-por-senha-operacao.md` | Credenciais internas, convite e SMTP |
 | `docs/superpowers/specs/2026-08-21-totem-pedidos-rapidos-design.md` | Regras do totem demonstrativo |
 | `docs/superpowers/specs/2026-08-21-totem-finalizacao-acolhedora-design.md` | Regra de inatividade, finalização e encerramento manual |
+| `docs/superpowers/specs/2026-08-27-nucleo-estoque-design.md` | Limites, permissões e contrato do núcleo de estoque preparado |
+| `docs/superpowers/plans/2026-08-27-nucleo-estoque.md` | Plano técnico e condição de ativação futura no Supabase |
 
 ## Referências
 

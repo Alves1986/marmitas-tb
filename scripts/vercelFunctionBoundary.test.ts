@@ -22,16 +22,14 @@ async function listTypeScriptFiles(directory: string, relativeDirectory = ""): P
 }
 
 describe("fronteira de funções Vercel", () => {
-  it("mantém os doze handlers HTTP necessários em api, dentro do limite Hobby", async () => {
+  it("consolida recursos operacionais sem exceder o limite Hobby", async () => {
     await expect(listTypeScriptFiles(apiRoot)).resolves.toEqual([
       "admin/catalog.ts",
       "admin/finance.ts",
       "admin/settings.ts",
       "admin/staff.ts",
-      "operations/alerts.ts",
+      "operations/[resource].ts",
       "operations/counter-orders.ts",
-      "operations/orders.ts",
-      "operations/printJobs.ts",
       "public/kiosk-orders.ts",
       "public/menu.ts",
       "public/orders.ts",
@@ -51,9 +49,12 @@ describe("fronteira de funções Vercel", () => {
     const packageJson = JSON.parse(packageJsonText) as { scripts?: Record<string, string> };
 
     expect(vercelConfig.functions?.["api/**/*.ts"]?.includeFiles).toBe(
-      "{server/vercel/_lib/**/*.js,shared/operations.js}",
+      "{server/vercel/_lib/**/*.js,shared/operations.js,shared/inventory.js}",
     );
     expect(packageJson.scripts?.build).toContain("build:vercel-runtime");
+    expect(packageJson.scripts?.["build:vercel-runtime"]).toContain("server/vercel/_lib/operations/orders.ts");
+    expect(packageJson.scripts?.["build:vercel-runtime"]).toContain("server/vercel/_lib/operations/alerts.ts");
+    expect(packageJson.scripts?.["build:vercel-runtime"]).toContain("server/vercel/_lib/operations/printJobs.ts");
   });
 
   it("preserva as funções /api fora do fallback da aplicação de página única", async () => {

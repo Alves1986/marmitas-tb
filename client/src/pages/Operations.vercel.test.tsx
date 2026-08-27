@@ -60,6 +60,12 @@ describe("Operations no runtime Vercel", () => {
     expect((await screen.findByRole("link", { name: "Abrir tela de cozinha" })).getAttribute("href")).toBe("/operacao/cozinha");
   });
 
+  it("oferece à equipe um atalho para consultar o estoque", async () => {
+    render(<Operations />);
+
+    expect((await screen.findByRole("link", { name: "Abrir estoque" })).getAttribute("href")).toBe("/operacao/estoque");
+  });
+
   it("mantém o pedido pendente e mostra o erro quando o reconhecimento falha", async () => {
     mocks.acknowledgeAlert.mockRejectedValueOnce(new Error("Serviço indisponível"));
     render(<Operations />);

@@ -1,4 +1,4 @@
-import { ArrowLeft, ChefHat, ClipboardList, LayoutDashboard, LockKeyhole, LogIn, ShoppingBag } from "lucide-react";
+import { ArrowLeft, ChefHat, ClipboardList, LayoutDashboard, LockKeyhole, LogIn, PackageSearch, ShoppingBag } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { canAccessOperation } from "@shared/permissions";
@@ -109,6 +109,7 @@ export default function Operations() {
               <Button asChild variant="outline" className="border-[#c9b28f] text-[#481e1f] hover:bg-[#fff5df]"><a href="/admin"><LayoutDashboard aria-hidden="true" className="mr-2 size-4" />Gestão administrativa</a></Button>
               <Button asChild className="bg-[#a82926] text-white hover:bg-[#7e1f1d]"><a href="/operacao/pdv"><ShoppingBag aria-hidden="true" className="mr-2 size-4" />Abrir PDV de balcão</a></Button>
               <Button asChild variant="outline" className="border-[#c9b28f] text-[#481e1f] hover:bg-[#fff5df]"><a href="/operacao/cozinha"><ChefHat aria-hidden="true" className="mr-2 size-4" />Abrir tela de cozinha</a></Button>
+              <Button asChild variant="outline" className="border-[#c9b28f] text-[#481e1f] hover:bg-[#fff5df]"><a href="/operacao/estoque"><PackageSearch aria-hidden="true" className="mr-2 size-4" />Abrir estoque</a></Button>
               <Button asChild variant="outline" className="border-[#c9b28f] text-[#481e1f] hover:bg-[#fff5df]"><a href="/operacao/despesas">Registrar despesa</a></Button>
               <Button asChild variant="outline" className="border-[#c9b28f] text-[#481e1f] hover:bg-[#fff5df]"><a href="/"><ArrowLeft aria-hidden="true" className="mr-2 size-4" />Cardápio</a></Button>
             </div>

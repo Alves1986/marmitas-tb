@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { ApiAuthError, createSupabaseAuthGuards, type AuthenticatedProfile } from "../../server/vercel/_lib/auth.js";
-import { asVercelNodeHandler, json, jsonError, methodNotAllowed } from "../../server/vercel/_lib/http.js";
-import { assertTransition, OrderTransitionError } from "../../server/vercel/_lib/orders.js";
-import { orderStatuses, type OrderStatus } from "../../shared/operations.js";
-import { createSupabaseAdmin } from "../../server/vercel/_lib/supabaseAdmin.js";
+import { ApiAuthError, createSupabaseAuthGuards, type AuthenticatedProfile } from "../auth.js";
+import { json, jsonError, methodNotAllowed } from "../http.js";
+import { assertTransition, OrderTransitionError } from "../orders.js";
+import { orderStatuses, type OrderStatus } from "../../../../shared/operations.js";
+import { createSupabaseAdmin } from "../supabaseAdmin.js";
 
 const transitionInput = z.object({
   orderId: z.string().uuid(),
@@ -113,7 +113,7 @@ export function toOperationalOrder(order: RawOperationalOrder, acknowledgedAt: s
   };
 }
 
-async function listSupabaseOperationsOrders(): Promise<OperationalOrder[]> {
+export async function listSupabaseOperationsOrders(): Promise<OperationalOrder[]> {
   const client = createSupabaseAdmin();
   const { data, error } = await client
     .from("orders")
@@ -140,7 +140,7 @@ async function listSupabaseOperationsOrders(): Promise<OperationalOrder[]> {
   return ((data ?? []) as RawOperationalOrder[]).map((order) => toOperationalOrder(order, acknowledgedAtByOrderId.get(order.id) ?? null));
 }
 
-async function transitionSupabaseOrder(input: { orderId: string; nextStatus: OrderStatus; actorUserId: string }) {
+export async function transitionSupabaseOrder(input: { orderId: string; nextStatus: OrderStatus; actorUserId: string }) {
   const client = createSupabaseAdmin();
   const { data: currentOrder, error: currentError } = await client
     .from("orders")
@@ -172,14 +172,12 @@ async function transitionSupabaseOrder(input: { orderId: string; nextStatus: Ord
   return { id: updatedOrder.id, status: updatedOrder.status as OrderStatus };
 }
 
-function defaultOperationsOrdersHandler(request: Request): Promise<Response> {
+export function createDefaultOperationsOrdersHandler() {
   const client = createSupabaseAdmin();
   const guards = createSupabaseAuthGuards(client);
   return createOperationsOrdersHandler({
     requireStaff: guards.requireStaff,
     listOrders: listSupabaseOperationsOrders,
     transitionOrder: transitionSupabaseOrder,
-  })(request);
+  });
 }
-
-export default asVercelNodeHandler(defaultOperationsOrdersHandler);

@@ -11,6 +11,7 @@ import Home from "./pages/Home";
 import Operations from "./pages/Operations";
 import OperationsExpenses from "./pages/OperationsExpenses";
 import CounterPdv from "./pages/CounterPdv";
+import Inventory from "./pages/Inventory";
 import KitchenBoard from "./pages/KitchenBoard";
 import SetPassword from "./pages/SetPassword";
 import StaffAccess from "./pages/StaffAccess";
@@ -30,6 +31,7 @@ function Router() {
       <Route path={"/operacao/despesas"} component={OperationsExpenses} />
       <Route path={"/operacao/pdv"} component={CounterPdv} />
       <Route path={"/operacao/cozinha"} component={KitchenBoard} />
+      <Route path={"/operacao/estoque"} component={Inventory} />
       <Route path={"/admin"} component={Admin} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}

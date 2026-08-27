@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import * as printJobsApi from "../api/operations/printJobs.js";
+import * as printJobsApi from "./vercel/_lib/operations/printJobs.js";
 
 const { createPrintJobsHandler } = printJobsApi;
 

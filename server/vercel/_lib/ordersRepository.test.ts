@@ -58,3 +58,35 @@ describe("adaptador KIOSK", () => {
     });
   });
 });
+
+describe("adaptador COUNTER", () => {
+  it("constrói uma venda presencial confirmada sem integrar cobrança externa", () => {
+    const buildCounterUnifiedOrderPayload = Reflect.get(ordersRepository, "buildCounterUnifiedOrderPayload") as undefined | ((input: {
+      code: string;
+      idempotencyKey: string;
+      displayName?: string;
+      paymentMethod: "cash" | "pix" | "debit_card" | "credit_card" | "voucher";
+      orderItems: Array<{ productId: string; productName: string; unitPriceInCents: number; quantity: number; configuration: []; note: string }>;
+    }) => unknown);
+    expect(buildCounterUnifiedOrderPayload).toBeTypeOf("function");
+    if (!buildCounterUnifiedOrderPayload) return;
+
+    const payload = buildCounterUnifiedOrderPayload({
+      code: "TB-20260827-COUNTER",
+      idempotencyKey: "b2a5f4d8-9a4d-4d66-b1a9-9aa5f93c9241",
+      displayName: "Anderson",
+      paymentMethod: "debit_card",
+      orderItems: [{ productId: "19c4f23b-1e6d-4ca1-8e62-c44876fc65f2", productName: "Marmita", unitPriceInCents: 2500, quantity: 1, configuration: [], note: "" }],
+    });
+
+    expect(payload).toMatchObject({
+      sourceChannel: "COUNTER",
+      fulfillmentMethod: "pickup",
+      totalInCents: 2500,
+      status: "confirmado",
+      paymentMethod: "debit_card",
+      paymentStatus: "confirmed",
+      paymentProvider: "counter_record",
+    });
+  });
+});

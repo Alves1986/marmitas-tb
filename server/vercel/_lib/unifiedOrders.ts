@@ -51,8 +51,8 @@ export type UnifiedOrderPayload = {
   deliveryFeeInCents: number;
   totalInCents: number;
   status: "aguardando_pagamento" | "confirmado" | "em_preparo" | "saiu_para_entrega" | "pronto_para_retirada" | "concluido" | "cancelado";
-  paymentMethod: "pix" | "credit_card" | "voucher" | "cash";
-  paymentProvider: "asaas_test" | "asaas";
+  paymentMethod: "pix" | "credit_card" | "debit_card" | "voucher" | "cash";
+  paymentProvider: "asaas_test" | "asaas" | "counter_record";
   paymentStatus: "pending" | "confirmed" | "failed" | "cancelled" | "refunded";
   paymentReference?: string;
   items: UnifiedOrderItem[];
@@ -112,4 +112,65 @@ export async function persistUnifiedOrder(client: UnifiedOrderRpcClient, payload
   if (!row) throw new Error("O núcleo de pedidos não retornou confirmação.");
 
   return { id: row.order_id, code: row.order_code, createdAt: row.order_created_at, reused: row.reused };
+}
+
+export type CounterOrderPayload = {
+  code: string;
+  idempotencyKey: string;
+  displayName?: string;
+  subtotalInCents: number;
+  totalInCents: number;
+  paymentMethod: "cash" | "pix" | "debit_card" | "credit_card" | "voucher";
+  items: UnifiedOrderItem[];
+  actorUserId: string;
+  printStationCode?: string;
+};
+
+type CounterOrderRpcRow = {
+  order_id: string;
+  order_code: string;
+  order_created_at: string;
+  counter_ticket_date: string;
+  counter_ticket_number: number;
+  reused: boolean;
+};
+
+type CounterOrderRpcClient = {
+  rpc: (functionName: "create_counter_order", arguments_: Record<string, unknown>) => PromiseLike<{
+    data: CounterOrderRpcRow[] | null;
+    error: { message: string } | null;
+  }>;
+};
+
+export type PersistedCounterOrder = {
+  id: string;
+  code: string;
+  createdAt: string;
+  ticket: string;
+  reused: boolean;
+};
+
+export async function persistCounterOrder(client: CounterOrderRpcClient, payload: CounterOrderPayload): Promise<PersistedCounterOrder> {
+  const { data, error } = await client.rpc("create_counter_order", {
+    p_code: payload.code,
+    p_idempotency_key: payload.idempotencyKey,
+    p_display_name: payload.displayName?.trim() || null,
+    p_subtotal_in_cents: payload.subtotalInCents,
+    p_total_in_cents: payload.totalInCents,
+    p_payment_method: payload.paymentMethod,
+    p_items: payload.items,
+    p_actor_user_id: payload.actorUserId,
+    p_print_station_code: payload.printStationCode ?? "COZINHA",
+  });
+  if (error) throw new Error(`Não foi possível registrar o pedido de balcão: ${error.message}`);
+  const row = data?.[0];
+  if (!row) throw new Error("O PDV não recebeu confirmação do pedido de balcão.");
+
+  return {
+    id: row.order_id,
+    code: row.order_code,
+    createdAt: row.order_created_at,
+    ticket: `MTB-${String(row.counter_ticket_number).padStart(3, "0")}`,
+    reused: row.reused,
+  };
 }

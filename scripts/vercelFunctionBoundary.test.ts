@@ -22,13 +22,14 @@ async function listTypeScriptFiles(directory: string, relativeDirectory = ""): P
 }
 
 describe("fronteira de funções Vercel", () => {
-  it("mantém os onze handlers HTTP necessários em api, abaixo do limite Hobby", async () => {
+  it("mantém os doze handlers HTTP necessários em api, dentro do limite Hobby", async () => {
     await expect(listTypeScriptFiles(apiRoot)).resolves.toEqual([
       "admin/catalog.ts",
       "admin/finance.ts",
       "admin/settings.ts",
       "admin/staff.ts",
       "operations/alerts.ts",
+      "operations/counter-orders.ts",
       "operations/orders.ts",
       "operations/printJobs.ts",
       "public/kiosk-orders.ts",

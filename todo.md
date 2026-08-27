@@ -258,3 +258,15 @@
 - [x] Aplicar a migração compatível autorizada do núcleo unificado no Supabase, preservando pedidos existentes e preenchendo-os como OWN_APP.
 - [x] Conectar o totem ao catálogo persistido e criar pedidos KIOSK no mesmo núcleo, sem habilitar cobrança real.
 - [x] Ordenar a fila Vercel por prioridade e criação, atribuir prioridade máxima ao balcão e exigir motivo auditável em reimpressões.
+- [x] Projetar e aprovar o fluxo de PDV de balcão integrado ao núcleo unificado, preservando pagamentos reais inativos.
+- [x] Implementar o PDV de balcão para criar pedidos COUNTER com prioridade máxima de impressão e auditoria server-side.
+- [x] Incluir no PDV a configuração completa de produtos e o registro de pagamento operacional, sem integração de cobrança nesta fase.
+- [x] Exibir no PDV dinheiro, PIX, débito, crédito e voucher como registros internos de pagamento, sem processar transações.
+- [x] Gerar senha de retirada no PDV com nome do cliente opcional, sem exigir dados pessoais para concluir a venda de balcão.
+- [x] Confirmar o pedido COUNTER imediatamente após o registro presencial do pagamento e criar seu trabalho prioritário de impressão.
+- [x] Construir o PDV no formato híbrido aprovado: catálogo e carrinho no painel, configuração lateral e confirmação de pagamento em diálogo.
+- [x] Formalizar e revisar a especificação técnica aprovada do PDV híbrido antes da implementação.
+- [x] Preparar o plano técnico testável do PDV híbrido aprovado antes de alterar o código.
+- [x] Executar continuamente o plano aprovado do PDV, com TDD e checkpoint em cada marco estável.
+- [x] Adicionar a senha persistida de balcão e o adaptador transacional COUNTER de forma aditiva e compatível.
+- [x] Aplicar a migração Supabase autorizada do PDV de balcão e confirmar somente o esquema resultante.

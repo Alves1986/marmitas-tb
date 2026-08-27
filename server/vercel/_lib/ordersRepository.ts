@@ -1,7 +1,7 @@
 import { createTemporaryOrderCode } from "./orders.js";
 import { createSupabaseAdmin } from "./supabaseAdmin.js";
 import { createAsaasSandboxPixPayment } from "./asaasSandboxPayments.js";
-import { persistUnifiedOrder, type UnifiedOrderItem, type UnifiedOrderPayload } from "./unifiedOrders.js";
+import { persistCounterOrder, persistUnifiedOrder, type UnifiedOrderItem, type UnifiedOrderPayload } from "./unifiedOrders.js";
 import type { CreateKioskOrderInput, CreatePublicOrderInput, KioskOrderConfirmation, PublicOrderConfirmation, PublicTrackingOrder } from "../../../api/public/orders";
 
 type ProductRecord = { id: string; name: string; price_in_cents: number };
@@ -12,6 +12,24 @@ type OptionRecord = {
   label: string;
   price_delta_in_cents: number;
   is_required: boolean;
+};
+
+export type CounterPaymentMethod = "cash" | "pix" | "debit_card" | "credit_card" | "voucher";
+
+export type CreateCounterOrderInput = {
+  sourceChannel: "COUNTER";
+  idempotencyKey: string;
+  displayName?: string;
+  paymentMethod: CounterPaymentMethod;
+  actorUserId: string;
+  items: Array<{ productId: string; quantity: number; optionIds: string[]; note: string }>;
+};
+
+export type CounterOrderConfirmation = {
+  orderNumber: string;
+  ticket: string;
+  estimatedTime: string;
+  submittedAt: string;
 };
 
 type BuildOwnAppUnifiedOrderInput = {
@@ -30,6 +48,14 @@ type BuildKioskUnifiedOrderInput = {
   idempotencyKey: string;
   displayName?: string;
   paymentMethod: "pix" | "card";
+  orderItems: UnifiedOrderItem[];
+};
+
+type BuildCounterUnifiedOrderInput = {
+  code: string;
+  idempotencyKey: string;
+  displayName?: string;
+  paymentMethod: "cash" | "pix" | "debit_card" | "credit_card" | "voucher";
   orderItems: UnifiedOrderItem[];
 };
 
@@ -83,6 +109,32 @@ export function buildKioskUnifiedOrderPayload(input: BuildKioskUnifiedOrderInput
     paymentProvider: "asaas_test",
     paymentStatus: "confirmed",
     paymentReference: `kiosk_demo_${input.code}`,
+    items: input.orderItems,
+  };
+}
+
+export function buildCounterUnifiedOrderPayload(input: BuildCounterUnifiedOrderInput): UnifiedOrderPayload {
+  const subtotalInCents = input.orderItems.reduce((total, item) => total + item.unitPriceInCents * item.quantity, 0);
+
+  return {
+    code: input.code,
+    sourceChannel: "COUNTER",
+    idempotencyKey: input.idempotencyKey,
+    customer: {
+      name: input.displayName?.trim() || "Cliente de balcão",
+      phone: "BALCAO",
+      phoneLookup: "BALCAO",
+      notes: "Pagamento registrado presencialmente no PDV.",
+    },
+    fulfillmentMethod: "pickup",
+    subtotalInCents,
+    deliveryFeeInCents: 0,
+    totalInCents: subtotalInCents,
+    status: "confirmado",
+    paymentMethod: input.paymentMethod,
+    paymentProvider: "counter_record",
+    paymentStatus: "confirmed",
+    paymentReference: `counter_${input.code}`,
     items: input.orderItems,
   };
 }
@@ -271,6 +323,80 @@ export async function createSupabaseKioskOrder(input: CreateKioskOrderInput): Pr
 
   return {
     orderNumber: persisted.code,
+    estimatedTime: "15 a 25 min",
+    submittedAt: persisted.createdAt,
+  };
+}
+
+export async function createSupabaseCounterOrder(input: CreateCounterOrderInput): Promise<CounterOrderConfirmation> {
+  const client = createSupabaseAdmin();
+  const productIds = unique(input.items.map((item) => item.productId));
+  const { data: productData, error: productError } = await client
+    .from("products")
+    .select("id, name, price_in_cents")
+    .in("id", productIds)
+    .eq("is_active", true);
+  if (productError) throw new Error("Não foi possível validar os produtos do balcão.");
+
+  const products = (productData ?? []) as ProductRecord[];
+  const productsById = new Map(products.map((product) => [product.id, product]));
+  if (productsById.size !== productIds.length) throw new Error("Um dos produtos do balcão não está disponível.");
+
+  const { data: optionData, error: optionError } = await client
+    .from("product_options")
+    .select("id, product_id, group_name, label, price_delta_in_cents, is_required")
+    .in("product_id", productIds)
+    .eq("is_active", true);
+  if (optionError) throw new Error("Não foi possível validar as opções do balcão.");
+
+  const options = (optionData ?? []) as OptionRecord[];
+  const optionsById = new Map(options.map((option) => [option.id, option]));
+  const orderItems: UnifiedOrderItem[] = input.items.map((item) => {
+    const product = productsById.get(item.productId)!;
+    const selectedOptions = item.optionIds.map((optionId) => optionsById.get(optionId));
+    if (selectedOptions.some((option) => !option || option.product_id !== product.id)) {
+      throw new Error("Configuração de produto inválida no balcão.");
+    }
+
+    const selectedGroupNames = new Set(selectedOptions.map((option) => option!.group_name));
+    const requiredGroupNames = unique(
+      options.filter((option) => option.product_id === product.id && option.is_required).map((option) => option.group_name),
+    );
+    if (requiredGroupNames.some((groupName) => !selectedGroupNames.has(groupName))) {
+      throw new Error("Selecione as opções obrigatórias do produto no balcão.");
+    }
+
+    const optionTotal = selectedOptions.reduce((total, option) => total + option!.price_delta_in_cents, 0);
+    return {
+      productId: product.id,
+      productName: product.name,
+      unitPriceInCents: product.price_in_cents + optionTotal,
+      quantity: item.quantity,
+      configuration: selectedOptions.map((option) => ({
+        id: option!.id,
+        groupName: option!.group_name,
+        label: option!.label,
+        priceDeltaInCents: option!.price_delta_in_cents,
+      })),
+      note: item.note,
+    };
+  });
+
+  const code = createTemporaryOrderCode(new Date(), crypto.randomUUID());
+  const persisted = await persistCounterOrder(client, {
+    code,
+    idempotencyKey: input.idempotencyKey,
+    displayName: input.displayName,
+    subtotalInCents: orderItems.reduce((total, item) => total + item.unitPriceInCents * item.quantity, 0),
+    totalInCents: orderItems.reduce((total, item) => total + item.unitPriceInCents * item.quantity, 0),
+    paymentMethod: input.paymentMethod,
+    items: orderItems,
+    actorUserId: input.actorUserId,
+  });
+
+  return {
+    orderNumber: persisted.code,
+    ticket: persisted.ticket,
     estimatedTime: "15 a 25 min",
     submittedAt: persisted.createdAt,
   };

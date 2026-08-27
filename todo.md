@@ -309,3 +309,6 @@
 - [x] Concluir os controles administrativos de edição e inativação de insumos, mantendo histórico imutável, autorização server-side e confirmação antes da inativação.
 - [x] Reposicionar a entrada pública como aplicativo de venda, com identidade Marmitas TB, destaque para a marmita do dia e acesso principal para realizar pedido, preservando as áreas internas protegidas.
 - [x] Corrigir a indisponibilidade do endereço temporário de comparação visual usado para aprovar o novo layout de venda.
+- [x] Criar um tutorial de pedido para clientes, alinhado à nova entrada de venda e às etapas reais de catálogo, sacola, checkout e acompanhamento.
+- [x] Criar um tutorial de gestão para administradores, cobrindo acesso, painel, cardápio, equipe, financeiro, relatórios, operação, PDV, cozinha, estoque e limites externos.
+- [x] Adaptar o assistente de IA existente para oferecer ajuda contextual por perfil, com respostas ancoradas nos fluxos documentados e sem executar ações operacionais, financeiras ou administrativas.

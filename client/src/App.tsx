@@ -2,12 +2,15 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { InstallAppPrompt } from "@/components/pwa/InstallAppPrompt";
 import { OfflineNotice } from "@/components/pwa/OfflineNotice";
+import { HelpAssistant } from "@/components/help/HelpAssistant";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Admin from "./pages/Admin";
 import Home from "./pages/Home";
+import CustomerHelp from "./pages/CustomerHelp";
+import ManagementHelp from "./pages/ManagementHelp";
 import Operations from "./pages/Operations";
 import OperationsExpenses from "./pages/OperationsExpenses";
 import CounterPdv from "./pages/CounterPdv";
@@ -25,6 +28,8 @@ function Router() {
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/acompanhar"} component={TrackOrder} />
+      <Route path={"/ajuda/pedidos"} component={CustomerHelp} />
+      <Route path={"/ajuda/gestao"} component={ManagementHelp} />
       <Route path={"/totem"} component={Totem} />
       <Route path={"/chamadas"} component={PublicCalls} />
       <Route path={"/acesso"} component={StaffAccess} />
@@ -49,7 +54,7 @@ function Router() {
 
 function App() {
   const [location] = useLocation();
-  const isPublicRoute = location === "/" || location === "/acompanhar" || location === "/totem" || location === "/chamadas";
+  const isPublicRoute = location === "/" || location === "/acompanhar" || location === "/totem" || location === "/chamadas" || location === "/ajuda/pedidos";
 
   return (
     <ErrorBoundary>
@@ -61,6 +66,7 @@ function App() {
           {isPublicRoute && <OfflineNotice />}
           <Toaster />
           <Router />
+          <HelpAssistant path={location} />
           {isPublicRoute && <InstallAppPrompt />}
         </TooltipProvider>
       </ThemeProvider>

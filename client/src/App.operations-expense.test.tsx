@@ -15,6 +15,7 @@ vi.mock("./pages/NotFound", () => ({ default: () => <div>Página não encontrada
 vi.mock("./_core/hooks/useAuth", () => ({ useAuth: () => ({ loading: false, user: { id: "staff-1", role: "staff" } }) }));
 vi.mock("./components/pwa/InstallAppPrompt", () => ({ InstallAppPrompt: () => null }));
 vi.mock("./components/pwa/OfflineNotice", () => ({ OfflineNotice: () => null }));
+vi.mock("./components/help/HelpAssistant", () => ({ HelpAssistant: () => null }));
 
 import App from "./App";
 

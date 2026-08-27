@@ -1,10 +1,12 @@
 import { asVercelNodeHandler, jsonError } from "../../server/vercel/_lib/http.js";
 import { createDefaultOperationsAlertsHandler } from "../../server/vercel/_lib/operations/alerts.js";
+import { createDefaultHelpHandler } from "../../server/vercel/_lib/operations/help.js";
 import { createDefaultInventoryHandler } from "../../server/vercel/_lib/operations/inventory.js";
 import { createDefaultOperationsOrdersHandler } from "../../server/vercel/_lib/operations/orders.js";
 import { createDefaultPrintJobsHandler } from "../../server/vercel/_lib/operations/printJobs.js";
 
-export type OperationResource = "orders" | "alerts" | "inventory" | "printJobs";
+export const operationResources = ["orders", "alerts", "inventory", "printJobs", "help"] as const;
+export type OperationResource = typeof operationResources[number];
 export type OperationHandler = (request: Request) => Promise<Response>;
 export type OperationHandlerFactories = Record<OperationResource, () => OperationHandler>;
 
@@ -13,6 +15,7 @@ const defaultHandlerFactories: OperationHandlerFactories = {
   alerts: createDefaultOperationsAlertsHandler,
   inventory: createDefaultInventoryHandler,
   printJobs: createDefaultPrintJobsHandler,
+  help: createDefaultHelpHandler,
 };
 
 export function getOperationResource(request: Request): string | null {

@@ -23,6 +23,8 @@ A Marmitas TB é uma aplicação de delivery própria para Telêmaco Borba/PR. E
 | Estoque | `/operacao/estoque` | `staff` e `admin` | Saldo por movimentos, histórico e lançamentos auditáveis; sem baixa automática por pedido |
 | Despesas operacionais | `/operacao/despesas` | Perfil autorizado | Registro operacional de despesas |
 | Administração | `/admin` | `admin` | Financeiro, cardápio, equipe e configurações |
+| Ajuda de pedidos | `/ajuda/pedidos` | Cliente | Tutorial de pedido e PDF ilustrado complementar |
+| Ajuda de gestão | `/ajuda/gestao` | `staff` e `admin` | Tutorial operacional e administrativo protegido pela barreira de operação |
 
 ## 2. Arquitetura e diretórios importantes
 
@@ -32,11 +34,12 @@ A Marmitas TB é uma aplicação de delivery própria para Telêmaco Borba/PR. E
 | Rotas | Wouter | `client/src/App.tsx` | Registrar rotas públicas e internas de forma explícita |
 | Lógica do totem | React e estado local | `client/src/pages/Totem.tsx`, `client/src/lib/totem.ts` | Não introduzir Supabase, cobrança ou pedido real sem autorização específica |
 | API | Funções TypeScript para Vercel | `api/`, `server/vercel/_lib/` | Preservar autorização no servidor e contratos por domínio |
+| Assistência de ajuda | IA server-side sem ferramentas | `shared/helpContent.ts`, `server/vercel/_lib/operations/help.ts`, `client/src/components/help/` | Orientar por perfil sem mutações, dados pessoais ou credenciais |
 | Dados e acesso | Supabase Auth, Postgres e Storage | `api/`, cliente Supabase e migrações | Nunca expor privilégios administrativos ao navegador |
 | Pagamentos | Asaas Sandbox | webhook e helpers de pagamento | Não ativar cobrança real sem autorização e homologação |
 | Implantação | GitHub privado e Vercel | `vercel.json`, repositório dedicado | Não enviar ao repositório `Alves1986/ministral` |
 
-O Plano Hobby da Vercel admite no máximo **12 funções serverless** por implantação. A arquitetura atual usa 11 funções; pedidos, alertas, impressão e estoque são roteados pelo dispatcher `api/operations/[resource].ts`. Não fragmente contratos existentes sem avaliar esse limite.[2]
+O Plano Hobby da Vercel admite no máximo **12 funções serverless** por implantação. A arquitetura atual usa 11 funções; pedidos, alertas, impressão, estoque e ajuda são roteados pelo dispatcher `api/operations/[resource].ts`. Não fragmente contratos existentes sem avaliar esse limite.[2]
 
 ## 3. Autorização e segurança
 
@@ -50,6 +53,7 @@ No núcleo de estoque ativo, `staff` e `admin` consultam a posição e registram
 | Senhas | Exigir senha individual com 12 ou mais caracteres |
 | Segredos | `SUPABASE_SERVICE_ROLE_KEY`, chaves Asaas e tokens só podem existir no servidor/ambiente Vercel |
 | Dados pessoais | Não imprimir nem registrar telefone, endereço ou credenciais em logs/documentos |
+| Assistente de IA | Conversa efêmera, sem banco, ferramentas ou ações; rejeitar e-mail, CPF, telefone e UUID antes de consultar o modelo |
 | Revogação | Retirar acesso alterando o papel do membro pela gestão administrativa |
 | SMTP | Permanece pendente até que a empresa defina domínio institucional e conclua DNS/SMTP |
 
@@ -128,6 +132,8 @@ Se o preview falhar, investigue `.manus-logs/` pelo terminal. Para incidentes pu
 
 O Asaas continua em Sandbox, sem cobranças reais. O SMTP transacional permanece desativado até a definição de um domínio institucional. A migração aditiva `20260827120000_inventory_core.sql` foi aplicada como `inventory_core` no Supabase autorizado, sem criar insumos, saldos ou movimentos de teste. Esses limites são decisões intencionais de segurança e operação; não tente contorná-los por código, dados fictícios ou configuração improvisada.[1] [2]
 
+O assistente utiliza `claude-haiku-4-5` exclusivamente no servidor, pela operação consolidada `POST /api/operations/help`. A superfície enviada é validada; cliente e gestão são distinguidos no servidor, e sessão de `staff` ou `admin` é obrigatória nas telas internas. A conversa não é persistida e não recebe ferramentas, acesso ao banco, segredos, identificadores ou poderes de execução.
+
 ## 9. Documentos de referência
 
 | Documento | Uso |
@@ -140,6 +146,11 @@ O Asaas continua em Sandbox, sem cobranças reais. O SMTP transacional permanece
 | `docs/superpowers/specs/2026-08-21-totem-finalizacao-acolhedora-design.md` | Regra de inatividade, finalização e encerramento manual |
 | `docs/superpowers/specs/2026-08-27-nucleo-estoque-design.md` | Limites, permissões e contrato do núcleo de estoque ativo |
 | `docs/superpowers/plans/2026-08-27-nucleo-estoque.md` | Plano técnico e registro de ativação no Supabase |
+| `docs/superpowers/specs/2026-08-27-tutoriais-assistente-ia-design.md` | Escopo dos tutoriais por perfil e da assistência contextual somente orientativa |
+| `docs/superpowers/plans/2026-08-27-tutoriais-assistente-ia.md` | Plano técnico, contratos, testes e validação da ajuda integrada |
+| `docs/guias/tutorial-cliente-marmitas-tb.md` | Fonte editorial do tutorial de pedido ao cliente |
+| `docs/guias/tutorial-gestor-marmitas-tb.md` | Fonte editorial do tutorial completo de gestão |
+| `docs/guias/evidencias-tutoriais-2026-08-27.md` | Registro das capturas e revisão visual dos PDFs ilustrados |
 
 ## Referências
 

@@ -284,9 +284,9 @@
 - [x] Definir os dados mínimos de insumos e saldo operacional, sem baixa automática vinculada a pedidos nesta etapa.
 - [x] Definir autorização server-side: staff/admin para entrada e consumo; somente admin para perda e ajuste, sempre com motivo e auditoria.
 - [x] Definir cadastro mínimo de insumo com nome, unidade (kg, g, L, mL ou unidade) e estoque mínimo; formar saldo apenas por movimentações registradas.
-- [ ] Documentar e implementar a rota interna /operacao/estoque com lista de saldo, histórico e formulário de movimentações auditáveis.
+- [x] Documentar e implementar a rota interna /operacao/estoque com lista de saldo, histórico e formulário de movimentações auditáveis.
 - [x] Executar o incremento de estoque em branch local isolada, sem push GitHub ou publicação Vercel.
-- [ ] Aplicar futuramente a migração arquivada do núcleo de estoque e conectar a rota ao Supabase, somente após nova autorização explícita e sem dados de teste não autorizados.
+- [x] Aplicar a migração autorizada do núcleo de estoque e conectar a rota ao Supabase, sem inserir dados de teste não autorizados.
 - [x] Consolidar os recursos operacionais em um dispatcher dinâmico, preservando pedidos, alertas e impressão e mantendo a cota Vercel abaixo de 12 funções.
 - [x] Preparar a rota /operacao/estoque, os contratos e as regressões locais com estado explícito de ativação pendente e sem acesso ao Supabase.
 - [x] Levantar e aprovar transições controladas na tela de cozinha, com autorização server-side, prioridade COUNTER preservada e sem ações de impressão.
@@ -304,3 +304,6 @@
 - [x] Projetar uma única leitura pública server-side minimizada para até seis senhas COUNTER prontas, sem parâmetros e mantendo a Vercel em no máximo 11 funções.
 - [x] Preparar o plano técnico testável da tela pública de chamadas antes de alterar o código.
 - [x] Executar em etapas o plano aprovado do painel público de chamadas, com TDD, validação completa e checkpoint sem publicação.
+- [ ] Manter bloqueadas as credenciais Asaas e a configuração SMTP/domínio até nova autorização e insumos externos do responsável.
+- [x] Aplicar a migração aditiva arquivada do núcleo de estoque no Supabase, confirmar o esquema resultante e conectar o módulo sem inserir insumos, saldos ou movimentos de teste.
+- [x] Concluir os controles administrativos de edição e inativação de insumos, mantendo histórico imutável, autorização server-side e confirmação antes da inativação.

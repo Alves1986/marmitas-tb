@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
-import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { InventoryContent } from "./Inventory";
 import type { InventoryBoardItem } from "@/lib/inventoryBoard";
 
@@ -17,6 +17,8 @@ function inventoryItem(overrides: Partial<InventoryBoardItem> = {}): InventoryBo
   };
 }
 
+afterEach(() => cleanup());
+
 describe("Tela de estoque", () => {
   it("mostra resumo, busca e lançamentos permitidos à equipe", async () => {
     render(<InventoryContent role="staff" loadInventory={vi.fn().mockResolvedValue([
@@ -27,8 +29,8 @@ describe("Tela de estoque", () => {
     expect(await screen.findByRole("heading", { name: "Estoque" })).toBeTruthy();
     expect(screen.getByText("1 item crítico")).toBeTruthy();
     expect(screen.getByText("Estoque crítico")).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Registrar entrada" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Registrar consumo" })).toBeTruthy();
+    expect((screen.getByRole("button", { name: "Registrar entrada" }) as HTMLButtonElement).disabled).toBe(false);
+    expect((screen.getByRole("button", { name: "Registrar consumo" }) as HTMLButtonElement).disabled).toBe(false);
     expect(screen.queryByRole("button", { name: "Registrar perda" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Registrar ajuste" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Cadastrar insumo" })).toBeNull();
@@ -45,14 +47,52 @@ describe("Tela de estoque", () => {
     expect(screen.getByRole("button", { name: "Registrar perda" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Registrar ajuste" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Cadastrar insumo" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Editar insumo Arroz" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Inativar insumo Arroz" })).toBeTruthy();
   });
 
-  it("mostra estados de vazio e de ativação pendente de forma recuperável", async () => {
+  it("permite à administração editar e inativar um insumo somente após confirmação", async () => {
+    const updateItem = vi.fn().mockResolvedValue(undefined);
+    const setItemActive = vi.fn().mockResolvedValue(undefined);
+    render(<InventoryContent role="admin" loadInventory={vi.fn().mockResolvedValue([inventoryItem()])} updateItem={updateItem} setItemActive={setItemActive} />);
+
+    await screen.findByText("Arroz");
+    fireEvent.click(screen.getByRole("button", { name: "Editar insumo Arroz" }));
+    fireEvent.change(screen.getByLabelText("Nome do insumo"), { target: { value: "Arroz integral" } });
+    fireEvent.change(screen.getByLabelText("Estoque mínimo"), { target: { value: "3" } });
+    fireEvent.submit(screen.getByRole("button", { name: "Salvar alterações" }).closest("form")!);
+    await waitFor(() => expect(updateItem).toHaveBeenCalledWith({ inventoryItemId: "rice", name: "Arroz integral", minimumStock: 3 }));
+
+    fireEvent.click(screen.getByRole("button", { name: "Inativar insumo Arroz" }));
+    expect(screen.getByText("O histórico será preservado, mas novos lançamentos serão bloqueados.")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Confirmar inativação" }));
+    await waitFor(() => expect(setItemActive).toHaveBeenCalledWith({ inventoryItemId: "rice", isActive: false }));
+  });
+
+  it("permite que a equipe registre entrada com quantidade positiva e atualiza a posição", async () => {
+    const createMovement = vi.fn().mockResolvedValue(undefined);
+    render(<InventoryContent role="staff" loadInventory={vi.fn().mockResolvedValue([inventoryItem()])} createMovement={createMovement} createIdempotencyKey={() => "d94890f7-9f80-4cb6-9d14-f81e3d9ca0be"} />);
+
+    await screen.findByText("Arroz");
+    fireEvent.click(screen.getByRole("button", { name: "Registrar entrada" }));
+    fireEvent.change(screen.getByLabelText("Insumo"), { target: { value: "rice" } });
+    fireEvent.change(screen.getByLabelText("Quantidade"), { target: { value: "3" } });
+    expect((screen.getByRole("button", { name: "Confirmar entrada" }) as HTMLButtonElement).disabled).toBe(false);
+    fireEvent.submit(screen.getByRole("button", { name: "Confirmar entrada" }).closest("form")!);
+
+    await waitFor(() => expect(createMovement).toHaveBeenCalledWith(expect.objectContaining({
+      inventoryItemId: "rice",
+      type: "ENTRY",
+      quantityDelta: 3,
+    })));
+  });
+
+  it("mostra estados de vazio e falha recuperável de leitura", async () => {
     const { rerender } = render(<InventoryContent role="staff" loadInventory={vi.fn().mockResolvedValue([])} />);
     expect(await screen.findByText("Nenhum insumo cadastrado nesta etapa.")).toBeTruthy();
 
-    rerender(<InventoryContent role="staff" loadInventory={vi.fn().mockRejectedValue(new Error("O estoque está preparado e aguarda ativação da base de dados."))} />);
-    expect((await screen.findByRole("alert")).textContent).toContain("aguarda ativação da base de dados");
+    rerender(<InventoryContent role="staff" loadInventory={vi.fn().mockRejectedValue(new Error("Falha temporária"))} />);
+    expect((await screen.findByRole("alert")).textContent).toContain("Não foi possível carregar estoque.");
   });
 
   it("não consulta a API para perfil sem acesso operacional", () => {

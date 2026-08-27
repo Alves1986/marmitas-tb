@@ -1,6 +1,6 @@
 import { asVercelNodeHandler, jsonError } from "../../server/vercel/_lib/http.js";
 import { createDefaultOperationsAlertsHandler } from "../../server/vercel/_lib/operations/alerts.js";
-import { createDefaultInventoryUnavailableHandler } from "../../server/vercel/_lib/operations/inventory.js";
+import { createDefaultInventoryHandler } from "../../server/vercel/_lib/operations/inventory.js";
 import { createDefaultOperationsOrdersHandler } from "../../server/vercel/_lib/operations/orders.js";
 import { createDefaultPrintJobsHandler } from "../../server/vercel/_lib/operations/printJobs.js";
 
@@ -11,7 +11,7 @@ export type OperationHandlerFactories = Record<OperationResource, () => Operatio
 const defaultHandlerFactories: OperationHandlerFactories = {
   orders: createDefaultOperationsOrdersHandler,
   alerts: createDefaultOperationsAlertsHandler,
-  inventory: createDefaultInventoryUnavailableHandler,
+  inventory: createDefaultInventoryHandler,
   printJobs: createDefaultPrintJobsHandler,
 };
 

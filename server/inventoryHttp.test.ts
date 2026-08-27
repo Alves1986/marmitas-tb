@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { ApiAuthError, type AuthenticatedProfile } from "./vercel/_lib/auth.js";
-import { createInventoryHandler, createInventoryUnavailableHandler, type InventoryDependencies } from "./vercel/_lib/operations/inventory.js";
+import { createDefaultInventoryHandler, createInventoryHandler, createInventoryUnavailableHandler, type InventoryDependencies } from "./vercel/_lib/operations/inventory.js";
 
 const staff = {
   id: "5acb1c7d-1630-4b06-9f1e-9496bb3be555",
@@ -25,6 +25,10 @@ function createDependencies(actor: AuthenticatedProfile): InventoryDependencies 
 }
 
 describe("contrato HTTP de estoque", () => {
+  it("expõe o factory padrão do handler funcional após a ativação da persistência", () => {
+    expect(createDefaultInventoryHandler).toEqual(expect.any(Function));
+  });
+
   it("mantém o recurso protegido enquanto a persistência de estoque não foi ativada", async () => {
     const requireStaff = vi.fn().mockResolvedValue(staff);
     const handler = createInventoryUnavailableHandler(requireStaff);
@@ -113,6 +117,25 @@ describe("contrato HTTP de estoque", () => {
     expect(response.status).toBe(403);
     await expect(response.json()).resolves.toEqual({ error: "Acesso restrito à administração." });
     expect(dependencies.createItem).not.toHaveBeenCalled();
+  });
+
+  it("delegar edição e inativação para o repositório com autoria administrativa fixada no servidor", async () => {
+    const dependencies = createDependencies(admin);
+    const handler = createInventoryHandler(dependencies);
+
+    const updateResponse = await handler(new Request("https://app.test/api/operations/inventory", {
+      method: "PATCH",
+      body: JSON.stringify({ action: "update-item", inventoryItemId: itemId, name: "Arroz integral", minimumStock: 3 }),
+    }));
+    const inactivationResponse = await handler(new Request("https://app.test/api/operations/inventory", {
+      method: "PATCH",
+      body: JSON.stringify({ action: "set-item-active", inventoryItemId: itemId, isActive: false }),
+    }));
+
+    expect(updateResponse.status).toBe(200);
+    expect(inactivationResponse.status).toBe(200);
+    expect(dependencies.updateItem).toHaveBeenCalledWith({ inventoryItemId: itemId, name: "Arroz integral", minimumStock: 3, actorUserId: admin.id });
+    expect(dependencies.setItemActive).toHaveBeenCalledWith({ inventoryItemId: itemId, isActive: false, actorUserId: admin.id });
   });
 
   it("preserva respostas de autenticação do guarda operacional", async () => {

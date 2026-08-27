@@ -1,6 +1,6 @@
 # Núcleo inicial de estoque por movimentações — especificação de design
 
-**Status:** Experiência e contratos locais implementados; persistência Supabase arquivada e pendente de nova autorização.  
+**Status:** Implementado e conectado ao Supabase; nenhuma carga de dados de teste foi realizada.
 **Data:** 27/08/2026.  
 **Decisão arquitetural:** criar uma área operacional única em `/operacao/estoque`, onde o saldo de cada insumo é calculado a partir de movimentações imutáveis e auditáveis. Este incremento não altera pedidos, não baixa estoque automaticamente e não habilita compras, QR Code, lotes, validade ou integrações externas.
 
@@ -74,11 +74,11 @@ Em telas pequenas, a lista e o histórico serão exibidos em cartões, e o paine
 
 ## 6. Arquitetura, contrato e limite de funções
 
-O projeto já atingiu o limite de 12 handlers HTTP no plano Vercel Hobby. Portanto, este incremento não poderá acrescentar um décimo terceiro arquivo de função. A implementação consolidará o domínio operacional em uma rota dinâmica existente ou equivalente, sem criar novo handler líquido, preservando os contratos de pedidos já testados.
+O projeto possui 11 handlers HTTP no plano Vercel Hobby, cujo limite é 12. O estoque usa o dispatcher operacional dinâmico existente em `api/operations/[resource].ts`; portanto, sua ativação não acrescenta um novo handler líquido e preserva os contratos de pedidos já testados.
 
 O contrato interno terá operações de leitura para listar insumos, consultar o histórico e obter saldo calculado, além de comandos separados para criar ou manter insumos e registrar movimentos. Todas as escritas serão transacionais: validam sessão, papel, unidade, quantidade, saldo resultante e requisitos de motivo antes de inserir movimento e auditoria na mesma unidade de trabalho.
 
-Uma migração SQL aditiva será preparada para as tabelas, restrições, índices e funções de saldo necessárias. **Ela não será aplicada ao Supabase sem autorização explícita e específica para essa escrita de banco.** Durante esta fase de desenho e plano, nenhum pedido de teste, dado operacional ou alteração no Supabase será criado.
+Após autorização explícita do responsável, a migração aditiva `inventory_core` foi aplicada ao Supabase `marmitas-tb` em `sa-east-1`. Ela criou somente o esquema, restrições, índices, visão e funções do domínio; a conferência posterior registrou zero insumos e zero movimentos, sem pedido de teste, carga operacional ou alteração em pedidos.
 
 ## 7. Falhas, integridade e acessibilidade
 
@@ -96,10 +96,10 @@ Além dos testes focados, serão executados `pnpm test`, `pnpm check`, `pnpm bui
 
 As próximas fases poderão acrescentar ficha técnica, reserva ou consumo por produção, lotes, validade, QR Code, inventário contado, fornecedores, sugestão de compra e aprovação de pedidos de compra. Cada uma exigirá desenho e autorização próprios. Nenhuma delas é pressuposto para concluir este núcleo inicial.
 
-## 10. Registro de implementação local — 27/08/2026
+## 10. Registro de ativação — 27/08/2026
 
-O projeto passou a reservar a rota interna `/operacao/estoque`, protegida pela mesma barreira visual da operação. Enquanto a persistência não for autorizada, a tela deixa claro que o saldo e os lançamentos aguardam ativação da base de dados; ela não consulta, cria ou altera registros de estoque. Seus estados de permissão, lista, busca, alertas, vazio e falha são cobertos por regressões com dados injetáveis.
+O projeto disponibiliza a rota interna `/operacao/estoque`, protegida pela mesma barreira visual da operação. A tela consulta a posição calculada, permite busca, abre o histórico do insumo e oferece lançamentos conforme papel. Para administração, também há edição cadastral de nome/mínimo e inativação confirmada; o histórico é preservado e o item inativo não aceita novo lançamento. Ela também mantém estados acessíveis de carregamento, vazio e falha, cobertos por regressões com dependências injetáveis.
 
-Os contratos puros definem as unidades permitidas, os tipos de movimento, os sinais de entrada e saída, o motivo obrigatório para perdas e ajustes e a classificação de saldo. O endpoint interno de estoque também está preparado em modo protegido de indisponibilidade: valida sessão de equipe, retorna uma resposta explícita de ativação pendente e não acessa tabelas de inventário.
+Os contratos puros definem as unidades permitidas, os tipos de movimento, os sinais de entrada e saída, o motivo obrigatório para perdas e ajustes e a classificação de saldo. O endpoint interno agora valida sessão e papel no servidor, consulta a visão `inventory_item_balances`, chama as RPCs transacionais de cadastro, edição, inativação e movimento e retorna histórico sem dados de pedidos, clientes ou pagamentos. O saldo posterior exibido para cada movimento é calculado a partir do saldo atual menos os fatos mais recentes, preservando a semântica mesmo com a listagem em ordem decrescente.
 
-Para preservar a cota Vercel Hobby, as rotas internas de pedidos, alertas, impressão e estoque foram agrupadas em `api/operations/[resource].ts`, preservando as URLs existentes e reduzindo o conjunto de handlers HTTP para dez. A migração `20260827120000_inventory_core.sql` e seu roteiro de verificação foram criados apenas como arquivos locais; **não foram aplicados ao Supabase e nenhum insumo, saldo ou movimento foi inserido**.
+Para preservar a cota Vercel Hobby, as rotas internas de pedidos, alertas, impressão e estoque foram agrupadas em `api/operations/[resource].ts`, preservando as URLs existentes. A migração `20260827120000_inventory_core.sql` foi aplicada com sucesso como `inventory_core`; a leitura de confirmação final registrou **zero insumos e zero movimentos**, sem inserção de saldo inicial ou movimentação de teste. A validação integral encerrou com 351 testes aprovados e 2 pulados, tipagem, build PWA, runtime Vercel e `git diff --check` concluídos; a barreira da rota foi revisada em desktop e celular sem sessão.

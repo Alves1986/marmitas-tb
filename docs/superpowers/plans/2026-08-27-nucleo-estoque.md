@@ -6,7 +6,7 @@
 
 **Architecture:** O domínio introduz `inventory_items` e `inventory_movements` no Supabase. Uma RPC transacional valida o papel, o tipo, o sinal, a idempotência e o saldo resultante antes de registrar movimento e auditoria. Para continuar dentro do limite Vercel Hobby, os três handlers operacionais atuais serão consolidados em uma função dinâmica `api/operations/[resource].ts`, que preservará as URLs existentes e acrescentará `/api/operations/inventory` sem aumentar o número de funções HTTP.
 
-> **Registro de execução:** a consolidação de handlers, os contratos e a experiência local foram implementados em `feat/inventory-core`. Por decisão do responsável, a migração do Supabase foi somente arquivada; a parte de persistência e os comandos de escrita permanecem bloqueados até autorização futura específica.
+> **Registro de execução:** a consolidação de handlers, os contratos e a experiência local foram implementados em `feat/inventory-core`. Após autorização explícita do responsável, a migração `inventory_core` foi aplicada ao Supabase autorizado e a rota passou a usar a visão de saldo e RPCs transacionais reais. A conferência somente leitura final registrou zero insumos e zero movimentos; não houve carga de dados de teste.
 
 **Tech Stack:** React 19, TypeScript, Vite 7, Wouter, Tailwind 4, Vitest/happy-dom, Zod, Vercel Functions TypeScript e Supabase Postgres/Auth.
 
@@ -16,13 +16,13 @@
 
 | Arquivo | Responsabilidade |
 |---|---|
-| `supabase/migrations/20260827120000_inventory_core.sql` | Estruturas aditivas, visão de saldo, políticas de leitura e RPCs transacionais de estoque. **Somente preparar; aplicar após nova autorização explícita.** |
+| `supabase/migrations/20260827120000_inventory_core.sql` | Estruturas aditivas, visão de saldo, políticas de leitura e RPCs transacionais de estoque; aplicada como `inventory_core` após autorização explícita. |
 | `shared/inventory.ts` | Tipos e listas canônicas de unidades, tipos de movimento e estados de saldo, sem dependência de UI. |
 | `server/vercel/_lib/inventory.ts` | Validação pura de domínio, mapeamento das linhas do Supabase e cálculo de estado visual de saldo. |
 | `server/vercel/_lib/inventory.test.ts` | Regressões unitárias do domínio de estoque. |
 | `api/operations/[resource].ts` | Único dispatcher Vercel para `orders`, `alerts`, `printJobs` e `inventory`; preserva as rotas já públicas para a equipe. |
 | `api/operations/inventory.test.ts` | Contratos HTTP, autorização, validação, idempotência e erros recuperáveis do recurso de estoque. |
-| `client/src/services/operationsService.ts` | Contratos do cliente Vercel e métodos de leitura/escrita de estoque. |
+| `client/src/services/inventoryService.ts` | Contratos do cliente Vercel e métodos de leitura, movimento, cadastro, edição e inativação de estoque. |
 | `client/src/lib/inventoryBoard.ts` | Funções puras de filtros, classificação de alertas e apresentação segura do saldo. |
 | `client/src/lib/inventoryBoard.test.ts` | Regressões de busca, estados de alerta e ausência de ações não autorizadas. |
 | `client/src/pages/Inventory.tsx` | Rota interna de estoque responsiva, com resumo, lista, formulário e histórico. |
@@ -447,4 +447,4 @@
 | Migração somente após autorização | Task 3 |
 | Testes, build, revisão visual e checkpoint | Task 6 |
 
-Uma busca textual do plano não contém os marcadores proibidos `TBD`, `TODO`, `implement later` ou instruções vagas de validação. As assinaturas, unidades, tipos de movimento e nomes de rota são consistentes com a especificação aprovada.
+**Encerramento da execução:** as ações previstas de consulta, movimento, cadastro, edição e inativação estão conectadas ao Supabase, com autorização server-side, auditoria e idempotência delegadas às RPCs. O histórico calcula `balanceAfter` a partir do saldo atual e dos eventos mais recentes. A validação de 27/08/2026 registrou 351 testes aprovados e 2 pulados, além de tipagem, build PWA, runtime Vercel e `git diff --check` sem falhas; não houve push, publicação ou dados de teste.

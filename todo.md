@@ -307,3 +307,5 @@
 - [ ] Manter bloqueadas as credenciais Asaas e a configuração SMTP/domínio até nova autorização e insumos externos do responsável.
 - [x] Aplicar a migração aditiva arquivada do núcleo de estoque no Supabase, confirmar o esquema resultante e conectar o módulo sem inserir insumos, saldos ou movimentos de teste.
 - [x] Concluir os controles administrativos de edição e inativação de insumos, mantendo histórico imutável, autorização server-side e confirmação antes da inativação.
+- [x] Reposicionar a entrada pública como aplicativo de venda, com identidade Marmitas TB, destaque para a marmita do dia e acesso principal para realizar pedido, preservando as áreas internas protegidas.
+- [x] Corrigir a indisponibilidade do endereço temporário de comparação visual usado para aprovar o novo layout de venda.

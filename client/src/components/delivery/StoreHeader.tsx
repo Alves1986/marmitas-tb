@@ -28,9 +28,7 @@ export function StoreHeader() {
         </button>
 
         <nav className="hidden items-center gap-5 text-sm font-semibold text-[#664b3d] md:flex" aria-label="Navegação principal">
-          <button type="button" onClick={() => scrollToSection("cardapio")} className="transition-colors hover:text-[#a82926]">Cardápio</button>
-          <button type="button" onClick={() => scrollToSection("informacoes")} className="transition-colors hover:text-[#a82926]">Informações</button>
-          <button type="button" onClick={() => scrollToSection("contato")} className="transition-colors hover:text-[#a82926]">Contato</button>
+          <a href="/acompanhar" className="transition-colors hover:text-[#a82926]">Acompanhar pedido</a>
         </nav>
 
         <button

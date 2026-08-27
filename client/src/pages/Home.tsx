@@ -4,7 +4,6 @@ import { Hero } from "@/components/delivery/Hero";
 import { MobileCartBar } from "@/components/delivery/OrderActions";
 import { ProductCatalog } from "@/components/delivery/ProductCatalog";
 import { StoreHeader } from "@/components/delivery/StoreHeader";
-import { StoreInfo } from "@/components/delivery/StoreInfo";
 
 export default function Home() {
   return (
@@ -12,7 +11,6 @@ export default function Home() {
       <StoreHeader />
       <main>
         <Hero />
-        <StoreInfo />
         <ProductCatalog />
       </main>
       <footer id="contato" className="border-t border-[#e5d5bc] bg-[#f3ead8] py-10">

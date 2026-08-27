@@ -295,3 +295,12 @@
 - [x] Documentar e implementar ações diretas no cartão de cozinha, com uma única transição permitida por estado e atualização somente após resposta do servidor.
 - [x] Preparar o plano técnico testável das transições de cozinha aprovadas antes de alterar o código.
 - [x] Executar em etapas o plano aprovado das transições de cozinha, com TDD, validação completa e checkpoint sem publicação.
+- [x] Levantar e aprovar uma tela pública de chamadas de retirada, somente leitura, sem dados pessoais, impressão ou alteração de pedidos.
+- [x] Definir o painel público de chamadas para exibir somente a senha de retirada, sem nome, telefone, endereço, itens ou valores.
+- [x] Definir a tela pública para mostrar até seis senhas prontas, da mais recente para a mais antiga, com atualização automática a cada 10 segundos.
+- [x] Definir o layout principal do painel público para monitor horizontal 16:9, com contraste alto e adaptação em coluna única para manutenção móvel.
+- [x] Definir a chamada principal para a senha mais recente e até cinco senhas recentes, com logo Marmitas TB e atualização discreta.
+- [x] Restringir a primeira versão do painel público a pedidos COUNTER prontos com senha persistida, deixando aplicativo e totem fora até definição futura de identificadores públicos.
+- [x] Projetar uma única leitura pública server-side minimizada para até seis senhas COUNTER prontas, sem parâmetros e mantendo a Vercel em no máximo 11 funções.
+- [x] Preparar o plano técnico testável da tela pública de chamadas antes de alterar o código.
+- [x] Executar em etapas o plano aprovado do painel público de chamadas, com TDD, validação completa e checkpoint sem publicação.

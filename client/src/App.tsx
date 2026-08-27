@@ -13,6 +13,7 @@ import OperationsExpenses from "./pages/OperationsExpenses";
 import CounterPdv from "./pages/CounterPdv";
 import Inventory from "./pages/Inventory";
 import KitchenBoard from "./pages/KitchenBoard";
+import PublicCalls from "./pages/PublicCalls";
 import SetPassword from "./pages/SetPassword";
 import StaffAccess from "./pages/StaffAccess";
 import TrackOrder from "./pages/TrackOrder";
@@ -25,6 +26,7 @@ function Router() {
       <Route path={"/"} component={Home} />
       <Route path={"/acompanhar"} component={TrackOrder} />
       <Route path={"/totem"} component={Totem} />
+      <Route path={"/chamadas"} component={PublicCalls} />
       <Route path={"/acesso"} component={StaffAccess} />
       <Route path={"/definir-senha"} component={SetPassword} />
       <Route path={"/operacao"} component={Operations} />
@@ -47,7 +49,7 @@ function Router() {
 
 function App() {
   const [location] = useLocation();
-  const isPublicRoute = location === "/" || location === "/acompanhar" || location === "/totem";
+  const isPublicRoute = location === "/" || location === "/acompanhar" || location === "/totem" || location === "/chamadas";
 
   return (
     <ErrorBoundary>

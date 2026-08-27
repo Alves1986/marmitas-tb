@@ -33,6 +33,7 @@ describe("fronteira de funções Vercel", () => {
       "public/kiosk-orders.ts",
       "public/menu.ts",
       "public/orders.ts",
+      "public/ready-tickets.ts",
       "webhooks/asaas.ts",
     ]);
   });
@@ -55,6 +56,7 @@ describe("fronteira de funções Vercel", () => {
     expect(packageJson.scripts?.["build:vercel-runtime"]).toContain("server/vercel/_lib/operations/orders.ts");
     expect(packageJson.scripts?.["build:vercel-runtime"]).toContain("server/vercel/_lib/operations/alerts.ts");
     expect(packageJson.scripts?.["build:vercel-runtime"]).toContain("server/vercel/_lib/operations/printJobs.ts");
+    expect(packageJson.scripts?.["build:vercel-runtime"]).toContain("server/vercel/_lib/publicReadyTickets.ts");
   });
 
   it("preserva as funções /api fora do fallback da aplicação de página única", async () => {

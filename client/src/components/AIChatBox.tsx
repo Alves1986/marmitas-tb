@@ -197,7 +197,7 @@ export function AIChatBox({
     >
       {/* Messages Area */}
       <div ref={scrollAreaRef} className="flex-1 overflow-hidden">
-        {displayMessages.length === 0 ? (
+        {displayMessages.length === 0 && !isLoading ? (
           <div className="flex h-full flex-col p-4">
             <div className="flex flex-1 flex-col items-center justify-center gap-6 text-muted-foreground">
               <div className="flex flex-col items-center gap-3">
@@ -282,6 +282,9 @@ export function AIChatBox({
               {isLoading && (
                 <div
                   className="flex items-start gap-3"
+                  role="status"
+                  aria-live="polite"
+                  aria-label="Assistente está preparando uma resposta"
                   style={
                     minHeightForLastMessage > 0
                       ? { minHeight: `${minHeightForLastMessage}px` }
@@ -289,10 +292,15 @@ export function AIChatBox({
                   }
                 >
                   <div className="size-8 shrink-0 mt-1 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Sparkles className="size-4 text-primary" />
+                    <Sparkles className="size-4 text-primary" aria-hidden="true" />
                   </div>
-                  <div className="rounded-lg bg-muted px-4 py-2.5">
-                    <Loader2 className="size-4 animate-spin text-muted-foreground" />
+                  <div className="rounded-2xl bg-muted px-4 py-3 text-sm text-muted-foreground">
+                    <span className="typing-dots" aria-hidden="true">
+                      <span data-testid="typing-dot" />
+                      <span data-testid="typing-dot" />
+                      <span data-testid="typing-dot" />
+                    </span>
+                    <span className="ml-2">Preparando orientação…</span>
                   </div>
                 </div>
               )}

@@ -289,3 +289,9 @@
 - [ ] Aplicar futuramente a migração arquivada do núcleo de estoque e conectar a rota ao Supabase, somente após nova autorização explícita e sem dados de teste não autorizados.
 - [x] Consolidar os recursos operacionais em um dispatcher dinâmico, preservando pedidos, alertas e impressão e mantendo a cota Vercel abaixo de 12 funções.
 - [x] Preparar a rota /operacao/estoque, os contratos e as regressões locais com estado explícito de ativação pendente e sem acesso ao Supabase.
+- [x] Levantar e aprovar transições controladas na tela de cozinha, com autorização server-side, prioridade COUNTER preservada e sem ações de impressão.
+- [x] Definir e aprovar as ações de cozinha confirmado → em_preparo e em_preparo → pronto_para_retirada, sem cancelamento, retorno ou reimpressão.
+- [x] Definir interação de cozinha sem modal: aguardar resposta server-side, bloquear repetição e exibir falha recuperável por cartão.
+- [x] Documentar e implementar ações diretas no cartão de cozinha, com uma única transição permitida por estado e atualização somente após resposta do servidor.
+- [x] Preparar o plano técnico testável das transições de cozinha aprovadas antes de alterar o código.
+- [x] Executar em etapas o plano aprovado das transições de cozinha, com TDD, validação completa e checkpoint sem publicação.

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildKitchenBoard, type KitchenOrder } from "./kitchenBoard";
+import { buildKitchenBoard, getKitchenOrderAction, type KitchenOrder } from "./kitchenBoard";
 
 function order(overrides: Partial<KitchenOrder> = {}): KitchenOrder {
   return {
@@ -17,6 +17,13 @@ function order(overrides: Partial<KitchenOrder> = {}): KitchenOrder {
 }
 
 describe("buildKitchenBoard", () => {
+  it("expõe somente a próxima ação permitida para os estados ativos da cozinha", () => {
+    expect(getKitchenOrderAction("confirmado")).toEqual({ label: "Iniciar preparo", nextStatus: "em_preparo" });
+    expect(getKitchenOrderAction("em_preparo")).toEqual({ label: "Marcar pronto", nextStatus: "pronto_para_retirada" });
+    expect(getKitchenOrderAction("pronto_para_retirada")).toBeNull();
+    expect(getKitchenOrderAction("concluido")).toBeNull();
+  });
+
   it("destaca COUNTER ativo sem duplicá-lo nas colunas e mantém a ordem mais antiga primeiro", () => {
     const board = buildKitchenBoard([
       order({ id: "own-new", createdAt: "2026-08-27T12:10:00.000Z" }),

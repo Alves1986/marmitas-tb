@@ -10,10 +10,21 @@ export type KitchenBoard = {
   ready: KitchenOrder[];
 };
 
+export type KitchenOrderAction = {
+  label: "Iniciar preparo" | "Marcar pronto";
+  nextStatus: "em_preparo" | "pronto_para_retirada";
+};
+
 const kitchenActiveStatuses = new Set<OrderStatus>(["confirmado", "em_preparo", "pronto_para_retirada"]);
 
 export function isKitchenActiveStatus(status: OrderStatus): boolean {
   return kitchenActiveStatuses.has(status);
+}
+
+export function getKitchenOrderAction(status: OrderStatus): KitchenOrderAction | null {
+  if (status === "confirmado") return { label: "Iniciar preparo", nextStatus: "em_preparo" };
+  if (status === "em_preparo") return { label: "Marcar pronto", nextStatus: "pronto_para_retirada" };
+  return null;
 }
 
 export function sortOldestFirst(left: KitchenOrder, right: KitchenOrder): number {

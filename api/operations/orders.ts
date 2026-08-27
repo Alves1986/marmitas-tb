@@ -13,6 +13,8 @@ const transitionInput = z.object({
 type OperationalOrder = {
   id: string;
   code: string;
+  sourceChannel: "OWN_APP" | "KIOSK" | "COUNTER" | "IFOOD" | "PHONE" | "WHATSAPP" | "INTERNAL";
+  counterTicket: string | null;
   customerName: string;
   customerPhone: string;
   fulfillmentMethod: "delivery" | "pickup";
@@ -67,6 +69,8 @@ type RawOperationalItem = { product_name: string; quantity: number; unit_price_i
 type RawOperationalOrder = {
   id: string;
   code: string;
+  source_channel: "OWN_APP" | "KIOSK" | "COUNTER" | "IFOOD" | "PHONE" | "WHATSAPP" | "INTERNAL";
+  counter_ticket_number: number | null;
   customer_name: string;
   customer_phone: string;
   fulfillment_method: "delivery" | "pickup";
@@ -80,11 +84,40 @@ type RawOperationalOrder = {
   order_items: RawOperationalItem[] | null;
 };
 
+export function toOperationalOrder(order: RawOperationalOrder, acknowledgedAt: string | null): OperationalOrder {
+  return {
+    id: order.id,
+    code: order.code,
+    sourceChannel: order.source_channel,
+    counterTicket: order.source_channel === "COUNTER" && typeof order.counter_ticket_number === "number"
+      ? `MTB-${String(order.counter_ticket_number).padStart(3, "0")}`
+      : null,
+    customerName: order.customer_name,
+    customerPhone: order.customer_phone,
+    fulfillmentMethod: order.fulfillment_method,
+    deliveryAddress: order.delivery_address,
+    customerNotes: order.customer_notes,
+    totalInCents: order.total_in_cents,
+    status: order.status,
+    paymentMethod: order.payment_method,
+    paymentStatus: order.payment_status,
+    acknowledgedAt,
+    createdAt: order.created_at,
+    items: (order.order_items ?? []).map((item) => ({
+      productName: item.product_name,
+      quantity: item.quantity,
+      unitPriceInCents: item.unit_price_in_cents,
+      configuration: item.configuration,
+      notes: item.notes,
+    })),
+  };
+}
+
 async function listSupabaseOperationsOrders(): Promise<OperationalOrder[]> {
   const client = createSupabaseAdmin();
   const { data, error } = await client
     .from("orders")
-    .select("id, code, customer_name, customer_phone, fulfillment_method, delivery_address, customer_notes, total_in_cents, status, payment_method, payment_status, created_at, order_items(product_name, quantity, unit_price_in_cents, configuration, notes)")
+    .select("id, code, source_channel, counter_ticket_number, customer_name, customer_phone, fulfillment_method, delivery_address, customer_notes, total_in_cents, status, payment_method, payment_status, created_at, order_items(product_name, quantity, unit_price_in_cents, configuration, notes)")
     .in("status", ["aguardando_pagamento", "confirmado", "em_preparo", "saiu_para_entrega", "pronto_para_retirada"])
     .order("created_at", { ascending: false });
   if (error) throw new Error("Não foi possível carregar a fila operacional.");
@@ -104,28 +137,7 @@ async function listSupabaseOperationsOrders(): Promise<OperationalOrder[]> {
     }
   }
 
-  return ((data ?? []) as RawOperationalOrder[]).map((order) => ({
-    id: order.id,
-    code: order.code,
-    customerName: order.customer_name,
-    customerPhone: order.customer_phone,
-    fulfillmentMethod: order.fulfillment_method,
-    deliveryAddress: order.delivery_address,
-    customerNotes: order.customer_notes,
-    totalInCents: order.total_in_cents,
-    status: order.status,
-    paymentMethod: order.payment_method,
-    paymentStatus: order.payment_status,
-    acknowledgedAt: acknowledgedAtByOrderId.get(order.id) ?? null,
-    createdAt: order.created_at,
-    items: (order.order_items ?? []).map((item) => ({
-      productName: item.product_name,
-      quantity: item.quantity,
-      unitPriceInCents: item.unit_price_in_cents,
-      configuration: item.configuration,
-      notes: item.notes,
-    })),
-  }));
+  return ((data ?? []) as RawOperationalOrder[]).map((order) => toOperationalOrder(order, acknowledgedAtByOrderId.get(order.id) ?? null));
 }
 
 async function transitionSupabaseOrder(input: { orderId: string; nextStatus: OrderStatus; actorUserId: string }) {

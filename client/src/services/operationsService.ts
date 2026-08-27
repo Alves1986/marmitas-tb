@@ -6,6 +6,8 @@ export type OperationsApi = <T>(path: string, init?: { method?: string; body?: u
 export type VercelOperationalOrder = {
   id: string;
   code: string;
+  sourceChannel: "OWN_APP" | "KIOSK" | "COUNTER" | "IFOOD" | "PHONE" | "WHATSAPP" | "INTERNAL";
+  counterTicket: string | null;
   customerName: string;
   customerPhone: string;
   fulfillmentMethod: "delivery" | "pickup";

@@ -11,6 +11,7 @@ import Home from "./pages/Home";
 import Operations from "./pages/Operations";
 import OperationsExpenses from "./pages/OperationsExpenses";
 import CounterPdv from "./pages/CounterPdv";
+import KitchenBoard from "./pages/KitchenBoard";
 import SetPassword from "./pages/SetPassword";
 import StaffAccess from "./pages/StaffAccess";
 import TrackOrder from "./pages/TrackOrder";
@@ -28,6 +29,7 @@ function Router() {
       <Route path={"/operacao"} component={Operations} />
       <Route path={"/operacao/despesas"} component={OperationsExpenses} />
       <Route path={"/operacao/pdv"} component={CounterPdv} />
+      <Route path={"/operacao/cozinha"} component={KitchenBoard} />
       <Route path={"/admin"} component={Admin} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}

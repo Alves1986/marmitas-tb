@@ -270,3 +270,12 @@
 - [x] Executar continuamente o plano aprovado do PDV, com TDD e checkpoint em cada marco estável.
 - [x] Adicionar a senha persistida de balcão e o adaptador transacional COUNTER de forma aditiva e compatível.
 - [x] Aplicar a migração Supabase autorizada do PDV de balcão e confirmar somente o esquema resultante.
+- [x] Levantar e aprovar o próximo incremento de produção e impressão apoiado pela fila unificada, sem ativar agente local ou hardware.
+- [x] Projetar uma tela de cozinha separada, com comandas por estado e prioridade COUNTER visível, sem ativar agente ou hardware.
+- [x] Manter a tela de cozinha somente consulta, sem controles de transição, cancelamento ou reimpressão de pedidos.
+- [x] Exibir na tela de cozinha apenas pedidos ativos em Novo pedido, Em preparo e Pronto para retirada.
+- [x] Organizar a tela de cozinha com faixa prioritária COUNTER e colunas por estado para os demais pedidos ativos.
+- [x] Formalizar e revisar a especificação técnica da tela de cozinha aprovada antes da implementação.
+- [x] Preparar o plano técnico testável da tela de cozinha aprovada antes de alterar o código.
+- [x] Executar continuamente o plano aprovado da tela de cozinha, com TDD e checkpoint por marco estável.
+- [x] Ampliar o contrato operacional de leitura com origem do pedido e senha COUNTER para a projeção de cozinha.

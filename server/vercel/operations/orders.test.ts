@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { ApiAuthError } from "../_lib/auth";
-import { createOperationsOrdersHandler } from "../../../api/operations/orders";
+import { createOperationsOrdersHandler, toOperationalOrder } from "../../../api/operations/orders";
 
 const staff = {
   id: "d9071683-ba84-45a8-bb4d-3f026d356fe0",
@@ -10,6 +10,28 @@ const staff = {
 };
 
 describe("/api/operations/orders", () => {
+  it("projeta origem e senha persistida de um pedido COUNTER para leitura interna", () => {
+    const order = toOperationalOrder({
+      id: "order-uuid",
+      code: "TB-20260827-COUNTER",
+      customer_name: "Cliente de balcão",
+      customer_phone: "BALCAO",
+      fulfillment_method: "pickup",
+      delivery_address: null,
+      customer_notes: "Pagamento registrado presencialmente no PDV.",
+      total_in_cents: 2500,
+      status: "confirmado",
+      payment_method: "cash",
+      payment_status: "confirmed",
+      source_channel: "COUNTER",
+      counter_ticket_number: 1,
+      created_at: "2026-08-27T12:00:00.000Z",
+      order_items: [],
+    }, null);
+
+    expect(order).toEqual(expect.objectContaining({ sourceChannel: "COUNTER", counterTicket: "MTB-001" }));
+  });
+
   it("não expõe a fila para um usuário sem papel operacional", async () => {
     const handler = createOperationsOrdersHandler({
       requireStaff: vi.fn().mockRejectedValue(new ApiAuthError(403, "Acesso restrito à equipe.")),

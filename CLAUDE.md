@@ -134,6 +134,16 @@ O Asaas continua em Sandbox, sem cobranças reais. O SMTP transacional permanece
 
 O assistente utiliza `claude-haiku-4-5` exclusivamente no servidor, pela operação consolidada `POST /api/operations/help`. A superfície enviada é validada; cliente e gestão são distinguidos no servidor, e sessão de `staff` ou `admin` é obrigatória nas telas internas. A conversa não é persistida e não recebe ferramentas, acesso ao banco, segredos, identificadores ou poderes de execução.
 
+### 8.1 Pendências que dependem do cliente
+
+Não há pendências internas verificáveis abertas nesta etapa. As integrações abaixo permanecem propositalmente bloqueadas até que o responsável forneça os insumos externos; não criar valores fictícios, não habilitar cobrança e não enviar e-mails de teste antes disso.
+
+| Integração | Insumos que o cliente deve fornecer ou aprovar | Próxima ação permitida depois dos insumos |
+|---|---|---|
+| Asaas Sandbox | Chave de API e token de webhook válidos, com autorização de uso em homologação | Configurar variáveis privadas, executar sonda somente leitura e validar o webhook sem cobrança real |
+| SMTP transacional | Provedor escolhido, conta vinculada, host, porta, usuário, senha e remetente verificado | Configurar o Supabase e testar convite/recuperação somente com autorização operacional |
+| Domínio institucional | Nome do domínio, definição de compra ou vínculo e acesso para validação DNS | Verificar DNS do remetente e concluir a identidade de envio do SMTP |
+
 ## 9. Documentos de referência
 
 | Documento | Uso |

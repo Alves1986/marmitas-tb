@@ -312,3 +312,4 @@
 - [x] Criar um tutorial de pedido para clientes, alinhado à nova entrada de venda e às etapas reais de catálogo, sacola, checkout e acompanhamento.
 - [x] Criar um tutorial de gestão para administradores, cobrindo acesso, painel, cardápio, equipe, financeiro, relatórios, operação, PDV, cozinha, estoque e limites externos.
 - [x] Adaptar o assistente de IA existente para oferecer ajuda contextual por perfil, com respostas ancoradas nos fluxos documentados e sem executar ações operacionais, financeiras ou administrativas.
+- [x] Classificar as pendências abertas entre execução interna e dependências externas do cliente, mantendo domínio, SMTP e pagamentos bloqueados até o fornecimento dos insumos necessários.
